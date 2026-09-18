@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Русификаторы с Клодом</title>
+<meta name="description" content="Каталог русификаторов для игр, собранных вместе с нейросетью Claude. Установщики, инструкции и обратная связь.">
+<meta property="og:title" content="Русификаторы с Клодом">
+<meta property="og:description" content="Каталог русификаторов для игр, собранных вместе с нейросетью Claude.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="head">
+    <div class="head-text">
+      <h1>Русификаторы <span class="by">с Клодом</span></h1>
+      <p>Переводы игр на русский, собранные вместе с нейросетью Claude.
+         Каждый — установщик, который сам находит игру, делает резервные копии
+         и умеет вернуть всё как было.</p>
+    </div>
+    <div class="mascot"><img src="assets/mascot-wave.png" alt=""></div>
+  </header>
+
+  <main id="catalog">
+    <p class="empty">Каталог загружается…</p>
+  </main>
+
+  <section class="section">
+    <h2 class="section-title">Как поставить</h2>
+    <ol class="steps">
+      <li><b>Закройте игру.</b> Установщик правит файлы игры — с запущенной это не сработает.</li>
+      <li>Скачайте <b>.exe</b> со страницы релиза и запустите.</li>
+      <li>Путь искать не нужно: установщик сам находит игру по библиотекам Steam. Проверьте, что путь верный, и нажмите <b>Установить</b>.</li>
+      <li>Передумали — откройте установщик снова и нажмите <b>Удалить</b>: он вернёт оригинальные файлы из резервных копий.</li>
+    </ol>
+    <p class="notice"><b>SmartScreen.</b> Установщик не подписан цифровой подписью, поэтому Windows
+       на него ругается — это реакция на незнакомый файл, а не находка антивируса.
+       «Подробнее» → «Выполнить в любом случае». Исходный код всего, чем правятся файлы,
+       открыт и лежит в репозиториях.</p>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Нашли ошибку?</h2>
+    <p class="summary">Переводы большие, и что-то наверняка проскочило: непереведённая фраза,
+       опечатка, кривая текстура, вылет. Напишите об этом в
+       <a href="https://github.com/e24x5-Fox/claude-rus-hub/issues">Issues</a>
+       или в комментариях под руководством в Steam — со скриншотом, если он есть.
+       Правки собираются и выходят следующей версией.</p>
+  </section>
+
+  <footer class="foot">
+    <div class="links">
+      <a href="https://github.com/e24x5-Fox/claude-rus-hub">Репозиторий</a>
+      <a href="https://github.com/e24x5-Fox/claude-rus-hub/releases">Релизы</a>
+      <a href="https://github.com/e24x5-Fox/claude-rus-hub/issues">Сообщить об ошибке</a>
+    </div>
+    <div class="mascot"><img src="assets/mascot-calm.png" alt=""></div>
+  </footer>
+
+</div>
+
+<script src="games.js"></script>
+<script>
+/* Страница строится из window.CATALOG (games.js). Править разметку карточек
+   при добавлении игры не нужно — только данные. */
+(function () {
+  var STATUS = {
+    released: { cls: 'ready', label: 'готово' },
+    wip:      { cls: 'wip',   label: 'в работе' },
+    planned:  { cls: 'wip',   label: 'в планах' }
+  };
+  var GROUPS = [
+    { key: 'released', title: 'Готовые переводы' },
+    { key: 'wip',      title: 'В работе' },
+    { key: 'planned',  title: 'В планах' }
+  ];
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  function link(href, cls, text) {
+    var a = el('a', cls, text);
+    a.href = href;
+    if (/^https?:/.test(href)) { a.rel = 'noopener'; }
+    return a;
+  }
+
+  function card(game) {
+    var st = STATUS[game.status] || STATUS.wip;
+    var c = el('article', 'card' + (game.status === 'released' ? '' : ' wip'));
+
+    if (game.banner) {
+      var img = el('img', 'banner');
+      img.src = game.banner;
+      img.alt = game.title;
+      img.loading = 'lazy';
+      c.appendChild(img);
+    }
+
+    var body = el('div', 'card-body');
+    body.appendChild(el('h2', null, game.title));
+
+    var tags = el('div', 'tags');
+    tags.appendChild(el('span', 'tag ' + st.cls, st.label));
+    if (game.version) { tags.appendChild(el('span', 'tag', 'v' + game.version)); }
+    (game.tags || []).forEach(function (t) {
+      tags.appendChild(el('span', 'tag' + (t === '18+' ? ' adult' : ''), t));
+    });
+    body.appendChild(tags);
+
+    if (game.summary) { body.appendChild(el('p', 'summary', game.summary)); }
+
+    if (game.scope && game.scope.length) {
+      var stats = el('div', 'stats');
+      game.scope.forEach(function (s) {
+        var tile = el('div', 'stat');
+        tile.appendChild(el('span', 'v', s.value));
+        tile.appendChild(el('span', 'k', s.label));
+        stats.appendChild(tile);
+      });
+      body.appendChild(stats);
+    }
+
+    var links = game.links || {};
+    var actions = el('div', 'actions');
+    if (links.download) { actions.appendChild(link(links.download, 'btn btn-primary', 'Скачать русификатор')); }
+    if (links.guide)    { actions.appendChild(link(links.guide, 'btn btn-mini', 'Руководство в Steam')); }
+    if (links.steam)    { actions.appendChild(link(links.steam, 'btn btn-mini', 'Игра в Steam')); }
+    if (game.install_size && links.download) { actions.appendChild(el('span', 'size', game.install_size)); }
+    if (actions.childNodes.length) { body.appendChild(actions); }
+
+    if (game.note) { body.appendChild(el('p', 'note', game.note)); }
+
+    c.appendChild(body);
+    return c;
+  }
+
+  var root = document.getElementById('catalog');
+  var data = window.CATALOG;
+
+  if (!data || !data.games || !data.games.length) {
+    root.innerHTML = '';
+    var p = el('p', 'empty', 'Пока пусто. Первый перевод появится здесь, как только выйдет его установщик.');
+    root.appendChild(p);
+    return;
+  }
+
+  root.innerHTML = '';
+  GROUPS.forEach(function (group) {
+    var games = data.games.filter(function (g) { return g.status === group.key; });
+    if (!games.length) { return; }
+
+    var sec = el('section', 'section');
+    var h = el('h2', 'section-title', group.title);
+    h.appendChild(el('span', 'count', games.length));
+    sec.appendChild(h);
+    games.forEach(function (g) { sec.appendChild(card(g)); });
+    root.appendChild(sec);
+  });
+})();
+</script>
+
+<noscript>
+  <div class="wrap">
+    <p class="empty">Каталог рисуется скриптом. Без JavaScript список игр можно посмотреть
+       на странице <a href="https://github.com/e24x5-Fox/claude-rus-hub/releases">релизов</a>.</p>
+  </div>
+</noscript>
+
+</body>
+</html>

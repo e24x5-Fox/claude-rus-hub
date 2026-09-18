@@ -1,0 +1,218 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   site.css — каталог русификаторов. Цвета, шрифты и метрики берутся из
+   tokens.css (слепок палитры бренда) — своих цветов здесь не заводить.
+
+   Отличие от настольных приложений набора: база крупнее (15px вместо 13px).
+   В окне приложения текст читают в упор, страницу в браузере — с обычного
+   расстояния, и 13px на ней мелковат.
+   ───────────────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 1.6;
+  border-top: 3px solid var(--accent);   /* отсылка к рамке окна установщика */
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+
+/* ── Шапка ──────────────────────────────────────────────────────────────── */
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 44px 0 32px;
+}
+.head-text { flex: 1 1 auto; min-width: 0; max-width: 100%; }
+.head h1 {
+  margin: 0 0 8px;
+  font-size: 26px;
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.head h1 .by { color: var(--accent2); }
+.head p {
+  margin: 0;
+  color: var(--text2);
+  font-size: 14px;
+  /* min(), а не 52ch: в колоночном флексе с align-items:flex-start ребёнок
+     тянется до max-content, и голый 52ch выпирал страницу за экран телефона. */
+  max-width: min(52ch, 100%);
+}
+.mascot {
+  flex: 0 0 auto;
+  width: 104px;
+  filter: var(--mascot-shadow);
+}
+.mascot img { display: block; width: 100%; height: auto; }
+
+/* ── Секции ─────────────────────────────────────────────────────────────── */
+
+.section { padding: 20px 0 8px; }
+.section-title {
+  margin: 0 0 14px;
+  font-size: var(--fs-title);
+  color: var(--accent2);
+  font-weight: 600;
+}
+.section-title .count {
+  color: var(--text3);
+  font-weight: 400;
+  font-size: var(--fs-note);
+  margin-left: 8px;
+}
+
+/* ── Карточка игры ──────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--bg3);
+  border-radius: var(--r-card);
+  padding: 0;
+  margin-bottom: var(--gap-lg);
+  overflow: hidden;
+}
+
+.banner {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-bottom: 1px solid var(--bg3);
+  background: var(--bg3);
+}
+
+.card-body { padding: 18px 20px 20px; }
+
+.card h2 {
+  margin: 0 0 6px;
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+.tag {
+  font-size: var(--fs-micro);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--text2);
+  background: var(--bg3);
+  border-radius: var(--r-pill);
+  padding: 3px 10px;
+}
+.tag.adult { color: var(--red); background: rgba(239,68,68,.10); }
+.tag.ready { color: var(--green); background: rgba(34,197,94,.10); }
+.tag.wip   { color: var(--yellow); background: rgba(234,179,8,.10); }
+
+.summary { margin: 0 0 14px; color: var(--text2); font-size: 14px; }
+
+/* Плитки объёма перевода: число крупно акцентом, подпись мелко и тускло */
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 16px;
+}
+.stat {
+  flex: 1 1 120px;
+  background: var(--bg3);
+  border-radius: var(--r-field);
+  padding: 10px 12px;
+}
+.stat .v { display: block; color: var(--accent2); font-size: 16px; line-height: 1.3; }
+.stat .k { display: block; color: var(--text3); font-size: var(--fs-micro); text-transform: uppercase; letter-spacing: .04em; }
+
+.actions { display: flex; flex-wrap: wrap; gap: var(--gap); align-items: center; }
+
+.btn {
+  display: inline-block;
+  border-radius: var(--r-btn);
+  padding: 9px 16px;
+  font-size: var(--fs-label);
+  font-family: inherit;
+  border: 1px solid transparent;
+  transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+}
+.btn:hover { text-decoration: none; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-muted); }
+.btn-mini {
+  background: var(--bg3);
+  color: var(--text2);
+  border-color: var(--bg3);
+}
+.btn-mini:hover { background: var(--bg4); border-color: var(--accent); color: var(--text); }
+.size { color: var(--text3); font-size: var(--fs-note); }
+
+.note {
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--bg3);
+  color: var(--text3);
+  font-size: var(--fs-note);
+}
+
+/* Карточка «в работе» — тише готовой: без баннера и с приглушённым заголовком */
+.card.wip h2 { color: var(--text2); }
+
+/* ── Инструкция ─────────────────────────────────────────────────────────── */
+
+.steps { margin: 0; padding-left: 22px; color: var(--text2); font-size: 14px; }
+.steps li { margin-bottom: 6px; }
+.steps b { color: var(--text); font-weight: 600; }
+
+.notice {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border-radius: var(--r-field);
+  font-size: var(--fs-note);
+  color: var(--text2);
+  background: rgba(234,179,8,.08);
+  border: 1px solid rgba(234,179,8,.25);
+}
+.notice b { color: var(--yellow); }
+
+/* ── Подвал ─────────────────────────────────────────────────────────────── */
+
+.foot {
+  margin-top: 36px;
+  padding: 22px 0 40px;
+  border-top: 1px solid var(--bg3);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: var(--text3);
+  font-size: var(--fs-note);
+}
+.foot .links { flex: 1 1 auto; display: flex; flex-wrap: wrap; gap: 16px; }
+.foot .mascot { width: 62px; }
+
+/* ── Пустое состояние и ошибка загрузки каталога ────────────────────────── */
+
+.empty {
+  color: var(--text3);
+  font-size: 14px;
+  padding: 18px 0;
+}
+
+/* ── Узкий экран ────────────────────────────────────────────────────────── */
+
+@media (max-width: 560px) {
+  .head { flex-direction: column-reverse; align-items: stretch; gap: 16px; padding-top: 32px; }
+  .head .mascot { align-self: flex-start; }
+  .mascot { width: 84px; }
+  .head h1 { font-size: 22px; }
+  .stat { flex-basis: 45%; }
+}
