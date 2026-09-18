@@ -3,6 +3,13 @@
    добавить объект в games[] — карточка на странице появится сама.
    status: released — готово и лежит в релизах | wip — в работе | planned — в планах
 
+   release.tag_prefix — с чего начинаются теги релизов ИМЕННО ЭТОЙ игры
+   (dragnwash-v1.0, dragnwash-v1.1, …). Страница спрашивает у GitHub API самый
+   свежий релиз с таким префиксом и сама подставляет ссылку на файл, версию и
+   размер. Поэтому после выпуска новой версии здесь ничего менять не нужно —
+   достаточно назвать тег правильно. links.download остаётся запасным путём:
+   на него страница откатывается, если API недоступен.
+
    Почему .js, а не .json: страницу удобно открыть двойным щелчком с диска,
    а fetch() по file:// браузер запрещает. Через <script src> данные приходят
    и локально, и на GitHub Pages одинаково.
@@ -28,8 +35,9 @@ window.CATALOG = {
         { "label": "Текстуры", "value": "87 файлов" }
       ],
       "install_size": "75 МБ",
+      "release": { "tag_prefix": "dragnwash-", "asset": "DragNWash-RU-Setup.exe" },
       "links": {
-        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases/latest",
+        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/4739660/",
         "guide": ""
       },

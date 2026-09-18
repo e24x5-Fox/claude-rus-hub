@@ -69,6 +69,15 @@
 /* Страница строится из window.CATALOG (games.js). Править разметку карточек
    при добавлении игры не нужно — только данные. */
 (function () {
+  var REPO = 'e24x5-Fox/claude-rus-hub';
+  var API = 'https://api.github.com/repos/' + REPO + '/releases?per_page=100';
+  var CACHE_KEY = 'crh-releases';
+  var CACHE_TTL = 10 * 60 * 1000;   /* 10 минут: GitHub пускает без ключа 60 запросов в час на IP */
+
+  /* Карточки, которым нужен свежий релиз: заполняется при отрисовке,
+     разбирается после ответа API. */
+  var pending = [];
+
   var STATUS = {
     released: { cls: 'ready', label: 'готово' },
     wip:      { cls: 'wip',   label: 'в работе' },
@@ -111,7 +120,11 @@
 
     var tags = el('div', 'tags');
     tags.appendChild(el('span', 'tag ' + st.cls, st.label));
-    if (game.version) { tags.appendChild(el('span', 'tag', 'v' + game.version)); }
+    var verPill = null;
+    if (game.version) {
+      verPill = el('span', 'tag', 'v' + game.version);
+      tags.appendChild(verPill);
+    }
     (game.tags || []).forEach(function (t) {
       tags.appendChild(el('span', 'tag' + (t === '18+' ? ' adult' : ''), t));
     });
@@ -132,11 +145,24 @@
 
     var links = game.links || {};
     var actions = el('div', 'actions');
-    if (links.download) { actions.appendChild(link(links.download, 'btn btn-primary', 'Скачать русификатор')); }
+    var dl = null, size = null;
+    if (links.download) {
+      dl = link(links.download, 'btn btn-primary', 'Скачать русификатор');
+      actions.appendChild(dl);
+    }
     if (links.guide)    { actions.appendChild(link(links.guide, 'btn btn-mini', 'Руководство в Steam')); }
     if (links.steam)    { actions.appendChild(link(links.steam, 'btn btn-mini', 'Игра в Steam')); }
-    if (game.install_size && links.download) { actions.appendChild(el('span', 'size', game.install_size)); }
+    if (game.install_size && links.download) {
+      size = el('span', 'size', game.install_size);
+      actions.appendChild(size);
+    }
     if (actions.childNodes.length) { body.appendChild(actions); }
+
+    /* Ссылка из games.js — запасная: она ведёт на список релизов и работает
+       всегда. Если API ответит, её подменит прямая ссылка на свежий файл. */
+    if (dl && game.release && game.release.tag_prefix) {
+      pending.push({ game: game, dl: dl, size: size, ver: verPill });
+    }
 
     if (game.note) { body.appendChild(el('p', 'note', game.note)); }
 
@@ -154,6 +180,87 @@
     return;
   }
 
+  /* ── Свежий релиз для каждой игры ────────────────────────────────────────
+     Тегов в репозитории много и они от разных игр, поэтому «последний релиз»
+     тут не общий: для каждой игры берётся самый свежий тег с её префиксом. */
+
+  function fmtSize(bytes) {
+    if (!bytes) { return ''; }
+    var mb = bytes / 1048576;
+    return (mb >= 100 ? Math.round(mb) : mb.toFixed(1).replace('.0', '').replace('.', ',')) + ' МБ';
+  }
+
+  function fmtDate(iso) {
+    var m = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+    var d = new Date(iso);
+    if (isNaN(d)) { return ''; }
+    return d.getDate() + ' ' + m[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  function latestFor(releases, prefix) {
+    var mine = releases.filter(function (r) {
+      return !r.draft && r.tag_name && r.tag_name.indexOf(prefix) === 0;
+    });
+    /* Черновиков уже нет; предрелизы берём, только если готовых нет вовсе. */
+    var stable = mine.filter(function (r) { return !r.prerelease; });
+    var pool = stable.length ? stable : mine;
+    pool.sort(function (a, b) {
+      return new Date(b.published_at || b.created_at) - new Date(a.published_at || a.created_at);
+    });
+    return pool[0] || null;
+  }
+
+  function assetOf(release, wanted) {
+    var list = release.assets || [];
+    var hit = wanted && list.filter(function (a) { return a.name === wanted; })[0];
+    return hit || list.filter(function (a) { return /\.exe$/i.test(a.name); })[0] || null;
+  }
+
+  function apply(releases) {
+    pending.forEach(function (item) {
+      var rel = latestFor(releases, item.game.release.tag_prefix);
+      if (!rel) { return; }
+
+      var asset = assetOf(rel, item.game.release.asset);
+      if (asset) { item.dl.href = asset.browser_download_url; }
+      else { item.dl.href = rel.html_url; }
+
+      /* Версия — из тега: dragnwash-v1.2 → v1.2 */
+      var ver = rel.tag_name.slice(item.game.release.tag_prefix.length);
+      if (item.ver && ver) { item.ver.textContent = /^v/i.test(ver) ? ver : 'v' + ver; }
+
+      if (item.size) {
+        var parts = [];
+        if (asset && asset.size) { parts.push(fmtSize(asset.size)); }
+        else if (item.game.install_size) { parts.push(item.game.install_size); }
+        var when = fmtDate(rel.published_at || rel.created_at);
+        if (when) { parts.push(when); }
+        item.size.textContent = parts.join(' · ');
+      }
+    });
+  }
+
+  function loadReleases() {
+    if (!pending.length) { return; }
+
+    try {
+      var raw = sessionStorage.getItem(CACHE_KEY);
+      if (raw) {
+        var box = JSON.parse(raw);
+        if (box && Date.now() - box.at < CACHE_TTL) { apply(box.data); return; }
+      }
+    } catch (e) { /* приватный режим — просто сходим в сеть */ }
+
+    fetch(API, { headers: { 'Accept': 'application/vnd.github+json' } })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+      .then(function (data) {
+        if (!Array.isArray(data)) { return; }
+        apply(data);
+        try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), data: data })); } catch (e) {}
+      })
+      .catch(function () { /* остаются запасные ссылки на список релизов */ });
+  }
+
   root.innerHTML = '';
   GROUPS.forEach(function (group) {
     var games = data.games.filter(function (g) { return g.status === group.key; });
@@ -166,6 +273,8 @@
     games.forEach(function (g) { sec.appendChild(card(g)); });
     root.appendChild(sec);
   });
+
+  loadReleases();
 })();
 </script>
 
