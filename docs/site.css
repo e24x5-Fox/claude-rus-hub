@@ -328,3 +328,9 @@ a:hover { text-decoration: underline; }
   .views { width: 100%; }
   .views button { flex: 1 1 0; }
 }
+
+/* Пустой ответ поиска: не «ничего не найдено», а приглашение назвать игру */
+.card.nothing { padding: 18px 20px 20px; }
+.card.nothing h2 { margin: 0 0 8px; font-size: 18px; font-weight: 600; }
+.card.nothing .summary { margin-bottom: 14px; }
+.card.nothing .note { margin-top: 14px; }

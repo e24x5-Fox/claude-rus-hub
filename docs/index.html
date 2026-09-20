@@ -313,12 +313,83 @@
 
   /* Название ищется и по слагу: «dragnwash» вводится быстрее, чем «Drag'n Wash».
      Метки складываются по И — выбрал «Unity» и «18+», получил пересечение. */
-  function matches(game) {
-    var q = state.q.trim().toLowerCase();
-    if (q) {
-      var hay = ((game.title || '') + ' ' + (game.slug || '')).toLowerCase();
-      if (hay.indexOf(q) < 0) { return false; }
+  /* ── Поиск, терпимый к тому, как на самом деле ищут ──────────────────────
+     «драгн ваш», «dragn wosh», «Аморус» — всё это один и тот же запрос.
+     Поэтому сравниваем не строки, а их упрощённые виды, и допускаем опечатки. */
+
+  var RU_TO_EN = {
+    а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ж: 'zh', з: 'z', и: 'i',
+    й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's',
+    т: 't', у: 'u', ф: 'f', х: 'h', ц: 'c', ч: 'ch', ш: 'sh', щ: 'sch',
+    ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya'
+  };
+
+  function norm(s) {
+    return String(s || '').toLowerCase().replace(/ё/g, 'е')
+      .replace(/[^a-zа-я0-9]+/g, ' ').trim();
+  }
+
+  /* Кириллицу приводим к латинице: писать название игры русскими буквами —
+     обычное дело, а в данных оно латиницей. */
+  function translit(s) {
+    return norm(s).replace(/[а-я]/g, function (ch) {
+      return RU_TO_EN.hasOwnProperty(ch) ? RU_TO_EN[ch] : ch;
+    });
+  }
+
+  /* Расстояние Левенштейна с потолком: дальше предела считать незачем. */
+  function distance(a, b, limit) {
+    if (Math.abs(a.length - b.length) > limit) { return limit + 1; }
+    var prev = [], cur = [], i, j;
+    for (j = 0; j <= b.length; j++) { prev[j] = j; }
+    for (i = 1; i <= a.length; i++) {
+      cur[0] = i;
+      var best = cur[0];
+      for (j = 1; j <= b.length; j++) {
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1,
+                          prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+        if (cur[j] < best) { best = cur[j]; }
+      }
+      if (best > limit) { return limit + 1; }
+      prev = cur.slice();
     }
+    return prev[b.length];
+  }
+
+  /* Во что игра превращается для поиска: название, слаг, метки, движок. */
+  function keysOf(game) {
+    var raw = [game.title, game.slug].concat(game.tags || []);
+    var out = [];
+    raw.forEach(function (s) {
+      var n = norm(s), t = translit(s);
+      if (n) { out.push(n); }
+      if (t && t !== n) { out.push(t); }
+    });
+    return out;
+  }
+
+  function score(game, query) {
+    var qs = [norm(query), translit(query)].filter(Boolean);
+    var keys = keysOf(game);
+    var best = 0;
+    qs.forEach(function (q) {
+      keys.forEach(function (key) {
+        if (key.indexOf(q) >= 0) { best = Math.max(best, 3); return; }
+        /* по словам: «ваш» находит «Drag'n Wash», «wash» — тоже */
+        key.split(' ').forEach(function (word) {
+          if (!word) { return; }
+          if (word.indexOf(q) === 0) { best = Math.max(best, 2); return; }
+          var limit = q.length <= 4 ? 1 : 2;
+          if (distance(q, word, limit) <= limit) { best = Math.max(best, 1); }
+        });
+      });
+    });
+    return best;
+  }
+
+  function matches(game) {
+    var q = state.q.trim();
+    if (q && score(game, q) === 0) { return false; }
     for (var i = 0; i < state.tags.length; i++) {
       if ((game.tags || []).indexOf(state.tags[i]) < 0) { return false; }
     }
@@ -361,6 +432,48 @@
     });
   }
 
+  /* Пустой ответ — это не тупик, а лучший момент спросить, что переводить
+     дальше: человек уже назвал игру, осталось донести это до нас. */
+  function nothingFound() {
+    var q = state.q.trim();
+    var box = el('div', 'card nothing');
+
+    box.appendChild(el('h2', null, q ? 'Перевода для «' + q + '» у нас нет'
+                                     : 'Под эти метки ничего не подошло'));
+    box.appendChild(el('p', 'summary', q
+      ? 'Мы переводим по одной игре за раз и выбираем следующую по просьбам. '
+        + 'Если хотите, чтобы этой игрой занялись, — скажите об этом, это одна кнопка.'
+      : 'Попробуйте снять часть меток — или предложите игру, которой здесь не хватает.'));
+
+    var actions = el('div', 'actions');
+    var title = 'Предложить перевод' + (q ? ': ' + q : '');
+    var body = ['Игра: ' + (q || ''),
+                'Страница в Steam: ',
+                '',
+                'Почему хочется перевод: '].join('\n');
+    var ask = link('https://github.com/e24x5-Fox/claude-rus-hub/issues/new'
+                   + '?title=' + encodeURIComponent(title)
+                   + '&body=' + encodeURIComponent(body),
+                   'btn btn-primary', 'Предложить эту игру');
+    actions.appendChild(ask);
+
+    var reset = el('button', 'btn btn-mini', 'Сбросить поиск и метки');
+    reset.type = 'button';
+    reset.addEventListener('click', function () {
+      state.q = '';
+      state.tags = [];
+      document.getElementById('q').value = '';
+      renderTagbar();
+      render();
+    });
+    actions.appendChild(reset);
+    box.appendChild(actions);
+
+    box.appendChild(el('p', 'note', 'Кнопка открывает форму на GitHub — понадобится '
+      + 'аккаунт. Если его нет, напишите в комментариях под руководством в Steam.'));
+    return box;
+  }
+
   function render() {
     pending.length = 0;
     root.className = 'view-' + state.view;
@@ -385,20 +498,7 @@
       root.appendChild(sec);
     });
 
-    if (!shown) {
-      var none = el('p', 'empty', 'Ничего не нашлось. ');
-      var reset = el('button', 'link-reset', 'Сбросить поиск и метки');
-      reset.type = 'button';
-      reset.addEventListener('click', function () {
-        state.q = '';
-        state.tags = [];
-        document.getElementById('q').value = '';
-        renderTagbar();
-        render();
-      });
-      none.appendChild(reset);
-      root.appendChild(none);
-    }
+    if (!shown) { root.appendChild(nothingFound()); }
 
     if (releasesCache) { apply(releasesCache); }
   }
