@@ -26,7 +26,17 @@
     <div class="mascot"><img src="assets/mascot-wave.png" alt=""></div>
   </header>
 
-  <main id="catalog">
+  <div class="toolbar">
+    <input type="search" id="q" class="search" placeholder="Поиск по названию" autocomplete="off">
+    <div class="views" id="views">
+      <button type="button" data-view="cards" title="Крупными карточками">Крупно</button>
+      <button type="button" data-view="grid" title="Плитками по две в ряд">Плитки</button>
+      <button type="button" data-view="list" title="Компактным списком">Список</button>
+    </div>
+  </div>
+  <div class="tagbar" id="tagbar"></div>
+
+  <main id="catalog" class="view-cards">
     <p class="empty">Каталог загружается…</p>
   </main>
 
@@ -77,6 +87,10 @@
   /* Карточки, которым нужен свежий релиз: заполняется при отрисовке,
      разбирается после ответа API. */
   var pending = [];
+
+  /* Ответ GitHub, уже разобранный: нужен, чтобы перерисовка по фильтру
+     подставляла ссылки на релизы, не спрашивая API заново. */
+  var releasesCache = null;
 
   var STATUS = {
     released: { cls: 'ready', label: 'готово' },
@@ -256,6 +270,7 @@
       if (raw) {
         var box = JSON.parse(raw);
         if (box && Date.now() - box.at < CACHE_TTL && apply(box.data) === pending.length) {
+          releasesCache = box.data;
           return;
         }
       }
@@ -263,27 +278,148 @@
 
     fetch(API, { headers: { 'Accept': 'application/vnd.github+json' } })
       .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
-      .then(function (data) {
-        if (!Array.isArray(data)) { return; }
-        apply(data);
-        try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), data: data })); } catch (e) {}
+      .then(function (fresh) {
+        if (!Array.isArray(fresh)) { return; }
+        releasesCache = fresh;
+        apply(fresh);
+        try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), data: fresh })); } catch (e) {}
       })
       .catch(function () { /* остаются запасные ссылки на список релизов */ });
   }
 
-  root.innerHTML = '';
-  GROUPS.forEach(function (group) {
-    var games = data.games.filter(function (g) { return g.status === group.key; });
-    if (!games.length) { return; }
+  /* ── Поиск, метки и вид ──────────────────────────────────────────────────
+     Карточки перерисовываются целиком на каждое изменение: игр тут единицы,
+     а перерисовка заново собирает pending, и найденные релизы подставляются
+     из того же ответа API, без нового запроса. */
 
-    var sec = el('section', 'section');
-    var h = el('h2', 'section-title', group.title);
-    h.appendChild(el('span', 'count', games.length));
-    sec.appendChild(h);
-    games.forEach(function (g) { sec.appendChild(card(g)); });
-    root.appendChild(sec);
+  var VIEW_KEY = 'crh-view';
+  var VIEWS = ['cards', 'grid', 'list'];
+  var state = { q: '', tags: [], view: 'cards' };
+
+  try {
+    var saved = localStorage.getItem(VIEW_KEY);
+    if (VIEWS.indexOf(saved) >= 0) { state.view = saved; }
+  } catch (e) { /* приватный режим — останется вид по умолчанию */ }
+
+  function allTags() {
+    var seen = {}, out = [];
+    data.games.forEach(function (g) {
+      (g.tags || []).forEach(function (t) {
+        if (!seen[t]) { seen[t] = 1; out.push(t); }
+      });
+    });
+    return out;
+  }
+
+  /* Название ищется и по слагу: «dragnwash» вводится быстрее, чем «Drag'n Wash».
+     Метки складываются по И — выбрал «Unity» и «18+», получил пересечение. */
+  function matches(game) {
+    var q = state.q.trim().toLowerCase();
+    if (q) {
+      var hay = ((game.title || '') + ' ' + (game.slug || '')).toLowerCase();
+      if (hay.indexOf(q) < 0) { return false; }
+    }
+    for (var i = 0; i < state.tags.length; i++) {
+      if ((game.tags || []).indexOf(state.tags[i]) < 0) { return false; }
+    }
+    return true;
+  }
+
+  function renderTagbar() {
+    var bar = document.getElementById('tagbar');
+    bar.innerHTML = '';
+    allTags().forEach(function (t) {
+      var b = el('button', 'chip' + (state.tags.indexOf(t) >= 0 ? ' on' : ''), t);
+      b.type = 'button';
+      b.setAttribute('aria-pressed', state.tags.indexOf(t) >= 0 ? 'true' : 'false');
+      b.addEventListener('click', function () {
+        var at = state.tags.indexOf(t);
+        if (at >= 0) { state.tags.splice(at, 1); } else { state.tags.push(t); }
+        renderTagbar();
+        render();
+      });
+      bar.appendChild(b);
+    });
+    if (state.tags.length) {
+      var clear = el('button', 'chip clear', 'сбросить метки');
+      clear.type = 'button';
+      clear.addEventListener('click', function () {
+        state.tags = [];
+        renderTagbar();
+        render();
+      });
+      bar.appendChild(clear);
+    }
+  }
+
+  function renderViews() {
+    var box = document.getElementById('views');
+    Array.prototype.forEach.call(box.querySelectorAll('button'), function (b) {
+      var on = b.getAttribute('data-view') === state.view;
+      b.className = on ? 'on' : '';
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
+  function render() {
+    pending.length = 0;
+    root.className = 'view-' + state.view;
+    root.innerHTML = '';
+
+    var shown = 0;
+    GROUPS.forEach(function (group) {
+      var games = data.games.filter(function (g) {
+        return g.status === group.key && matches(g);
+      });
+      if (!games.length) { return; }
+      shown += games.length;
+
+      var sec = el('section', 'section');
+      var h = el('h2', 'section-title', group.title);
+      h.appendChild(el('span', 'count', games.length));
+      sec.appendChild(h);
+
+      var box = el('div', 'cards');
+      games.forEach(function (g) { box.appendChild(card(g)); });
+      sec.appendChild(box);
+      root.appendChild(sec);
+    });
+
+    if (!shown) {
+      var none = el('p', 'empty', 'Ничего не нашлось. ');
+      var reset = el('button', 'link-reset', 'Сбросить поиск и метки');
+      reset.type = 'button';
+      reset.addEventListener('click', function () {
+        state.q = '';
+        state.tags = [];
+        document.getElementById('q').value = '';
+        renderTagbar();
+        render();
+      });
+      none.appendChild(reset);
+      root.appendChild(none);
+    }
+
+    if (releasesCache) { apply(releasesCache); }
+  }
+
+  document.getElementById('q').addEventListener('input', function () {
+    state.q = this.value;
+    render();
   });
 
+  document.getElementById('views').addEventListener('click', function (e) {
+    var view = e.target && e.target.getAttribute && e.target.getAttribute('data-view');
+    if (!view) { return; }
+    state.view = view;
+    try { localStorage.setItem(VIEW_KEY, view); } catch (err) { /* ничего страшного */ }
+    renderViews();
+    render();
+  });
+
+  renderTagbar();
+  renderViews();
+  render();
   loadReleases();
 })();
 </script>
