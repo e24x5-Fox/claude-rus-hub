@@ -71,7 +71,7 @@
 (function () {
   var REPO = 'e24x5-Fox/claude-rus-hub';
   var API = 'https://api.github.com/repos/' + REPO + '/releases?per_page=100';
-  var CACHE_KEY = 'crh-releases';
+  var CACHE_KEY = 'crh-releases-2';
   var CACHE_TTL = 10 * 60 * 1000;   /* 10 минут: GitHub пускает без ключа 60 запросов в час на IP */
 
   /* Карточки, которым нужен свежий релиз: заполняется при отрисовке,
@@ -216,10 +216,14 @@
     return hit || list.filter(function (a) { return /\.exe$/i.test(a.name); })[0] || null;
   }
 
+  /* Возвращает, скольким карточкам нашёлся релиз: по этому числу видно,
+     стоит ли доверять кэшу. */
   function apply(releases) {
+    var resolved = 0;
     pending.forEach(function (item) {
       var rel = latestFor(releases, item.game.release.tag_prefix);
       if (!rel) { return; }
+      resolved++;
 
       var asset = assetOf(rel, item.game.release.asset);
       if (asset) { item.dl.href = asset.browser_download_url; }
@@ -238,16 +242,22 @@
         item.size.textContent = parts.join(' · ');
       }
     });
+    return resolved;
   }
 
   function loadReleases() {
     if (!pending.length) { return; }
 
+    /* Кэш годится, только если в нём нашлись релизы на все карточки. Иначе это
+       снимок, сделанный до выпуска, и держать его десять минут — значит десять
+       минут показывать запасную ссылку вместо готового файла. */
     try {
       var raw = sessionStorage.getItem(CACHE_KEY);
       if (raw) {
         var box = JSON.parse(raw);
-        if (box && Date.now() - box.at < CACHE_TTL) { apply(box.data); return; }
+        if (box && Date.now() - box.at < CACHE_TTL && apply(box.data) === pending.length) {
+          return;
+        }
       }
     } catch (e) { /* приватный режим — просто сходим в сеть */ }
 
