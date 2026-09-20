@@ -34,7 +34,7 @@ window.CATALOG = {
         { "label": "Настройки", "value": "36 подписей" },
         { "label": "Текстуры", "value": "87 файлов" }
       ],
-      "install_size": "75 МБ",
+      "install_size": "138 МБ",
       "release": { "tag_prefix": "dragnwash-", "asset": "DragNWash-RU-Setup.exe" },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
