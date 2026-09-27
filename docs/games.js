@@ -17,7 +17,7 @@
 
 window.CATALOG = {
   "_comment": "Каталог переводов. Добавить игру — добавить объект в games[]. Страница строится отсюда, править index.html не нужно. status: released | wip | planned",
-  "updated": "2026-09-18",
+  "updated": "2026-09-28",
   "games": [
     {
       "slug": "dragnwash",
@@ -42,6 +42,52 @@ window.CATALOG = {
         "guide": ""
       },
       "note": "Проверено на версии игры под Unity 6000.3.14f1. Установщик сам находит игру в библиотеке Steam и умеет откатывать изменения."
+    },
+    {
+      "slug": "protogen",
+      "title": "My Furry Protogen",
+      "banner": "assets/protogen.png",
+      "status": "released",
+      "version": "1.0",
+      "adult": true,
+      "tags": ["Ren'Py", "Windows", "18+"],
+      "summary": "Полный перевод визуальной новеллы: 1821 реплика и весь интерфейс, ~34 тыс. слов. Мат и взрослые сцены переведены как в оригинале, без смягчения.",
+      "scope": [
+        { "label": "Диалоги", "value": "1821 реплика" },
+        { "label": "Интерфейс", "value": "363 строки" },
+        { "label": "Объём", "value": "~34 тыс. слов" }
+      ],
+      "install_size": "2 МБ",
+      "release": { "tag_prefix": "protogen-", "asset": "MyFurryProtogen-RU-Setup.exe" },
+      "links": {
+        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
+        "steam": "https://store.steampowered.com/app/2009010/",
+        "guide": ""
+      },
+      "note": "Ren'Py переводится своим механизмом: перевод лежит отдельными файлами, оригиналы игры не трогаются вовсе. Удаление стирает добавленное — от русификатора не остаётся следа."
+    },
+    {
+      "slug": "protogen2",
+      "title": "My Furry Protogen 2",
+      "banner": "assets/protogen2.png",
+      "status": "released",
+      "version": "1.0",
+      "adult": true,
+      "tags": ["Ren'Py", "Windows", "18+"],
+      "summary": "Продолжение, вдвое длиннее первой части: 3217 реплик и весь интерфейс, ~52 тыс. слов. Имена, термины и легенда йерианцев сведены с первой частью.",
+      "scope": [
+        { "label": "Диалоги", "value": "3217 реплик" },
+        { "label": "Интерфейс", "value": "368 строк" },
+        { "label": "Объём", "value": "~52 тыс. слов" }
+      ],
+      "install_size": "3 МБ",
+      "release": { "tag_prefix": "protogen2-", "asset": "MyFurryProtogen2-RU-Setup.exe" },
+      "links": {
+        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
+        "steam": "https://store.steampowered.com/app/2591910/",
+        "guide": ""
+      },
+      "note": "Ставится и удаляется так же, как первая часть. Оригинальные файлы игры не изменяются."
     },
     {
       "slug": "amorous",
