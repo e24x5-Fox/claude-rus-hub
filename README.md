@@ -24,7 +24,7 @@
 | **Drag'n Wash** <br><sub>Unity · 18+</sub> | ✅ готово, v1.0 | диалоги (1839 реплик), интерфейс (89 строк), меню настроек (36 подписей), 87 текстур | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/latest) |
 | **My Furry Protogen** <br><sub>Ren'Py · 18+</sub> | ✅ готово, v1.0 | диалоги (1821 реплика), интерфейс (363 строки), ~34 тыс. слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/latest) |
 | **My Furry Protogen 2** <br><sub>Ren'Py · 18+</sub> | ✅ готово, v1.0 | диалоги (3217 реплик), интерфейс (368 строк), ~52 тыс. слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/latest) |
-| **Amorous** <br><sub>FNA/MonoGame · 18+</sub> | 🛠 в работе | 13 142 реплики, 276 579 слов; надписи интерфейса вшиты в картинки | — |
+| **Amorous** <br><sub>FNA/MonoGame · 18+</sub> | ✅ готово, v1.0 | диалоги (12 884 реплики, ~270 тыс. слов), интерфейс (171 строка), титры, 18 картинок, 6 шрифтов с кириллицей | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/amorous-v1.0) |
 
 Список на сайте строится из [`docs/games.js`](docs/games.js) — новая игра
 добавляется одной записью, разметку страницы править не нужно.
@@ -35,7 +35,7 @@
 тег каждого релиза начинается с префикса своей игры.
 
 ```
-dragnwash-v1.0   dragnwash-v1.1   protogen-v1.0   protogen2-v1.0   …
+dragnwash-v1.0   dragnwash-v1.1   protogen-v1.0   protogen2-v1.0   amorous-v1.0   …
 ```
 
 Префикс записан в `docs/games.js` (`release.tag_prefix`), и кнопка «Скачать»
