@@ -15,6 +15,8 @@
 <body>
 
 <div class="wrap">
+<div class="layout">
+<div class="main-col">
 
   <header class="head">
     <div class="head-text">
@@ -63,6 +65,27 @@
        Правки собираются и выходят следующей версией.</p>
   </section>
 
+</div>
+
+  <!-- Колонка справа: заполняет side.js. На узком экране уезжает под каталог. -->
+  <aside class="side" aria-label="Статистика">
+    <div class="side-block">
+      <h2 class="side-title">Скачивания</h2>
+      <div id="side-downloads"><p class="side-next">Спрашиваем у GitHub…</p></div>
+    </div>
+    <div class="side-block">
+      <h2 class="side-title">Посещения</h2>
+      <div id="side-visits"><p class="side-next">Считаем…</p></div>
+    </div>
+    <div class="side-block">
+      <h2 class="side-title">Всего сделано</h2>
+      <div id="side-summary"></div>
+    </div>
+    <p class="side-foot"><span id="side-since"></span></p>
+  </aside>
+
+</div>
+
   <footer class="foot">
     <div class="links">
       <a href="https://github.com/e24x5-Fox/claude-rus-hub">Репозиторий</a>
@@ -75,6 +98,7 @@
 </div>
 
 <script src="games.js"></script>
+<script src="side.js"></script>
 <script>
 /* Страница строится из window.CATALOG (games.js). Править разметку карточек
    при добавлении игры не нужно — только данные. */
@@ -230,6 +254,29 @@
     return hit || list.filter(function (a) { return /\.exe$/i.test(a.name); })[0] || null;
   }
 
+  /* Скачивания игры — по всем её версиям, а не только по свежей:
+     v1.1 вышла позже, и счёт v1.0 никуда не девается. */
+  function downloadsFor(releases, prefix) {
+    var sum = 0;
+    releases.forEach(function (r) {
+      if (r.draft || !r.tag_name || r.tag_name.indexOf(prefix) !== 0) { return; }
+      (r.assets || []).forEach(function (a) { sum += a.download_count || 0; });
+    });
+    return sum;
+  }
+
+  function plural(n, one, few, many) {
+    var a = Math.abs(n) % 100, b = a % 10;
+    if (a > 10 && a < 20) { return many; }
+    if (b > 1 && b < 5) { return few; }
+    if (b === 1) { return one; }
+    return many;
+  }
+
+  function side(releases) {
+    if (window.CRH_SIDE) { window.CRH_SIDE.downloads(releases); }
+  }
+
   /* Возвращает, скольким карточкам нашёлся релиз: по этому числу видно,
      стоит ли доверять кэшу. */
   function apply(releases) {
@@ -253,6 +300,8 @@
         else if (item.game.install_size) { parts.push(item.game.install_size); }
         var when = fmtDate(rel.published_at || rel.created_at);
         if (when) { parts.push(when); }
+        var got = downloadsFor(releases, item.game.release.tag_prefix);
+        if (got) { parts.push(got + ' ' + plural(got, 'скачивание', 'скачивания', 'скачиваний')); }
         item.size.textContent = parts.join(' · ');
       }
     });
@@ -271,6 +320,7 @@
         var box = JSON.parse(raw);
         if (box && Date.now() - box.at < CACHE_TTL && apply(box.data) === pending.length) {
           releasesCache = box.data;
+          side(box.data);
           return;
         }
       }
@@ -282,9 +332,14 @@
         if (!Array.isArray(fresh)) { return; }
         releasesCache = fresh;
         apply(fresh);
+        side(fresh);
         try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), data: fresh })); } catch (e) {}
       })
-      .catch(function () { /* остаются запасные ссылки на список релизов */ });
+      .catch(function () {
+        /* остаются запасные ссылки на список релизов */
+        var box = document.getElementById('side-downloads');
+        if (box) { box.innerHTML = '<p class="side-next">GitHub сейчас не отвечает — число появится позже.</p>'; }
+      });
   }
 
   /* ── Поиск, метки и вид ──────────────────────────────────────────────────

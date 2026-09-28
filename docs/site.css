@@ -334,3 +334,102 @@ a:hover { text-decoration: underline; }
 .card.nothing h2 { margin: 0 0 8px; font-size: 18px; font-weight: 600; }
 .card.nothing .summary { margin-bottom: 14px; }
 .card.nothing .note { margin-top: 14px; }
+
+/* ── Колонка статистики справа ──────────────────────────────────────────── */
+
+/* На широком экране каталог и колонка идут рядом, колонка прилипает к верху
+   и едет вместе с прокруткой. Уже 1100px ей рядом не место — там она уходит
+   под каталог обычным блоком, а страница остаётся прежней ширины. */
+.layout { display: block; }
+.side { margin-top: 28px; }
+
+@media (min-width: 1100px) {
+  .wrap { max-width: 1200px; }
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 860px) 290px;
+    gap: 32px;
+    justify-content: center;
+    align-items: start;
+  }
+  .side {
+    position: sticky;
+    top: 16px;
+    margin-top: 44px;              /* вровень с шапкой */
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+}
+
+.side-block {
+  background: var(--bg2);
+  border: 1px solid var(--bg3);
+  border-radius: var(--r-card);
+  padding: 14px 16px;
+  margin-bottom: var(--gap-lg);
+}
+.side-title {
+  margin: 0 0 10px;
+  font-size: var(--fs-micro);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text3);
+  font-weight: 600;
+}
+
+.side-big { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.side-big .v { font-size: 30px; line-height: 1.1; color: var(--accent2); font-weight: 600; }
+.side-big .k { color: var(--text2); font-size: var(--fs-note); }
+
+.side-bar {
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: var(--bg3);
+  overflow: hidden;
+}
+.side-bar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: inherit;
+  transition: width var(--t-slow);
+}
+.side-next { margin: 6px 0 0; color: var(--text3); font-size: var(--fs-hint); }
+
+.side-thanks {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--r-field);
+  color: var(--text);
+  font-size: var(--fs-note);
+  line-height: 1.55;
+}
+.side-thanks .m,
+.side-more .m {
+  display: block;
+  color: var(--accent2);
+  font-size: var(--fs-micro);
+  letter-spacing: .04em;
+  margin-bottom: 2px;
+}
+
+.side-more { margin-top: 10px; font-size: var(--fs-note); }
+.side-more summary { cursor: pointer; color: var(--text2); }
+.side-more summary:hover { color: var(--text); }
+.side-more p {
+  margin: 8px 0 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--bg3);
+  color: var(--text2);
+}
+
+.side-stat { padding: 6px 0; border-top: 1px solid var(--bg3); }
+.side-stat:first-child { border-top: 0; padding-top: 0; }
+.side-stat .v { display: block; color: var(--accent2); font-size: 17px; line-height: 1.3; }
+.side-stat .k { display: block; color: var(--text2); font-size: var(--fs-note); }
+.side-stat[title] { cursor: help; }
+
+.side-foot { margin: 0 0 16px; color: var(--text3); font-size: var(--fs-hint); text-align: center; }

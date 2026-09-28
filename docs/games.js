@@ -13,14 +13,23 @@
    Почему .js, а не .json: страницу удобно открыть двойным щелчком с диска,
    а fetch() по file:// браузер запрещает. Через <script src> данные приходят
    и локально, и на GitHub Pages одинаково.
+
+   engine, lines, words — для колонки статистики справа: из них считаются
+   «сколько игр, реплик, слов и движков». lines — переведённые реплики
+   диалогов, words — слова английского оригинала в них (у больших игр
+   округлено). Движок пишется одинаково у игр одного движка — по нему
+   считаются уникальные.
    ───────────────────────────────────────────────────────────────────────── */
 
 window.CATALOG = {
   "_comment": "Каталог переводов. Добавить игру — добавить объект в games[]. Страница строится отсюда, править index.html не нужно. status: released | wip | planned",
-  "updated": "2026-09-28",
+  "updated": "2026-09-29",
   "games": [
     {
       "slug": "dragnwash",
+      "engine": "Unity",
+      "lines": 1839,
+      "words": 10333,
       "title": "Drag'n Wash",
       "banner": "assets/dragnwash.png",
       "status": "released",
@@ -45,6 +54,9 @@ window.CATALOG = {
     },
     {
       "slug": "protogen",
+      "engine": "Ren'Py",
+      "lines": 1821,
+      "words": 34000,
       "title": "My Furry Protogen",
       "banner": "assets/protogen.png",
       "status": "released",
@@ -68,6 +80,9 @@ window.CATALOG = {
     },
     {
       "slug": "protogen2",
+      "engine": "Ren'Py",
+      "lines": 3217,
+      "words": 52000,
       "title": "My Furry Protogen 2",
       "banner": "assets/protogen2.png",
       "status": "released",
@@ -91,6 +106,9 @@ window.CATALOG = {
     },
     {
       "slug": "amorous",
+      "engine": "FNA/MonoGame",
+      "lines": 12884,
+      "words": 270000,
       "title": "Amorous",
       "banner": "assets/amorous.png",
       "status": "released",
