@@ -134,7 +134,7 @@ window.CATALOG = {
     {
       "slug": "bodycam",
       "engine": "Unreal Engine 5",
-      "lines": 3674,
+      "lines": 0,
       "words": 15445,
       "title": "Bodycam",
       "banner": "assets/bodycam.png",

@@ -9,7 +9,10 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; }
+html {
+  -webkit-text-size-adjust: 100%;
+  scrollbar-color: var(--bg3) var(--bg);   /* ползунок, дорожка — в цвет страницы */
+}
 
 body {
   margin: 0;
@@ -359,7 +362,16 @@ a:hover { text-decoration: underline; }
     max-height: calc(100vh - 32px);
     overflow-y: auto;
     scrollbar-width: thin;
+    scrollbar-color: var(--bg3) var(--bg);   /* ползунок, дорожка — в цвет страницы */
   }
+  .side::-webkit-scrollbar { width: 8px; }
+  .side::-webkit-scrollbar-track { background: var(--bg); }
+  .side::-webkit-scrollbar-thumb {
+    background: var(--bg3);
+    border-radius: var(--r-pill);
+    border: 2px solid var(--bg);
+  }
+  .side::-webkit-scrollbar-thumb:hover { background: var(--text3); }
 }
 
 .side-block {
@@ -407,23 +419,12 @@ a:hover { text-decoration: underline; }
   font-size: var(--fs-note);
   line-height: 1.55;
 }
-.side-thanks .m,
-.side-more .m {
+.side-thanks .m {
   display: block;
   color: var(--accent2);
   font-size: var(--fs-micro);
   letter-spacing: .04em;
   margin-bottom: 2px;
-}
-
-.side-more { margin-top: 10px; font-size: var(--fs-note); }
-.side-more summary { cursor: pointer; color: var(--text2); }
-.side-more summary:hover { color: var(--text); }
-.side-more p {
-  margin: 8px 0 0;
-  padding-left: 10px;
-  border-left: 2px solid var(--bg3);
-  color: var(--text2);
 }
 
 .side-stat { padding: 6px 0; border-top: 1px solid var(--bg3); }

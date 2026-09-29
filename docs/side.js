@@ -148,18 +148,6 @@
       q.appendChild(el('span', 'm', num(last)));
       q.appendChild(document.createTextNode(thanksFor(last)));
       box.appendChild(q);
-
-      if (reached.length > 1) {
-        var more = el('details', 'side-more');
-        more.appendChild(el('summary', null, 'Все благодарности (' + reached.length + ')'));
-        reached.slice(0, -1).reverse().forEach(function (r) {
-          var p = el('p');
-          p.appendChild(el('span', 'm', num(r)));
-          p.appendChild(document.createTextNode(thanksFor(r)));
-          more.appendChild(p);
-        });
-        box.appendChild(more);
-      }
     } else {
       box.appendChild(el('p', 'side-next', 'Первый рубеж — два скачивания. Здесь появится благодарность.'));
     }
