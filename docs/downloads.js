@@ -4,11 +4,12 @@
 window.CRH_DOWNLOADS = {
  "days": {
   "2026-09-30": {
-   "dragnwash": 60,
+   "dragnwash": 63,
    "protogen": 0,
    "protogen2": 1,
    "amorous": 0,
-   "bodycam": 14
+   "bodycam": 14,
+   "oddremedy": 0
   }
  }
 };
