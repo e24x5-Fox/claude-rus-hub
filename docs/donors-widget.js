@@ -96,6 +96,14 @@
     li.appendChild(el('span', 'donors-name', d.name));
     li.appendChild(el('span', 'donors-sum', money(d.amount || 0, d.currency)));
     li.title = d.name + ' — ' + money(d.amount || 0, d.currency);
+    /* Сообщение — в две строки; длинное раскрывается по нажатию.
+       Только textContent: текст пишет донатер, разметке из него не место. */
+    if (d.message) {
+      var m = el('p', 'donors-msg', d.message);
+      m.title = 'Нажмите, чтобы прочитать целиком';
+      m.addEventListener('click', function () { m.classList.toggle('full'); });
+      li.appendChild(m);
+    }
     return li;
   }
 

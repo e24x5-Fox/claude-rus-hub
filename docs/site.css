@@ -579,8 +579,9 @@ a:hover { text-decoration: underline; }
 .donors-list:empty { display: none; }
 .donors-row {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
-  gap: 10px;
+  gap: 0 10px;
   padding: 6px 0;
   border-top: 1px solid var(--bg3);
   opacity: 0;
@@ -591,6 +592,22 @@ a:hover { text-decoration: underline; }
 .donors-row.in { opacity: 1; transform: none; }
 .donors-name { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .donors-sum { color: var(--accent2); white-space: nowrap; flex: none; }
+.donors-msg {
+  flex-basis: 100%;
+  margin: 3px 0 0;
+  padding-left: 8px;
+  border-left: 2px solid var(--accent-soft);
+  color: var(--text2);
+  font-size: var(--fs-hint);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  cursor: pointer;
+}
+.donors-msg.full { -webkit-line-clamp: unset; display: block; }
 .donors-row.top1 .donors-name::before { content: "♛ "; color: var(--yellow); }
 .donors-row.top1 .donors-sum { font-weight: 600; }
 
