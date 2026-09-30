@@ -7,7 +7,7 @@ DA_TOKEN, а страница получает готовую выжимку в 
 одну строку.
 
 Сообщение пишет кто угодно, а показывается оно на сайте, поэтому ссылки из
-него вырезаются, длина обрезается, а ники из tools/donors_hide.txt остаются
+него вырезаются, почта заменяется на «[почта скрыта]», длина обрезается, а ники из tools/donors_hide.txt остаются
 в списке без сообщения. Голосовые сообщения не показываются: текста у них нет.
 
 Ключа нет — скрипт ничего не трогает и выходит без ошибки: тогда donors.js
@@ -25,6 +25,7 @@ HIDE = os.path.join(ROOT, "tools", "donors_hide.txt")
 API = "https://www.donationalerts.com/api/v1/alerts/donations"
 ANON = "Аноним"
 MSG_MAX = 200
+EMAIL = re.compile(r"[\w.+-]+@[\w-]+(\.[\w-]+)+", re.I)
 LINK = re.compile(r"(https?://|www\.)\S+|\b[\w-]+\.(ru|com|net|org|io|gg|me|tv|su|рф|xyz|ly|to)(/\S*)?\b", re.I)
 
 # Донаты раньше этого дня пришли со стримов на Twitch, а не за переводы:
@@ -73,8 +74,10 @@ def hidden():
 
 
 def clean(text):
-    """Текст сообщения для сайта: без ссылок, в одну строку, не длиннее MSG_MAX."""
-    text = LINK.sub("", text or "")
+    """Текст сообщения для сайта: без почты и ссылок, в одну строку, не длиннее MSG_MAX.
+    Почта — первой: иначе ссылка съест «mail.ru», а «имя@» останется."""
+    text = EMAIL.sub("[почта скрыта]", text or "")
+    text = LINK.sub("", text)
     text = re.sub(r"\s+", " ", text).strip()
     if len(text) > MSG_MAX:
         text = text[:MSG_MAX - 1].rstrip() + "…"
