@@ -28,15 +28,28 @@
     <div class="mascot"><img src="assets/mascot-wave.png" alt=""></div>
   </header>
 
+  <div class="finder">
+    <label for="q" class="finder-label">Найти перевод своей игры</label>
+    <div class="finder-box">
+      <svg class="finder-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+      <input type="search" id="q" class="search" placeholder="Название, можно по-русски" autocomplete="off" spellcheck="false">
+    </div>
+    <p class="finder-hint">Пишите как помните: по-русски, на слух, с опечатками или частью
+       названия — поиск поймёт. Например:
+       <button type="button" class="try">драгн вош</button>
+       <button type="button" class="try">аморус</button>
+       <button type="button" class="try">бодикам</button>
+       <button type="button" class="try">мойка дракона</button></p>
+  </div>
+
   <div class="toolbar">
-    <input type="search" id="q" class="search" placeholder="Поиск по названию" autocomplete="off">
+    <div class="tagbar" id="tagbar"></div>
     <div class="views" id="views">
       <button type="button" data-view="cards" title="Крупными карточками">Крупно</button>
       <button type="button" data-view="grid" title="Плитками по две в ряд">Плитки</button>
       <button type="button" data-view="list" title="Компактным списком">Список</button>
     </div>
   </div>
-  <div class="tagbar" id="tagbar"></div>
 
   <main id="catalog" class="view-cards">
     <p class="empty">Каталог загружается…</p>
@@ -98,6 +111,7 @@
 </div>
 
 <script src="games.js"></script>
+<script src="downloads.js"></script>
 <script src="side.js"></script>
 <script>
 /* Страница строится из window.CATALOG (games.js). Править разметку карточек
@@ -320,6 +334,7 @@
         var box = JSON.parse(raw);
         if (box && Date.now() - box.at < CACHE_TTL && apply(box.data) === pending.length) {
           releasesCache = box.data;
+          render();   /* с живым счётом популярной может оказаться другая игра */
           side(box.data);
           return;
         }
@@ -335,7 +350,7 @@
       .then(function (fresh) {
         if (!Array.isArray(fresh)) { return; }
         releasesCache = fresh;
-        apply(fresh);
+        render();
         side(fresh);
         try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), data: fresh })); } catch (e) {}
       })
@@ -353,7 +368,7 @@
 
   var VIEW_KEY = 'crh-view';
   var VIEWS = ['cards', 'grid', 'list'];
-  var state = { q: '', tags: [], view: 'cards' };
+  var state = { q: '', tags: [], view: 'cards', all: false };
 
   try {
     var saved = localStorage.getItem(VIEW_KEY);
@@ -415,44 +430,106 @@
     return prev[b.length];
   }
 
-  /* Во что игра превращается для поиска: название, слаг, метки, движок. */
+  /* Звуки, которые на слух одинаковы, а пишутся по-разному: «вош» — это wash,
+     «бодикам» — bodycam. После транслита склеиваем их в одну букву. */
+  function squash(s) {
+    return translit(s).replace(/ph/g, 'f').replace(/w/g, 'v').replace(/[cq]/g, 'k')
+      .replace(/x/g, 'ks').replace(/y/g, 'i').replace(/([a-z])\1+/g, '$1');
+  }
+
+  /* Во что игра превращается для поиска: название, русские названия, слаг,
+     метки. Каждый ключ — и словами, и слитно: «драгнвош» тоже должен найтись. */
   function keysOf(game) {
-    var raw = [game.title, game.slug].concat(game.tags || []);
+    var raw = [game.title, game.slug].concat(game.aliases || [], game.tags || []);
     var out = [];
     raw.forEach(function (s) {
-      var n = norm(s), t = translit(s);
-      if (n) { out.push(n); }
-      if (t && t !== n) { out.push(t); }
+      var k = squash(s);
+      if (k) { out.push({ words: k.split(' '), whole: k.replace(/ /g, '') }); }
     });
     return out;
   }
 
-  function score(game, query) {
-    var qs = [norm(query), translit(query)].filter(Boolean);
-    var keys = keysOf(game);
+  /* Насколько слово запроса похоже хоть на что-то у игры:
+     3 — нашлось внутри целиком, 2 — начало слова, 1 — с опечаткой, 0 — мимо. */
+  function wordScore(w, keys) {
     var best = 0;
-    qs.forEach(function (q) {
-      keys.forEach(function (key) {
-        if (key.indexOf(q) >= 0) { best = Math.max(best, 3); return; }
-        /* по словам: «ваш» находит «Drag'n Wash», «wash» — тоже */
-        key.split(' ').forEach(function (word) {
-          if (!word) { return; }
-          if (word.indexOf(q) === 0) { best = Math.max(best, 2); return; }
-          var limit = q.length <= 4 ? 1 : 2;
-          if (distance(q, word, limit) <= limit) { best = Math.max(best, 1); }
-        });
+    var limit = w.length <= 3 ? 0 : (w.length <= 5 ? 1 : 2);
+    keys.forEach(function (key) {
+      if (key.whole.indexOf(w) >= 0) { best = Math.max(best, w.length > 2 ? 3 : 2); }
+      key.words.forEach(function (word) {
+        if (!word || best >= 3) { return; }
+        if (word.indexOf(w) === 0) { best = Math.max(best, 2); return; }
+        if (limit && distance(w, word, limit) <= limit) { best = Math.max(best, 1); }
       });
     });
     return best;
   }
 
-  function matches(game) {
-    var q = state.q.trim();
-    if (q && score(game, q) === 0) { return false; }
-    for (var i = 0; i < state.tags.length; i++) {
-      if ((game.tags || []).indexOf(state.tags[i]) < 0) { return false; }
+  /* Весь запрос слитно, потом по словам: подойти должно каждое слово —
+     иначе «протоген 2» находил бы и первую часть. */
+  function score(game, query) {
+    var q = squash(query);
+    if (!q) { return 0; }
+    var keys = keysOf(game);
+    var whole = q.replace(/ /g, '');
+    for (var i = 0; i < keys.length; i++) {
+      if (keys[i].whole.indexOf(whole) >= 0) { return 4; }
     }
-    return true;
+    var worst = 3;
+    q.split(' ').forEach(function (w) { worst = Math.min(worst, wordScore(w, keys)); });
+    return worst;
+  }
+
+  function matches(game) {
+    for (var i = 0; i < state.tags.length; i++) {
+      if ((game.tags || []).indexOf(state.tags[i]) < 0) { return 0; }
+    }
+    var q = state.q.trim();
+    return q ? score(game, q) : 1;
+  }
+
+  /* ── Популярное за неделю ────────────────────────────────────────────────
+     У GitHub есть только общий счёт скачиваний, без истории. Историю пишет
+     раз в сутки tools/downloads_snapshot.py в downloads.js, а здесь из живого
+     счёта вычитается снимок недельной давности. Пока недельного снимка нет,
+     берётся самый старый, которому хотя бы сутки, а без истории вовсе —
+     общий счёт. Подпись над карточкой говорит, какой из случаев сейчас. */
+
+  var WEEK = 7;
+
+  function popularity() {
+    var hist = (window.CRH_DOWNLOADS && window.CRH_DOWNLOADS.days) || {};
+    var days = Object.keys(hist).sort();
+    var now = Date.now();
+    var base = null, age = 0;
+    days.forEach(function (d) {
+      var a = (now - Date.parse(d + 'T00:00:00Z')) / 864e5;
+      if (a >= WEEK) { base = d; age = a; }
+    });
+    if (!base && days.length) {
+      var a0 = (now - Date.parse(days[0] + 'T00:00:00Z')) / 864e5;
+      if (a0 >= 1) { base = days[0]; age = a0; }
+    }
+    var latest = days.length ? hist[days[days.length - 1]] : {};
+
+    var rows = data.games.filter(function (g) {
+      return g.status === 'released' && g.release && g.release.tag_prefix;
+    }).map(function (g, i) {
+      var total = releasesCache ? downloadsFor(releasesCache, g.release.tag_prefix)
+                                : (latest[g.slug] || 0);
+      var gain = base ? Math.max(0, total - (hist[base][g.slug] || 0)) : total;
+      return { game: g, gain: gain, total: total, order: i };
+    });
+    rows.sort(function (a, b) {
+      return (b.gain - a.gain) || (b.total - a.total) || (a.order - b.order);
+    });
+    return { top: rows[0] || null, days: base ? Math.min(WEEK, Math.round(age)) : 0 };
+  }
+
+  function popularTitle(days) {
+    if (!days) { return 'Больше всего скачиваний'; }
+    if (days >= WEEK) { return 'Популярное за неделю'; }
+    return 'Популярное за ' + days + ' ' + plural(days, 'день', 'дня', 'дней');
   }
 
   function renderTagbar() {
@@ -533,16 +610,65 @@
     return box;
   }
 
+  /* Кнопка-переключатель «все / только популярное» под каталогом. */
+  function moreBar(text, label, all) {
+    var bar = el('p', 'more', text);
+    var b = el('button', 'more-btn', label);
+    b.type = 'button';
+    b.addEventListener('click', function () {
+      state.all = all;
+      render();
+      if (!all) { document.getElementById('q').focus(); }
+    });
+    bar.appendChild(b);
+    return bar;
+  }
+
+  /* Пока ничего не ищут, на странице одна карточка — самая скачиваемая за
+     неделю: страница короткая, и грузится одна картинка вместо всех. */
+  function renderPopular() {
+    var pop = popularity();
+    if (!pop.top) { return false; }
+
+    var sec = el('section', 'section');
+    var h = el('h2', 'section-title', popularTitle(pop.days));
+    if (pop.days && pop.top.gain) {
+      h.appendChild(el('span', 'count', '+' + pop.top.gain + ' '
+        + plural(pop.top.gain, 'скачивание', 'скачивания', 'скачиваний')));
+    }
+    sec.appendChild(h);
+    var box = el('div', 'cards');
+    box.appendChild(card(pop.top.game));
+    sec.appendChild(box);
+    root.appendChild(sec);
+
+    var rest = data.games.length - 1;
+    if (rest > 0) {
+      root.appendChild(moreBar('Ещё ' + rest + ' ' + plural(rest, 'перевод', 'перевода', 'переводов')
+        + ' в каталоге — найдите свою игру поиском выше или ', 'покажите все', true));
+    }
+    return true;
+  }
+
   function render() {
     pending.length = 0;
     root.className = 'view-' + state.view;
     root.innerHTML = '';
 
+    var idle = !state.q.trim() && !state.tags.length;
+    if (idle && !state.all && renderPopular()) {
+      if (releasesCache) { apply(releasesCache); }
+      return;
+    }
+
     var shown = 0;
     GROUPS.forEach(function (group) {
-      var games = data.games.filter(function (g) {
-        return g.status === group.key && matches(g);
-      });
+      /* лучшие совпадения — выше, при равных — порядок каталога */
+      var games = data.games.map(function (g, i) {
+        return { g: g, s: g.status === group.key ? matches(g) : 0, i: i };
+      }).filter(function (x) { return x.s > 0; }).sort(function (a, b) {
+        return (b.s - a.s) || (a.i - b.i);
+      }).map(function (x) { return x.g; });
       if (!games.length) { return; }
       shown += games.length;
 
@@ -558,6 +684,9 @@
     });
 
     if (!shown) { root.appendChild(nothingFound()); }
+    if (idle && state.all) {
+      root.appendChild(moreBar('', 'Свернуть до самого популярного', false));
+    }
 
     if (releasesCache) { apply(releasesCache); }
   }
@@ -565,6 +694,17 @@
   document.getElementById('q').addEventListener('input', function () {
     state.q = this.value;
     render();
+  });
+
+  /* Примеры под поиском — не картинка, а кнопки: нажал и увидел, как работает. */
+  Array.prototype.forEach.call(document.querySelectorAll('.finder .try'), function (b) {
+    b.addEventListener('click', function () {
+      var q = document.getElementById('q');
+      q.value = b.textContent;
+      state.q = q.value;
+      render();
+      q.focus();
+    });
   });
 
   document.getElementById('views').addEventListener('click', function (e) {

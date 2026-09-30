@@ -19,6 +19,11 @@
    диалогов, words — слова английского оригинала в них (у больших игр
    округлено). Движок пишется одинаково у игр одного движка — по нему
    считаются уникальные.
+
+   aliases — как игру назовёт человек, который не помнит написание: по-русски,
+   на слух, по сюжету. Поиск смотрит и сюда, поэтому «мойка дракона» находит
+   Drag'n Wash. Опечатки и латиницу русскими буквами поиск ловит сам — их
+   сюда писать не нужно.
    ───────────────────────────────────────────────────────────────────────── */
 
 window.CATALOG = {
@@ -31,6 +36,7 @@ window.CATALOG = {
       "lines": 1839,
       "words": 10333,
       "title": "Drag'n Wash",
+      "aliases": ["Драг н Вош", "Драгн Ваш", "мойка дракона", "помыть дракона"],
       "banner": "assets/dragnwash.png",
       "status": "released",
       "version": "1.0",
@@ -58,6 +64,7 @@ window.CATALOG = {
       "lines": 1821,
       "words": 34000,
       "title": "My Furry Protogen",
+      "aliases": ["Мой пушистый протоген", "Протоген"],
       "banner": "assets/protogen.png",
       "status": "released",
       "version": "1.0",
@@ -84,6 +91,7 @@ window.CATALOG = {
       "lines": 3217,
       "words": 52000,
       "title": "My Furry Protogen 2",
+      "aliases": ["Мой пушистый протоген 2", "Протоген 2"],
       "banner": "assets/protogen2.png",
       "status": "released",
       "version": "1.0",
@@ -110,6 +118,7 @@ window.CATALOG = {
       "lines": 12884,
       "words": 270000,
       "title": "Amorous",
+      "aliases": ["Аморус", "Аморэс", "Эморес"],
       "banner": "assets/amorous.png",
       "status": "released",
       "version": "1.0",
@@ -137,6 +146,7 @@ window.CATALOG = {
       "lines": 0,
       "words": 15445,
       "title": "Bodycam",
+      "aliases": ["Бодикам", "Боди кам", "нательная камера"],
       "banner": "assets/bodycam.png",
       "status": "released",
       "version": "1.0",

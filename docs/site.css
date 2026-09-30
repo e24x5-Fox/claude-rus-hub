@@ -226,23 +226,96 @@ a:hover { text-decoration: underline; }
   display: flex;
   align-items: center;
   gap: var(--gap);
-  margin: 18px 0 10px;
+  margin: 12px 0 4px;
   flex-wrap: wrap;
 }
 
-.search {
-  flex: 1 1 220px;
-  min-width: 0;
-  font-family: inherit;
-  font-size: var(--fs-label);
-  color: var(--text);
+/* ── Поиск — главный вход в каталог ─────────────────────────────────────
+   На странице по умолчанию одна карточка, остальное находится поиском,
+   поэтому поле крупное, в акцентной рамке и с подсказкой, что искать можно
+   как угодно. */
+
+.finder {
+  margin: 20px 0 6px;
+  padding: 16px 18px 14px;
   background: var(--bg2);
-  border: 1px solid var(--bg3);
+  border: 1px solid var(--accent-muted);
+  border-radius: var(--r-card);
+}
+.finder-label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: var(--fs-title);
+  font-weight: 600;
+  color: var(--accent2);
+}
+.finder-box { position: relative; }
+.finder-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  fill: none;
+  stroke: var(--accent2);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+.search {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 17px;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--accent);
   border-radius: var(--r-field);
-  padding: 9px 12px;
+  padding: 13px 14px 13px 44px;
+  transition: box-shadow var(--t-fast);
 }
 .search::placeholder { color: var(--text3); }
-.search:focus { outline: none; border-color: var(--accent); }
+.search:focus { outline: none; box-shadow: 0 0 0 4px var(--accent-soft); }
+.finder-hint {
+  margin: 10px 0 0;
+  font-size: var(--fs-note);
+  line-height: 1.7;
+  color: var(--text2);
+}
+.finder .try {
+  font-family: inherit;
+  font-size: var(--fs-note);
+  color: var(--accent2);
+  background: var(--accent-soft);
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  padding: 1px 9px;
+  margin: 0 2px;
+  cursor: pointer;
+  transition: border-color var(--t-fast);
+}
+.finder .try:hover { border-color: var(--accent); }
+
+/* Строка под каталогом: «ещё N переводов… покажите все» */
+.more {
+  margin: 4px 0 8px;
+  font-size: var(--fs-note);
+  color: var(--text3);
+}
+.more-btn {
+  font-family: inherit;
+  font-size: var(--fs-note);
+  color: var(--accent2);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.more-btn:hover { color: var(--text); }
 
 .views { display: flex; gap: 4px; flex: 0 0 auto; }
 .views button {
@@ -259,7 +332,7 @@ a:hover { text-decoration: underline; }
 .views button:hover { background: var(--bg4); color: var(--text); }
 .views button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-.tagbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+.tagbar { display: flex; flex-wrap: wrap; gap: 6px; flex: 1 1 auto; min-width: 0; }
 .chip {
   font-family: inherit;
   font-size: var(--fs-micro);
