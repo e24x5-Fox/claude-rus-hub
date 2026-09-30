@@ -74,7 +74,7 @@ def main():
         if r["amount"] == int(r["amount"]):
             r["amount"] = int(r["amount"])
 
-    data = {"updated": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%MZ"),
+    data = {"updated": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%MZ"),
             "donors": donors}
     text = HEADER + "window.CRH_DONORS = " + json.dumps(data, ensure_ascii=False, indent=1) + ";\n"
 
