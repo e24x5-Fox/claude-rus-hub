@@ -425,9 +425,10 @@ a:hover { text-decoration: underline; }
 
 /* ── Колонка статистики справа ──────────────────────────────────────────── */
 
-/* На широком экране каталог и колонка идут рядом, колонка прилипает к верху
-   и едет вместе с прокруткой. Уже 1100px ей рядом не место — там она уходит
-   под каталог обычным блоком, а страница остаётся прежней ширины. */
+/* На широком экране каталог и колонка идут рядом. Своей прокрутки у колонки
+   нет: она едет вместе со страницей с отставанием (параллакс, side.js) и
+   приходит к низу ровно тогда, когда кончается каталог. Уже 1100px ей рядом
+   не место — там она уходит под каталог обычным блоком. */
 .layout { display: block; }
 .side { margin-top: 28px; }
 
@@ -441,22 +442,9 @@ a:hover { text-decoration: underline; }
     align-items: start;
   }
   .side {
-    position: sticky;
-    top: 16px;
     margin-top: 44px;              /* вровень с шапкой */
-    max-height: calc(100vh - 32px);
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--bg3) var(--bg);   /* ползунок, дорожка — в цвет страницы */
+    will-change: transform;
   }
-  .side::-webkit-scrollbar { width: 8px; }
-  .side::-webkit-scrollbar-track { background: var(--bg); }
-  .side::-webkit-scrollbar-thumb {
-    background: var(--bg3);
-    border-radius: var(--r-pill);
-    border: 2px solid var(--bg);
-  }
-  .side::-webkit-scrollbar-thumb:hover { background: var(--text3); }
 }
 
 .side-block {
