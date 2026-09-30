@@ -17,7 +17,7 @@ DA_TOKEN, а страница получает готовую выжимку в 
 
 Ключ получается один раз, на своей машине: tools/donors_token.py.
 """
-import os, re, sys, json, datetime, urllib.request, urllib.error
+import os, re, sys, json, unicodedata, datetime, urllib.request, urllib.error
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "docs", "donors.js")
@@ -25,6 +25,10 @@ HIDE = os.path.join(ROOT, "tools", "donors_hide.txt")
 API = "https://www.donationalerts.com/api/v1/alerts/donations"
 ANON = "Аноним"
 MSG_MAX = 200
+NAME_MAX = 32
+# Разворот направления текста (U+202A–202E, U+2066–2069) переворачивает
+# строку на странице; прочие управляющие символы ломают вёрстку.
+BIDI = set(range(0x202A, 0x202F)) | set(range(0x2066, 0x206A))
 EMAIL = re.compile(r"[\w.+-]+@[\w-]+(\.[\w-]+)+", re.I)
 LINK = re.compile(r"(https?://|www\.)\S+|\b[\w-]+\.(ru|com|net|org|io|gg|me|tv|su|рф|xyz|ly|to)(/\S*)?\b", re.I)
 
@@ -73,14 +77,30 @@ def hidden():
     return out
 
 
-def clean(text):
+def strip_controls(text):
+    """Без управляющих символов и разворотов. Управляющие (в том числе перенос
+    строки) становятся пробелом, чтобы не склеить слова; ZWJ остаётся — на нём
+    держатся составные эмодзи."""
+    out = []
+    for ch in text:
+        cat = unicodedata.category(ch)
+        if cat == "Cc":
+            out.append(" ")
+        elif ord(ch) in BIDI or (cat == "Cf" and ch != "\u200d"):
+            continue
+        else:
+            out.append(ch)
+    return "".join(out)
+
+
+def clean(text, limit=MSG_MAX):
     """Текст сообщения для сайта: без почты и ссылок, в одну строку, не длиннее MSG_MAX.
     Почта — первой: иначе ссылка съест «mail.ru», а «имя@» останется."""
-    text = EMAIL.sub("[почта скрыта]", text or "")
+    text = EMAIL.sub("[почта скрыта]", strip_controls(text or ""))
     text = LINK.sub("", text)
     text = re.sub(r"\s+", " ", text).strip()
-    if len(text) > MSG_MAX:
-        text = text[:MSG_MAX - 1].rstrip() + "…"
+    if len(text) > limit:
+        text = text[:limit - 1].rstrip() + "…"
     return text
 
 
@@ -89,7 +109,8 @@ def build(donations, hide):
     rows = {}
     # от старых к новым: у каждого остаётся последнее непустое сообщение
     for d in sorted(donations, key=lambda d: d.get("created_at") or ""):
-        name = (d.get("username") or "").strip() or ANON
+        # ник у анонимного доната — свободный текст, чистится как сообщение
+        name = clean(d.get("username"), NAME_MAX) or ANON
         value, cur = amount_of(d)
         cur = cur or main_cur
         key = (name.lower(), cur)
@@ -133,7 +154,10 @@ def main():
 
     data = {"updated": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%MZ"),
             "donors": donors}
-    text = HEADER + "window.CRH_DONORS = " + json.dumps(data, ensure_ascii=False, indent=1) + ";\n"
+    body = json.dumps(data, ensure_ascii=False, indent=1)
+    # U+2028/2029 — перевод строки для старых движков JS: в строковом литерале ломает файл
+    body = body.replace(chr(0x2028), r"\u2028").replace(chr(0x2029), r"\u2029")
+    text = HEADER + "window.CRH_DONORS = " + body + ";\n"
 
     old = open(OUT, encoding="utf-8").read() if os.path.isfile(OUT) else ""
     # время обновления само по себе не повод для коммита
