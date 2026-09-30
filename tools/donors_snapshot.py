@@ -12,7 +12,7 @@ DA_TOKEN, а страница получает готовую выжимку в 
 
 Ключ получается один раз, на своей машине: tools/donors_token.py.
 """
-import os, json, datetime, urllib.request, urllib.error
+import os, sys, json, datetime, urllib.request, urllib.error
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "docs", "donors.js")
@@ -57,6 +57,14 @@ def main():
     except urllib.error.HTTPError as e:
         # 401 — ключ истёк или отозван: список остаётся прежним, а не пустым
         raise SystemExit("DonationAlerts ответил %d: %s" % (e.code, e.read()[:200]))
+
+    if "--inspect" in sys.argv:
+        # лог Actions у открытого репозитория виден всем: ники и тексты не печатаем
+        keys = sorted({k for d in donations for k in d})
+        print("поля:", ", ".join(keys))
+        for d in donations:
+            print({k: v for k, v in d.items() if k not in ("username", "message", "recipient_name")})
+        return
 
     main_cur = "RUB"
     rows = {}

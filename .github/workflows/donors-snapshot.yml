@@ -6,6 +6,11 @@ on:
   schedule:
     - cron: "41 */6 * * *"
   workflow_dispatch:
+    inputs:
+      inspect:
+        description: "Только показать поля донатов, без записи"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -18,7 +23,7 @@ jobs:
       - name: Список
         env:
           DA_TOKEN: ${{ secrets.DA_TOKEN }}
-        run: python3 tools/donors_snapshot.py
+        run: python3 tools/donors_snapshot.py ${{ inputs.inspect && '--inspect' || '' }}
       - name: Сохранить
         run: |
           git diff --quiet docs/donors.js && exit 0
