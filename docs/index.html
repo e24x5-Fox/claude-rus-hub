@@ -368,7 +368,7 @@
 
   var VIEW_KEY = 'crh-view';
   var VIEWS = ['cards', 'grid', 'list'];
-  var state = { q: '', tags: [], view: 'cards', all: false };
+  var state = { q: '', tags: [], view: 'cards', shown: 1 };
 
   try {
     var saved = localStorage.getItem(VIEW_KEY);
@@ -523,7 +523,7 @@
     rows.sort(function (a, b) {
       return (b.gain - a.gain) || (b.total - a.total) || (a.order - b.order);
     });
-    return { top: rows[0] || null, days: base ? Math.min(WEEK, Math.round(age)) : 0 };
+    return { top: rows[0] || null, rows: rows, days: base ? Math.min(WEEK, Math.round(age)) : 0 };
   }
 
   function popularTitle(days) {
@@ -610,25 +610,18 @@
     return box;
   }
 
-  /* Кнопка-переключатель «все / только популярное» под каталогом. */
-  function moreBar(text, label, all) {
-    var bar = el('p', 'more', text);
-    var b = el('button', 'more-btn', label);
-    b.type = 'button';
-    b.addEventListener('click', function () {
-      state.all = all;
-      render();
-      if (!all) { document.getElementById('q').focus(); }
-    });
-    bar.appendChild(b);
-    return bar;
-  }
+  var STEP = 3;   /* сколько карточек добавляет «Показать ещё» */
 
-  /* Пока ничего не ищут, на странице одна карточка — самая скачиваемая за
-     неделю: страница короткая, и грузится одна картинка вместо всех. */
+  /* Пока ничего не ищут, на странице сначала одна карточка — самая
+     скачиваемая за неделю, а дальше по кнопке ещё по три, в порядке
+     популярности. Картинки грузятся только у показанных карточек. */
   function renderPopular() {
     var pop = popularity();
     if (!pop.top) { return false; }
+
+    var order = pop.rows.map(function (r) { return r.game; });
+    data.games.forEach(function (g) { if (order.indexOf(g) < 0) { order.push(g); } });
+    var upto = Math.min(state.shown, order.length);
 
     var sec = el('section', 'section');
     var h = el('h2', 'section-title', popularTitle(pop.days));
@@ -638,15 +631,42 @@
     }
     sec.appendChild(h);
     var box = el('div', 'cards');
-    box.appendChild(card(pop.top.game));
+    box.appendChild(card(order[0]));
     sec.appendChild(box);
     root.appendChild(sec);
 
-    var rest = data.games.length - 1;
-    if (rest > 0) {
-      root.appendChild(moreBar('Ещё ' + rest + ' ' + plural(rest, 'перевод', 'перевода', 'переводов')
-        + ' в каталоге — найдите свою игру поиском выше или ', 'покажите все', true));
+    if (upto > 1) {
+      var sec2 = el('section', 'section');
+      var h2 = el('h2', 'section-title', 'Другие переводы');
+      h2.appendChild(el('span', 'count', (upto - 1) + ' из ' + (order.length - 1)));
+      sec2.appendChild(h2);
+      var box2 = el('div', 'cards');
+      order.slice(1, upto).forEach(function (g) { box2.appendChild(card(g)); });
+      sec2.appendChild(box2);
+      root.appendChild(sec2);
     }
+
+    var left = order.length - upto;
+    var bar = el('div', 'more');
+    if (left > 0) {
+      var next = Math.min(STEP, left);
+      var b = el('button', 'btn more-next', 'Показать ещё ' + next);
+      b.type = 'button';
+      b.addEventListener('click', function () { state.shown = upto + next; render(); });
+      bar.appendChild(b);
+      bar.appendChild(el('span', 'more-hint', 'осталось ' + left + ' · или найдите свою игру поиском выше'));
+    }
+    if (upto > 1) {
+      var c = el('button', 'more-btn', 'Свернуть');
+      c.type = 'button';
+      c.addEventListener('click', function () {
+        state.shown = 1;
+        render();
+        document.querySelector('.finder').scrollIntoView({ block: 'start', behavior: 'smooth' });
+      });
+      bar.appendChild(c);
+    }
+    if (bar.childNodes.length) { root.appendChild(bar); }
     return true;
   }
 
@@ -656,7 +676,7 @@
     root.innerHTML = '';
 
     var idle = !state.q.trim() && !state.tags.length;
-    if (idle && !state.all && renderPopular()) {
+    if (idle && renderPopular()) {
       if (releasesCache) { apply(releasesCache); }
       return;
     }
@@ -684,9 +704,6 @@
     });
 
     if (!shown) { root.appendChild(nothingFound()); }
-    if (idle && state.all) {
-      root.appendChild(moreBar('', 'Свернуть до самого популярного', false));
-    }
 
     if (releasesCache) { apply(releasesCache); }
   }

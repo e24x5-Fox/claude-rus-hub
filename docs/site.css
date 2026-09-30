@@ -298,12 +298,24 @@ a:hover { text-decoration: underline; }
 }
 .finder .try:hover { border-color: var(--accent); }
 
-/* Строка под каталогом: «ещё N переводов… покажите все» */
+/* Строка под каталогом: «Показать ещё 3 · осталось N · Свернуть» */
 .more {
-  margin: 4px 0 8px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin: 6px 0 8px;
   font-size: var(--fs-note);
   color: var(--text3);
 }
+.more-next {
+  flex: 0 0 auto;
+  color: var(--accent2);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-muted);
+}
+.more-next:hover { color: var(--text); border-color: var(--accent); }
+.more-hint { flex: 1 1 auto; }
 .more-btn {
   font-family: inherit;
   font-size: var(--fs-note);
