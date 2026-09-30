@@ -105,7 +105,7 @@
 (function () {
   var REPO = 'e24x5-Fox/claude-rus-hub';
   var API = 'https://api.github.com/repos/' + REPO + '/releases?per_page=100';
-  var CACHE_KEY = 'crh-releases-2';
+  var CACHE_KEY = 'crh-releases-3';
   var CACHE_TTL = 10 * 60 * 1000;   /* 10 минут: GitHub пускает без ключа 60 запросов в час на IP */
 
   /* Карточки, которым нужен свежий релиз: заполняется при отрисовке,
@@ -326,7 +326,11 @@
       }
     } catch (e) { /* приватный режим — просто сходим в сеть */ }
 
-    fetch(API, { headers: { 'Accept': 'application/vnd.github+json' } })
+    /* Свой кэш на десять минут уже есть выше, поэтому чужие не нужны: у
+       владельца браузер отдавал вчерашние числа даже после Ctrl+Shift+R.
+       no-store — мимо кэша браузера, метка времени в адресе — мимо любого
+       кэша по дороге. */
+    fetch(API + '&_=' + Date.now(), { cache: 'no-store', headers: { 'Accept': 'application/vnd.github+json' } })
       .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
       .then(function (fresh) {
         if (!Array.isArray(fresh)) { return; }
