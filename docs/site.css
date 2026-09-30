@@ -510,3 +510,93 @@ a:hover { text-decoration: underline; }
 .side-thanks-link { margin-top: -8px; line-height: 1.5; }
 .side-thanks-link a { color: var(--text2); text-decoration: underline; text-underline-offset: 3px; }
 .side-thanks-link a:hover { color: var(--accent2); }
+
+/* ── Поддержавшие: панель в левом углу (donors-widget.js) ───────────────── */
+
+/* На широком экране слева от каталога пустое поле шириной больше панели —
+   там она открыта. Уже него — пилюля в левом нижнем углу, чтобы не
+   закрывать карточки. */
+.donors {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 20;
+  font-size: var(--fs-note);
+}
+.donors.wide { top: 47px; bottom: auto; }   /* вровень с шапкой: 3px рамка + 44px */
+
+.donors-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--bg3);
+  background: var(--bg2);
+  color: var(--text2);
+  font: inherit;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0,0,0,.45);
+  transition: border-color var(--t-fast), color var(--t-fast);
+}
+.donors-pill:hover { border-color: var(--accent); color: var(--text); }
+.donors-heart { color: var(--accent2); }
+.donors.open .donors-pill { display: none; }
+
+.donors-panel {
+  display: none;
+  width: min(260px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  background: var(--bg2);
+  border: 1px solid var(--bg3);
+  border-radius: var(--r-card);
+  padding: 14px 16px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.5);
+}
+.donors.wide .donors-panel { box-shadow: none; max-height: calc(100vh - 63px); }
+.donors.open .donors-panel { display: block; }
+
+.donors-head { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
+.donors-head .side-title { margin: 0 0 4px; }
+.donors-mascot { width: 42px; height: auto; flex: none; filter: var(--mascot-shadow); }
+.donors-thanks { margin: 0; color: var(--text2); line-height: 1.5; }
+.donors-close {
+  margin-left: auto;
+  flex: none;
+  background: none;
+  border: 0;
+  padding: 0 2px;
+  color: var(--text3);
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+.donors-close:hover { color: var(--text); }
+
+.donors-list { list-style: none; margin: 0; padding: 0; }
+.donors-list:empty { display: none; }
+.donors-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 0;
+  border-top: 1px solid var(--bg3);
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity var(--t-slow), transform var(--t-slow);
+}
+.donors-row:first-child { border-top: 0; }
+.donors-row.in { opacity: 1; transform: none; }
+.donors-name { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.donors-sum { color: var(--accent2); white-space: nowrap; flex: none; }
+.donors-row.top1 .donors-name::before { content: "♛ "; color: var(--yellow); }
+.donors-row.top1 .donors-sum { font-weight: 600; }
+
+.donors-more { display: block; margin: 4px 0 0; padding: 0; }
+.donors-btn { display: block; text-align: center; margin-top: 12px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .donors-row { transition: none; transform: none; }
+}
