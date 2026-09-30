@@ -19,6 +19,11 @@ OUT = os.path.join(ROOT, "docs", "donors.js")
 API = "https://www.donationalerts.com/api/v1/alerts/donations"
 ANON = "Аноним"
 
+# Донаты раньше этого дня пришли со стримов на Twitch, а не за переводы:
+# откуда донат, DonationAlerts не сообщает, поэтому граница — по дате.
+# 2026-09-20 — первый релиз каталога, dragnwash-v1.0.
+SINCE = "2026-09-20"
+
 HEADER = """/* Донатеры для виджета слева: пишет tools/donors_snapshot.py из GitHub
    Actions по списку донатов DonationAlerts. Ник и сумма, больше ничего.
    Без ключа DA_TOKEN скрипт файл не трогает — тогда его можно вести руками. */
@@ -65,6 +70,8 @@ def main():
         for d in donations:
             print({k: v for k, v in d.items() if k not in ("username", "message", "recipient_name")})
         return
+
+    donations = [d for d in donations if (d.get("created_at") or "") >= SINCE]
 
     main_cur = "RUB"
     rows = {}
