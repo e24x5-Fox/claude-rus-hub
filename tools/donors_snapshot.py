@@ -13,6 +13,13 @@ DA_TOKEN, а страница получает готовую выжимку в 
 Ключа нет — скрипт ничего не трогает и выходит без ошибки: тогда donors.js
 можно вести руками, в том же формате.
 
+Запрещённые слова — тот же список, что в «Общих настройках» виджетов
+DonationAlerts: скрипт читает его со страницы виджета по токену из секрета
+DA_WIDGET_TOKEN (тот, что в ссылке widget/alerts?token=…) и заменяет слова на
+***, в сообщениях и в никах. API донатов отдаёт текст как есть, фильтр
+DonationAlerts работает только в оповещениях. Список не прочитался — файл
+не трогается: лучше вчерашний список, чем мат на сайте.
+
     python tools/donors_snapshot.py      пересобрать docs/donors.js
 
 Ключ получается один раз, на своей машине: tools/donors_token.py.
@@ -58,6 +65,36 @@ def fetch(token):
         page += 1
 
 
+WIDGET = "https://www.donationalerts.com/widget/lastdonations?token="
+BAD = None   # регулярка запрещённых слов, собирается в main()
+
+
+def blacklist(widget_token):
+    """Запрещённые слова из общих настроек виджетов DonationAlerts."""
+    req = urllib.request.Request(WIDGET + widget_token, headers={"User-Agent": "claude-rus-hub-donors"})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        html = r.read().decode("utf-8")
+    m = re.search(r"handleGeneralWidgetSettings\('(.*?)'\);", html, re.S)
+    if not m:
+        raise ValueError("на странице виджета нет настроек")
+    # строка JS в одинарных кавычках: снимаем экранирование, не ломая кириллицу
+    raw = m.group(1).encode("utf-8").decode("unicode_escape").encode("latin-1").decode("utf-8")
+    words = json.loads(raw).get("black_list_words") or ""
+    if isinstance(words, list):
+        words = " ".join(words)
+    return [w for w in re.split(r"[\s,;]+", words) if w]
+
+
+def bad_pattern(words):
+    """Слово целиком, без регистра, е и ё — одно и то же. Целиком — потому что
+    иначе «бля» спрятало бы кусок «употребляю»."""
+    if not words:
+        return None
+    alts = sorted({re.escape(w.lower().replace("ё", "е")).replace("е", "[её]") for w in words},
+                  key=len, reverse=True)
+    return re.compile(r"(?<!\w)(?:" + "|".join(alts) + r")(?!\w)", re.I)
+
+
 def amount_of(d):
     """Сумма в основной валюте аккаунта, если API её дал, иначе как пришла."""
     if d.get("amount_in_user_currency") is not None:
@@ -98,6 +135,8 @@ def clean(text, limit=MSG_MAX):
     Почта — первой: иначе ссылка съест «mail.ru», а «имя@» останется."""
     text = EMAIL.sub("[почта скрыта]", strip_controls(text or ""))
     text = LINK.sub("", text)
+    if BAD:
+        text = BAD.sub("***", text)
     text = re.sub(r"\s+", " ", text).strip()
     if len(text) > limit:
         text = text[:limit - 1].rstrip() + "…"
@@ -134,6 +173,17 @@ def main():
     if not token:
         print("DA_TOKEN не задан — donors.js не трогаю")
         return
+    global BAD
+    widget = os.environ.get("DA_WIDGET_TOKEN", "").strip()
+    if widget:
+        try:
+            words = blacklist(widget)
+        except Exception as e:
+            raise SystemExit("Запрещённые слова не прочитались (%s) — donors.js не трогаю" % e)
+        BAD = bad_pattern(words)
+        print("запрещённых слов: %d" % len(words))   # сами слова в открытый лог не пишем
+    else:
+        print("DA_WIDGET_TOKEN не задан — запрещённые слова не фильтруются")
     try:
         donations = fetch(token)
     except urllib.error.HTTPError as e:
