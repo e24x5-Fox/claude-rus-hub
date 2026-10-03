@@ -22,8 +22,8 @@
 | Игра | Состояние | Что переведено | Скачать |
 |---|---|---|---|
 | **Drag'n Wash** <br><sub>Unity · 18+</sub> | ✅ готово, v1.0 | диалоги (1839 реплик), интерфейс (89 строк), меню настроек (36 подписей), 87 текстур | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/latest) |
-| **My Furry Protogen** <br><sub>Ren'Py · 18+</sub> | ✅ готово, v1.0 | диалоги (1821 реплика), интерфейс (363 строки), ~34 тыс. слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/latest) |
-| **My Furry Protogen 2** <br><sub>Ren'Py · 18+</sub> | ✅ готово, v1.0 | диалоги (3217 реплик), интерфейс (368 строк), ~52 тыс. слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/latest) |
+| **My Furry Protogen** <br><sub>Ren'Py · 18+</sub> | ✅ готово, v1.1 | диалоги (2007 реплик), интерфейс (373 строки), ~36 тыс. слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/latest) |
+| **My Furry Protogen 2** <br><sub>Ren'Py · 18+</sub> | ✅ готово, v1.1 | диалоги (3722 реплики), интерфейс (389 строк), ~60 тыс. слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/latest) |
 | **Amorous** <br><sub>FNA/MonoGame · 18+</sub> | ✅ готово, v1.0 | диалоги (12 884 реплики, ~270 тыс. слов), интерфейс (171 строка), титры, 18 картинок, 6 шрифтов с кириллицей | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/amorous-v1.0) |
 | **Bodycam** <br><sub>Unreal Engine 5</sub> | ✅ готово, v1.0 | интерфейс, меню, снаряжение, режимы, описания — 3674 строки, ~15 тыс. слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/bodycam-v1.0) |
 | **Odd Remedy** <br><sub>Unity · ранний доступ</sub> | ✅ готово, v0.1 | словарь игры (143 ключа), сцены и данные (993 строки), строки в коде (514 мест), ~6 тыс. слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/oddremedy-v0.1) |
@@ -45,7 +45,7 @@
 тег каждого релиза начинается с префикса своей игры.
 
 ```
-dragnwash-v1.0   dragnwash-v1.1   protogen-v1.0   protogen2-v1.0   amorous-v1.0   bodycam-v1.0   oddremedy-v0.1   …
+dragnwash-v1.0   dragnwash-v1.1   protogen-v1.0   protogen-v1.1   protogen2-v1.0   protogen2-v1.1   amorous-v1.0   bodycam-v1.0   oddremedy-v0.1   …
 ```
 
 Префикс записан в `docs/games.js` (`release.tag_prefix`), и кнопка «Скачать»
