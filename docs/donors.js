@@ -2,6 +2,13 @@
    Actions по списку донатов DonationAlerts. Ник, сумма и последнее сообщение.
    Без ключа DA_TOKEN скрипт файл не трогает — тогда его можно вести руками. */
 window.CRH_DONORS = {
- "updated": "2026-09-30T13:44Z",
- "donors": []
+ "updated": "2026-10-03T16:40Z",
+ "donors": [
+  {
+   "name": "Жопич",
+   "amount": 100,
+   "currency": "RUB",
+   "message": "Горгонзолла"
+  }
+ ]
 };
