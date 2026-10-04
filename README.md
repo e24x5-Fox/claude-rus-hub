@@ -27,7 +27,7 @@
 | **Amorous** <br><sub>FNA/MonoGame · 18+</sub> | ✅ готово, v1.0.1 | диалоги (12 884 реплики, ~270 тыс. слов), интерфейс (171 строка), титры, 18 картинок, 6 шрифтов с кириллицей | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/amorous-v1.0.1) |
 | **Bodycam** <br><sub>Unreal Engine 5</sub> | ✅ готово, v1.0.1 | интерфейс, меню, снаряжение, режимы, описания — 3674 строки, ~15 тыс. слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/bodycam-v1.0.1) |
 | **Odd Remedy** <br><sub>Unity · ранний доступ</sub> | ✅ готово, v0.2.1 | словарь игры (143 ключа), сцены и данные (1092 строки), строки в коде (514 мест), ~6 тыс. слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/oddremedy-v0.2.1) |
-| **ATLYSS** <br><sub>Unity · мультиплеер</sub> | ✅ готово, v1.0.2 | диалоги, задания, предметы, навыки, интерфейс (3013 строк), ~20 тыс. слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/atlyss-v1.0.2) |
+| **ATLYSS** <br><sub>Unity · мультиплеер</sub> | ✅ готово, v1.0.3 | диалоги, задания, предметы, навыки, интерфейс (3013 строк), ~20 тыс. слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/atlyss-v1.0.3) |
 
 Список на сайте строится из [`docs/games.js`](docs/games.js) — новая игра
 добавляется одной записью, разметку страницы править не нужно.
