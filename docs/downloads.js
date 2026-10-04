@@ -34,6 +34,15 @@ window.CRH_DOWNLOADS = {
    "amorous": 6,
    "bodycam": 114,
    "oddremedy": 25
+  },
+  "2026-10-04": {
+   "dragnwash": 189,
+   "protogen": 9,
+   "protogen2": 22,
+   "amorous": 8,
+   "bodycam": 347,
+   "oddremedy": 27,
+   "atlyss": 4
   }
  }
 };
