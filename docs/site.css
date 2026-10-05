@@ -626,9 +626,19 @@ a:hover { text-decoration: underline; }
 .seo-list p { margin: 0 0 .3em; }
 .js .seo-list { display: none; }
 
-/* Строка VirusTotal на карточке (virustotal.js) */
-.vt { margin: 12px 0 0; color: var(--text3); font-size: var(--fs-note); }
-.vt b { color: var(--text2); font-weight: 600; }
-.vt-ok b { color: var(--green); }
-.vt-warn b { color: var(--yellow); }
-.vt a { color: var(--accent); }
+/* Значок VirusTotal рядом с «Скачать» (virustotal.js): заметный, но не
+   спорит с главной кнопкой — цветная рамка и подложка вместо заливки. */
+.btn-vt {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-weight: 600;
+  border-width: 1.5px;
+}
+.btn-vt svg { width: 18px; height: 18px; flex: none; }
+.btn-vt svg path { fill: currentColor; }
+.btn-vt svg .tick { fill: none; stroke: var(--bg); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.vt-ok   { color: var(--green);  background: rgba(34,197,94,.12); border-color: rgba(34,197,94,.55); }
+.vt-warn { color: var(--yellow); background: rgba(234,179,8,.12); border-color: rgba(234,179,8,.55); }
+.btn-vt:hover { filter: brightness(1.15); }
+.vt-ok:hover   { border-color: var(--green); }
+.vt-warn:hover { border-color: var(--yellow); }
+.vt-note { margin: 10px 0 0; color: var(--text3); font-size: var(--fs-note); }

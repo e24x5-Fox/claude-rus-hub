@@ -514,10 +514,13 @@
     var links = game.links || {};
     var actions = el('div', 'actions');
     var dl = null, size = null;
+    var vt = virustotal(game);
     if (links.download) {
       dl = link(links.download, 'btn btn-primary', 'Скачать русификатор');
       actions.appendChild(dl);
     }
+    /* Значок проверки — сразу за «Скачать»: его должны увидеть до скачивания. */
+    if (vt) { actions.appendChild(vt.badge); }
     if (links.guide)    { actions.appendChild(link(links.guide, 'btn btn-mini', 'Руководство в Steam')); }
     if (links.steam)    { actions.appendChild(link(links.steam, 'btn btn-mini', 'Игра в Steam')); }
     if (game.install_size && links.download) {
@@ -526,8 +529,7 @@
     }
     if (actions.childNodes.length) { body.appendChild(actions); }
 
-    var vt = virustotalLine(game);
-    if (vt) { body.appendChild(vt); }
+    if (vt && vt.note) { body.appendChild(vt.note); }
 
     /* Ссылка из games.js — запасная: она ведёт на список релизов и работает
        всегда. Если API ответит, её подменит прямая ссылка на свежий файл. */
@@ -543,24 +545,31 @@
 
   /* ── Проверка на вирусы ───────────────────────────────────────────────
      Отчёты VirusTotal о каждом установщике лежат в virustotal.js (пишет
-     tools/vt_check.py мастерской). Отчёт привязан к хешу файла: когда API
-     GitHub ответит, строка сверяется с digest свежего релиза и прячется,
-     если отчёт про прошлую версию. Без ответа API показывается как есть. */
-  function virustotalLine(game) {
+     tools/vt_check.py мастерской). Значок стоит рядом с «Скачать» и ведёт на
+     отчёт. Отчёт привязан к хешу файла: когда API GitHub ответит, значок
+     сверяется с digest свежего релиза и прячется, если отчёт про прошлую
+     версию. Без ответа API показывается как есть. */
+  var SHIELD = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z"/>'
+             + '<path class="tick" d="m8.5 12 2.5 2.5 4.5-5"/></svg>';
+
+  function virustotal(game) {
     var r = (window.CRH_VT || {})[game.slug];
     if (!r || !r.link) { return null; }
     var bad = (r.malicious || 0) + (r.suspicious || 0);
-    var p = el('p', 'vt' + (bad ? ' vt-warn' : ' vt-ok'));
-    p.appendChild(el('b', null, 'Проверка на вирусы: '));
-    var text = bad
-      ? 'сработал' + (bad === 1 ? '' : 'и') + ' ' + bad + ' из ' + r.engines + ' антивирусов ('
-        + Object.keys(r.flagged || {}).slice(0, 3).join(', ') + '). Установщик не подписан, '
-        + 'и отдельные антивирусы помечают такие файлы общей эвристикой. '
-      : 'ни один из ' + r.engines + ' антивирусов ничего не нашёл. ';
-    p.appendChild(document.createTextNode(text));
-    p.appendChild(link(r.link, null, 'Отчёт VirusTotal'));
-    if (r.date) { p.appendChild(document.createTextNode(' · ' + r.date)); }
-    return p;
+    var badge = link(r.link, 'btn btn-vt ' + (bad ? 'vt-warn' : 'vt-ok'), '');
+    badge.innerHTML = SHIELD;
+    badge.appendChild(el('span', null, bad
+      ? 'Проверка на вирусы: ' + bad + ' из ' + r.engines + ' — подробнее'
+      : 'Проверено: вирусов нет (0 из ' + r.engines + ')'));
+    badge.title = 'Отчёт VirusTotal об этом установщике' + (r.date ? ', ' + r.date : '');
+    var note = null;
+    if (bad) {
+      note = el('p', 'vt-note', 'Сработал' + (bad === 1 ? '' : 'и') + ' '
+        + Object.keys(r.flagged || {}).slice(0, 3).join(', ') + ' из ' + r.engines
+        + ' антивирусов. Установщик не подписан цифровой подписью, и отдельные '
+        + 'антивирусы помечают такие файлы общей эвристикой, а не по найденному вирусу.');
+    }
+    return { badge: badge, note: note, sha256: r.sha256 };
   }
 
   var root = document.getElementById('catalog');
@@ -644,8 +653,9 @@
       var asset = assetOf(rel, item.game.release.asset);
       if (asset) { item.dl.href = asset.browser_download_url; }
       if (item.vt && asset && asset.digest) {
-        var r = (window.CRH_VT || {})[item.game.slug] || {};
-        item.vt.hidden = asset.digest !== 'sha256:' + r.sha256;
+        var stale = asset.digest !== 'sha256:' + item.vt.sha256;
+        item.vt.badge.hidden = stale;
+        if (item.vt.note) { item.vt.note.hidden = stale; }
       }
       else { item.dl.href = rel.html_url; }
 
