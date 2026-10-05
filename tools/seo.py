@@ -112,6 +112,10 @@ def head_block(games):
         "<!-- seo:head — пишет tools/seo.py из games.js, руками не править -->",
         f'<meta name="keywords" content="{e(", ".join(keywords))}">',
         '<meta name="robots" content="index, follow">',
+        # Список в #catalog нужен поисковику и тем, у кого нет JavaScript; у
+        # остальных он мелькал до отрисовки карточек. Класс ставится до первой
+        # отрисовки, и CSS прячет список сразу (site.css, .js .seo-list).
+        "<script>document.documentElement.className += ' js';</script>",
         f'<link rel="canonical" href="{SITE}">',
         f'<meta property="og:url" content="{SITE}">',
         f'<meta property="og:image" content="{SITE}assets/mascot-wave.png">',
