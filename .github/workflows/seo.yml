@@ -1,11 +1,16 @@
 # После правки games.js пересобирает разметку для поисковиков в index.html
-# и sitemap.xml (tools/seo.py), чтобы не забыть запустить его руками.
+# и sitemap.xml, метки версий у стилей и скриптов (tools/seo.py), чтобы не
+# забыть запустить его руками.
 name: Разметка для поисковиков
 
 on:
   push:
     paths:
       - docs/games.js
+      - docs/tokens.css
+      - docs/site.css
+      - docs/side.js
+      - docs/donors-widget.js
       - tools/seo.py
   workflow_dispatch:
 

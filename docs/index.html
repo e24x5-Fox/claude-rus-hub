@@ -286,8 +286,8 @@
 ]
 </script>
 <!-- /seo:head -->
-<link rel="stylesheet" href="tokens.css">
-<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="tokens.css?v=e5c898f0">
+<link rel="stylesheet" href="site.css?v=d5900a1e">
 </head>
 <body>
 
@@ -426,9 +426,9 @@
 <script src="games.js"></script>
 <script src="downloads.js"></script>
 <script src="virustotal.js"></script>
-<script src="side.js"></script>
+<script src="side.js?v=07fb88f1"></script>
 <script src="donors.js"></script>
-<script src="donors-widget.js"></script>
+<script src="donors-widget.js?v=bf3aa88b"></script>
 <script>
 /* Страница строится из window.CATALOG (games.js). Править разметку карточек
    при добавлении игры не нужно — только данные. */
@@ -549,7 +549,9 @@
      отчёт. Отчёт привязан к хешу файла: когда API GitHub ответит, значок
      сверяется с digest свежего релиза и прячется, если отчёт про прошлую
      версию. Без ответа API показывается как есть. */
-  var SHIELD = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z"/>'
+  /* Размер зашит в сам SVG: без стилей (старый site.css в кеше) щит иначе
+     растягивается на всю карточку. */
+  var SHIELD = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z"/>'
              + '<path class="tick" d="m8.5 12 2.5 2.5 4.5-5"/></svg>';
 
   function virustotal(game) {

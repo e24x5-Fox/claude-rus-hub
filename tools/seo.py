@@ -161,6 +161,23 @@ def replace(text, name, block, anchor, keep=False):
     return text.replace(anchor, anchor + "\n" + block if keep else block, 1)
 
 
+# Стили и код страницы: к адресу дописывается ?v=<хеш содержимого>, иначе после
+# правки браузер держит старый файл из кеша и новая разметка ломается без стилей
+# (06.10.2026 значок VirusTotal раздуло на всю карточку). Данные (games.js,
+# downloads.js, donors.js, virustotal.js) сюда не входят: их переписывают
+# workflow, а GitHub Pages и так кеширует всего на 10 минут.
+STAMPED = ("tokens.css", "site.css", "side.js", "donors-widget.js")
+
+
+def stamp(text):
+    import hashlib
+    for name in STAMPED:
+        digest = hashlib.sha1((DOCS / name).read_bytes()).hexdigest()[:8]
+        text = re.sub(r'"%s(\?v=[0-9a-f]*)?"' % re.escape(name),
+                      lambda m: f'"{name}?v={digest}"', text)
+    return text
+
+
 def sitemap(catalog):
     day = catalog.get("updated") or date.today().isoformat()
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -179,6 +196,7 @@ def main():
                    '<link rel="icon" type="image/png" href="assets/favicon.png">', keep=True)
     text = replace(text, "seo:list", list_block(games),
                    '    <p class="empty">Каталог загружается…</p>')
+    text = stamp(text)
     page.write_text(text, encoding="utf-8", newline="\n")
     (DOCS / "sitemap.xml").write_text(sitemap(catalog), encoding="utf-8", newline="\n")
     print(f"seo: {len(games)} игр в разметке")
