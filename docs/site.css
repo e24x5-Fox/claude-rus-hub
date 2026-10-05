@@ -617,3 +617,10 @@ a:hover { text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) {
   .donors-row { transition: none; transform: none; }
 }
+
+/* Список переводов обычным HTML (tools/seo.py) — для поисковиков и для тех,
+   у кого не работает JavaScript. Скрипт страницы заменяет его карточками. */
+.seo-list { list-style: none; margin: 0; padding: 0; }
+.seo-list li { margin: 0 0 1.2em; }
+.seo-list h2 { font-size: 1.05em; margin: 0 0 .3em; }
+.seo-list p { margin: 0 0 .3em; }
