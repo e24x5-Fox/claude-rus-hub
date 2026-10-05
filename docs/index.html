@@ -425,6 +425,7 @@
 
 <script src="games.js"></script>
 <script src="downloads.js"></script>
+<script src="virustotal.js"></script>
 <script src="side.js"></script>
 <script src="donors.js"></script>
 <script src="donors-widget.js"></script>
@@ -525,16 +526,41 @@
     }
     if (actions.childNodes.length) { body.appendChild(actions); }
 
+    var vt = virustotalLine(game);
+    if (vt) { body.appendChild(vt); }
+
     /* Ссылка из games.js — запасная: она ведёт на список релизов и работает
        всегда. Если API ответит, её подменит прямая ссылка на свежий файл. */
     if (dl && game.release && game.release.tag_prefix) {
-      pending.push({ game: game, dl: dl, size: size, ver: verPill });
+      pending.push({ game: game, dl: dl, size: size, ver: verPill, vt: vt });
     }
 
     if (game.note) { body.appendChild(el('p', 'note', game.note)); }
 
     c.appendChild(body);
     return c;
+  }
+
+  /* ── Проверка на вирусы ───────────────────────────────────────────────
+     Отчёты VirusTotal о каждом установщике лежат в virustotal.js (пишет
+     tools/vt_check.py мастерской). Отчёт привязан к хешу файла: когда API
+     GitHub ответит, строка сверяется с digest свежего релиза и прячется,
+     если отчёт про прошлую версию. Без ответа API показывается как есть. */
+  function virustotalLine(game) {
+    var r = (window.CRH_VT || {})[game.slug];
+    if (!r || !r.link) { return null; }
+    var bad = (r.malicious || 0) + (r.suspicious || 0);
+    var p = el('p', 'vt' + (bad ? ' vt-warn' : ' vt-ok'));
+    p.appendChild(el('b', null, 'Проверка на вирусы: '));
+    var text = bad
+      ? 'сработал' + (bad === 1 ? '' : 'и') + ' ' + bad + ' из ' + r.engines + ' антивирусов ('
+        + Object.keys(r.flagged || {}).slice(0, 3).join(', ') + '). Установщик не подписан, '
+        + 'и отдельные антивирусы помечают такие файлы общей эвристикой. '
+      : 'ни один из ' + r.engines + ' антивирусов ничего не нашёл. ';
+    p.appendChild(document.createTextNode(text));
+    p.appendChild(link(r.link, null, 'Отчёт VirusTotal'));
+    if (r.date) { p.appendChild(document.createTextNode(' · ' + r.date)); }
+    return p;
   }
 
   var root = document.getElementById('catalog');
@@ -617,6 +643,10 @@
 
       var asset = assetOf(rel, item.game.release.asset);
       if (asset) { item.dl.href = asset.browser_download_url; }
+      if (item.vt && asset && asset.digest) {
+        var r = (window.CRH_VT || {})[item.game.slug] || {};
+        item.vt.hidden = asset.digest !== 'sha256:' + r.sha256;
+      }
       else { item.dl.href = rel.html_url; }
 
       /* Версия — из тега: dragnwash-v1.2 → v1.2 */

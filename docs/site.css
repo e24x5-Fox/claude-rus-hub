@@ -625,3 +625,10 @@ a:hover { text-decoration: underline; }
 .seo-list h2 { font-size: 1.05em; margin: 0 0 .3em; }
 .seo-list p { margin: 0 0 .3em; }
 .js .seo-list { display: none; }
+
+/* Строка VirusTotal на карточке (virustotal.js) */
+.vt { margin: 12px 0 0; color: var(--text3); font-size: var(--fs-note); }
+.vt b { color: var(--text2); font-weight: 600; }
+.vt-ok b { color: var(--green); }
+.vt-warn b { color: var(--yellow); }
+.vt a { color: var(--accent); }
