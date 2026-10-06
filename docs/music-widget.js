@@ -68,6 +68,40 @@
   var layers = [el('div', 'music-bg-layer'), el('div', 'music-bg-layer')];
   bg.appendChild(layers[0]);
   bg.appendChild(layers[1]);
+
+  /* Как колонка статистики: наверху страницы виден верх обложки, внизу — низ.
+     Только очень медленно: две ступени сглаживания по BG_TAU секунд, фон
+     доплывает до места секунды через три после того, как прокрутка встала. */
+  var BG_TAU = 0.9;
+  var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var pan = 0, panMid = 0, panTarget = 0, panRaf = 0, panLast = 0;
+  function scrollShare() {
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    return max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+  }
+  function placeBg() {
+    /* запас хода — всё, что выше экрана, кроме полей под края размытия сверху и снизу */
+    var room = Math.max(0, layers[0].offsetHeight - window.innerHeight * 1.3);
+    var t = 'translate3d(0,' + (-pan * room).toFixed(1) + 'px,0)';
+    layers[0].style.transform = layers[1].style.transform = t;
+  }
+  function panTick(now) {
+    var dt = panLast ? Math.min(0.1, (now - panLast) / 1000) : 1 / 60;
+    panLast = now;
+    var a = 1 - Math.exp(-dt / BG_TAU);
+    panMid += (panTarget - panMid) * a;
+    pan += (panMid - pan) * a;
+    if (Math.abs(panTarget - pan) < 0.0005 && Math.abs(panTarget - panMid) < 0.0005) { pan = panMid = panTarget; }
+    placeBg();
+    if (pan === panTarget) { panRaf = 0; panLast = 0; } else { panRaf = requestAnimationFrame(panTick); }
+  }
+  function panTo() {
+    panTarget = scrollShare();
+    if (calm) { pan = panMid = panTarget; placeBg(); return; }
+    if (!panRaf) { panLast = 0; panRaf = requestAnimationFrame(panTick); }
+  }
+  window.addEventListener('scroll', panTo, { passive: true });
+  window.addEventListener('resize', function () { placeBg(); panTo(); });
   var front = 0, bgSrc = '';
   function setBg(src) {
     if (src === bgSrc) { return; }
@@ -334,6 +368,8 @@
 
   show();
   document.body.insertBefore(bg, document.body.firstChild);
+  pan = panMid = panTarget = scrollShare();   /* открыли посреди страницы — фон сразу на месте */
+  placeBg();
   document.body.appendChild(box);
   document.body.classList.add('has-music');
   fit();

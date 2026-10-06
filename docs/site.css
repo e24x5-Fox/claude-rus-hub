@@ -669,12 +669,15 @@ a:hover { text-decoration: underline; }
    чуть заметнее и чуть резче. */
 .music-bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
 .music-bg-layer {
-  position: absolute; inset: -20%;          /* края размытия — за экраном */
+  /* квадрат шире экрана: края размытия — за экраном, а по высоте есть запас,
+     по которому music-widget.js ведёт картинку сверху вниз вслед за прокруткой */
+  position: absolute; left: -15%; top: -15vh; width: 130%;
+  aspect-ratio: 1; min-height: 130vh;
   background: center / cover no-repeat;
   filter: blur(90px) saturate(1.3) brightness(.55);
   opacity: 0;
   transition: opacity 3.5s ease, filter 2.5s ease;
-  will-change: opacity, filter;
+  will-change: opacity, filter, transform;
 }
 .music-bg-layer.on { opacity: .14; }
 body.music-playing .music-bg-layer { filter: blur(24px) saturate(1.3) brightness(.55); }
