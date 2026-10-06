@@ -166,7 +166,7 @@ def replace(text, name, block, anchor, keep=False):
 # (06.10.2026 значок VirusTotal раздуло на всю карточку). Данные (games.js,
 # downloads.js, donors.js, virustotal.js) сюда не входят: их переписывают
 # workflow, а GitHub Pages и так кеширует всего на 10 минут.
-STAMPED = ("tokens.css", "site.css", "side.js", "donors-widget.js")
+STAMPED = ("tokens.css", "site.css", "side.js", "donors-widget.js", "music-widget.js")
 
 
 def stamp(text):
