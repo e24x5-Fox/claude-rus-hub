@@ -24,7 +24,7 @@ DonationAlerts работает только в оповещениях. Спис
 
 Ключ получается один раз, на своей машине: tools/donors_token.py.
 """
-import os, re, sys, json, unicodedata, datetime, urllib.request, urllib.error
+import os, re, sys, ssl, json, time, unicodedata, datetime, urllib.request, urllib.error
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "docs", "donors.js")
@@ -50,14 +50,29 @@ HEADER = """/* Донатеры для виджета слева: пишет too
 """
 
 
+def opened(req, tries=3):
+    """urlopen с повтором: DonationAlerts изредка рвёт TLS посреди ответа
+    (UNEXPECTED_EOF_WHILE_READING, 01.10.2026), и прогон падал на ровном месте.
+    HTTPError не повторяем — это ответ сервера, а не обрыв."""
+    for n in range(tries):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return r.read()
+        except urllib.error.HTTPError:
+            raise
+        except (urllib.error.URLError, ConnectionError, TimeoutError, ssl.SSLError):
+            if n == tries - 1:
+                raise
+            time.sleep(10 * (n + 1))
+
+
 def fetch(token):
     out, page = [], 1
     while True:
         req = urllib.request.Request(API + "?page=%d" % page, headers={
             "Authorization": "Bearer " + token,
             "User-Agent": "claude-rus-hub-donors"})
-        with urllib.request.urlopen(req, timeout=30) as r:
-            box = json.load(r)
+        box = json.loads(opened(req))
         out.extend(box.get("data") or [])
         meta = box.get("meta") or {}
         if page >= int(meta.get("last_page") or 1):
@@ -72,8 +87,7 @@ BAD = None   # регулярка запрещённых слов, собира�
 def blacklist(widget_token):
     """Запрещённые слова из общих настроек виджетов DonationAlerts."""
     req = urllib.request.Request(WIDGET + widget_token, headers={"User-Agent": "claude-rus-hub-donors"})
-    with urllib.request.urlopen(req, timeout=30) as r:
-        html = r.read().decode("utf-8")
+    html = opened(req).decode("utf-8")
     m = re.search(r"handleGeneralWidgetSettings\('(.*?)'\);", html, re.S)
     if not m:
         raise ValueError("на странице виджета нет настроек")
