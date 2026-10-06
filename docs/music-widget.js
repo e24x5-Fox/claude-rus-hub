@@ -12,8 +12,8 @@
    плеер запоминаются у посетителя в браузере; трек при каждом открытии
    страницы — случайный. Название ведёт на страницу трека в Suno.
 
-   Прокрутка вниз чуть замедляет трек, «Скачать» (событие crh:download из
-   thanks-widget.js) тормозит его до нуля.
+   Чем ниже по странице, тем медленнее идёт трек; «Скачать» (событие
+   crh:download из thanks-widget.js) тормозит его до нуля.
    ───────────────────────────────────────────────────────────────────────── */
 
 (function () {
@@ -146,10 +146,11 @@
     box.classList.remove('playing');
   });
 
-  /* ── скорость: прокрутка вниз чуть замедляет, «Скачать» — резкий стоп ──
-     Высоту тона не сохраняем: так замедление звучит как пластинка, которую
-     притормозили пальцем, а не как растянутый голос. */
-  var SCROLL_RATE = 0.9;   /* насколько замедляет прокрутка вниз */
+  /* ── скорость: чем ниже по странице, тем медленнее; «Скачать» — стоп ──
+     Наверху трек идёт как есть, в самом низу — на BOTTOM_RATE, между ними
+     плавно по положению прокрутки. Высоту тона не сохраняем: так замедление
+     звучит как притормозившая пластинка, а не как растянутый голос. */
+  var BOTTOM_RATE = 0.88;  /* скорость в самом низу страницы */
   var MIN_RATE = 0.07;     /* ниже 0.0625 Chrome не пускает */
   audio.preservesPitch = false;
   audio.mozPreservesPitch = false;
@@ -167,21 +168,25 @@
     if (!raf) { raf = requestAnimationFrame(tick); }
   }
 
-  var lastY = window.scrollY, calm = null;
+  /* скорость для текущего места на странице: 1 наверху, BOTTOM_RATE внизу */
+  function depthRate() {
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    var k = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+    return 1 - (1 - BOTTOM_RATE) * k;
+  }
   window.addEventListener('scroll', function () {
-    var y = window.scrollY, down = y > lastY;
-    lastY = y;
-    if (stopping || audio.paused || !down) { return; }
-    glide(SCROLL_RATE);
-    clearTimeout(calm);
-    calm = setTimeout(function () { if (!stopping) { glide(1); } }, 280);
+    if (!stopping) { glide(depthRate()); }
   }, { passive: true });
+  /* смена трека сбрасывает скорость браузером — возвращаем её на место */
+  audio.addEventListener('play', function () {
+    rate = target = depthRate();
+    audio.playbackRate = rate;
+  });
 
   /* «Скачать» — трек тормозит до нуля за секунду, как остановленная кассета */
   document.addEventListener('crh:download', function () {
     if (audio.paused || stopping) { return; }
     stopping = true;
-    clearTimeout(calm);
     cancelAnimationFrame(raf); raf = 0;
     clearInterval(fadeTimer);
     var from = audio.playbackRate, v0 = audio.volume, t0 = Date.now(), DUR = 1000;
@@ -192,8 +197,8 @@
       audio.volume = v0 * (1 - Math.max(0, (k - 0.6) / 0.4));
       if (k < 1) { requestAnimationFrame(step); return; }
       audio.pause();
-      rate = target = 1;
-      audio.playbackRate = 1;
+      rate = target = depthRate();
+      audio.playbackRate = rate;
       audio.volume = volume;
       stopping = false;
     })();
