@@ -8,8 +8,9 @@
    Треки идут по кругу сами, переключать и перематывать нечем — так задумано.
 
    Музыка не должна пугать: сама не играет (только по нажатию), громкость по
-   умолчанию маленькая, а старт — плавный, с нуля. Громкость, трек и свёрнут
-   ли плеер запоминаются у посетителя в браузере.
+   умолчанию маленькая, а старт — плавный, с нуля. Громкость и свёрнут ли
+   плеер запоминаются у посетителя в браузере; трек при каждом открытии
+   страницы — случайный. Название ведёт на страницу трека в Suno.
    ───────────────────────────────────────────────────────────────────────── */
 
 (function () {
@@ -27,12 +28,12 @@
   }
   var saved = load();
   var volume = typeof saved.volume === 'number' ? Math.min(1, Math.max(0, saved.volume)) : VOLUME;
-  var cur = saved.track >= 0 && saved.track < tracks.length ? saved.track : 0;
+  var cur = Math.floor(Math.random() * tracks.length);   /* каждый раз — случайный */
   var folded = typeof saved.folded === 'boolean' ? saved.folded : null;   /* null — по ширине экрана */
 
   function save() {
     try {
-      localStorage.setItem(KEY, JSON.stringify({ volume: volume, track: cur, folded: folded }));
+      localStorage.setItem(KEY, JSON.stringify({ volume: volume, folded: folded }));
     } catch (e) { /* без памяти — тоже можно */ }
   }
 
@@ -64,7 +65,9 @@
   coverBtn.appendChild(cover);
 
   var info = el('div', 'music-info');
-  var title = el('div', 'music-title');
+  var title = el('a', 'music-title');
+  title.target = '_blank';
+  title.rel = 'noopener';
   var artist = el('div', 'music-artist', (data.artist || '') + ' · Suno');
   var volRow = el('label', 'music-vol-row');
   volRow.title = 'Громкость';
@@ -101,7 +104,13 @@
   function show() {
     var t = tracks[cur];
     title.textContent = t.title;
-    title.title = t.title;
+    if (t.suno) {
+      title.href = 'https://suno.com/song/' + t.suno;
+      title.title = t.title + ' — открыть в Suno';
+    } else {
+      title.removeAttribute('href');
+      title.title = t.title;
+    }
     cover.src = 'music/' + t.file + '.jpg';
     coverBtn.title = t.title + ' — развернуть';
   }
