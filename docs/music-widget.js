@@ -11,6 +11,9 @@
    умолчанию маленькая, а старт — плавный, с нуля. Громкость и свёрнут ли
    плеер запоминаются у посетителя в браузере; трек при каждом открытии
    страницы — случайный. Название ведёт на страницу трека в Suno.
+
+   Прокрутка вниз чуть замедляет трек, «Скачать» (событие crh:download из
+   thanks-widget.js) тормозит его до нуля.
    ───────────────────────────────────────────────────────────────────────── */
 
 (function () {
@@ -129,7 +132,7 @@
     if (p && p.catch) { p.catch(function () { /* браузер не дал — ждём следующего нажатия */ }); }
   }
 
-  play.addEventListener('click', function () { audio.paused ? go() : audio.pause(); });
+  play.addEventListener('click', function () { if (!stopping) { audio.paused ? go() : audio.pause(); } });
   audio.addEventListener('ended', function () { pick(cur + 1); go(); });
 
   audio.addEventListener('play', function () {
@@ -141,6 +144,59 @@
     play.classList.replace('ico-pause', 'ico-play');
     play.setAttribute('aria-label', 'Играть'); play.title = 'Играть';
     box.classList.remove('playing');
+  });
+
+  /* ── скорость: прокрутка вниз чуть замедляет, «Скачать» — резкий стоп ──
+     Высоту тона не сохраняем: так замедление звучит как пластинка, которую
+     притормозили пальцем, а не как растянутый голос. */
+  var SCROLL_RATE = 0.9;   /* насколько замедляет прокрутка вниз */
+  var MIN_RATE = 0.07;     /* ниже 0.0625 Chrome не пускает */
+  audio.preservesPitch = false;
+  audio.mozPreservesPitch = false;
+  audio.webkitPreservesPitch = false;
+
+  var rate = 1, target = 1, raf = 0, stopping = false;
+  function tick() {
+    rate += (target - rate) * 0.12;
+    if (Math.abs(target - rate) < 0.003) { rate = target; }
+    audio.playbackRate = rate;
+    raf = rate === target ? 0 : requestAnimationFrame(tick);
+  }
+  function glide(to) {
+    target = to;
+    if (!raf) { raf = requestAnimationFrame(tick); }
+  }
+
+  var lastY = window.scrollY, calm = null;
+  window.addEventListener('scroll', function () {
+    var y = window.scrollY, down = y > lastY;
+    lastY = y;
+    if (stopping || audio.paused || !down) { return; }
+    glide(SCROLL_RATE);
+    clearTimeout(calm);
+    calm = setTimeout(function () { if (!stopping) { glide(1); } }, 280);
+  }, { passive: true });
+
+  /* «Скачать» — трек тормозит до нуля за секунду, как остановленная кассета */
+  document.addEventListener('crh:download', function () {
+    if (audio.paused || stopping) { return; }
+    stopping = true;
+    clearTimeout(calm);
+    cancelAnimationFrame(raf); raf = 0;
+    clearInterval(fadeTimer);
+    var from = audio.playbackRate, v0 = audio.volume, t0 = Date.now(), DUR = 1000;
+    (function step() {
+      var k = Math.min(1, (Date.now() - t0) / DUR);
+      var e = k * k;                          /* сначала медленно, потом обрыв */
+      audio.playbackRate = Math.max(MIN_RATE, from - (from - MIN_RATE) * e);
+      audio.volume = v0 * (1 - Math.max(0, (k - 0.6) / 0.4));
+      if (k < 1) { requestAnimationFrame(step); return; }
+      audio.pause();
+      rate = target = 1;
+      audio.playbackRate = 1;
+      audio.volume = volume;
+      stopping = false;
+    })();
   });
 
   vol.addEventListener('input', function () {

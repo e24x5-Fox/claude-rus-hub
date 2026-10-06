@@ -717,6 +717,43 @@ body.has-music .donors.wide .donors-panel { max-height: calc(100vh - 63px - 90px
   .music.folded.playing .music-cover { animation: none; }
 }
 
+/* ── «Спасибо, что скачали» (thanks-widget.js) ─────────────────────────── */
+.thanks {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+  background: rgba(0,0,0,.45);
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--t-med), visibility var(--t-med);
+}
+.thanks.show { opacity: 1; visibility: visible; }
+.thanks-card {
+  display: flex; gap: 16px; align-items: center;
+  max-width: 440px; width: 100%; box-sizing: border-box;
+  padding: 20px 22px;
+  background: var(--bg2);
+  border: 1px solid var(--accent);
+  border-radius: var(--r-card);
+  box-shadow: 0 12px 40px rgba(0,0,0,.6), 0 0 0 4px var(--accent-soft);
+  transform: translateY(12px) scale(.97);
+  transition: transform var(--t-med);
+}
+.thanks.show .thanks-card { transform: none; }
+.thanks-mascot { width: 92px; height: auto; flex: none; filter: var(--mascot-shadow); }
+.thanks.show .thanks-mascot { animation: thanks-wave 1.2s ease-in-out 2; transform-origin: 50% 90%; }
+@keyframes thanks-wave { 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
+.thanks-title { color: var(--text); font-weight: 600; font-size: var(--fs-title); line-height: 1.3; }
+.thanks-sub { margin: 6px 0 14px; color: var(--text2); line-height: 1.55; }
+.thanks-ok { border: 0; cursor: pointer; font: inherit; }
+@media (max-width: 560px) {
+  .thanks-card { flex-direction: column; text-align: center; }
+  .thanks-mascot { width: 76px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .thanks, .thanks-card { transition: none; }
+  .thanks.show .thanks-mascot { animation: none; }
+}
+
 /* Список переводов обычным HTML (tools/seo.py) — для поисковиков и для тех,
    у кого не работает JavaScript. Скрипт страницы заменяет его карточками. */
 .seo-list { list-style: none; margin: 0; padding: 0; }

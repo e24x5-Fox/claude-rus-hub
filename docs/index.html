@@ -289,7 +289,7 @@
 </script>
 <!-- /seo:head -->
 <link rel="stylesheet" href="tokens.css?v=e5c898f0">
-<link rel="stylesheet" href="site.css?v=759bb2f5">
+<link rel="stylesheet" href="site.css?v=86c90bcc">
 </head>
 <body>
 
@@ -431,8 +431,9 @@
 <script src="side.js?v=07fb88f1"></script>
 <script src="donors.js"></script>
 <script src="donors-widget.js?v=c57e3713"></script>
+<script src="thanks-widget.js?v=27064fd9"></script>
 <script src="music.js"></script>
-<script src="music-widget.js?v=1a261d1b"></script>
+<script src="music-widget.js?v=b566ef38"></script>
 <script>
 /* Страница строится из window.CATALOG (games.js). Править разметку карточек
    при добавлении игры не нужно — только данные. */
@@ -521,6 +522,7 @@
     var vt = virustotal(game);
     if (links.download) {
       dl = link(links.download, 'btn btn-primary', 'Скачать русификатор');
+      dl.setAttribute('data-download', '');   /* плашка «спасибо» — thanks-widget.js */
       actions.appendChild(dl);
     }
     /* Значок проверки — сразу за «Скачать»: его должны увидеть до скачивания. */

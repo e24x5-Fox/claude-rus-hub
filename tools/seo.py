@@ -166,13 +166,15 @@ def replace(text, name, block, anchor, keep=False):
 # (06.10.2026 значок VirusTotal раздуло на всю карточку). Данные (games.js,
 # downloads.js, donors.js, virustotal.js) сюда не входят: их переписывают
 # workflow, а GitHub Pages и так кеширует всего на 10 минут.
-STAMPED = ("tokens.css", "site.css", "side.js", "donors-widget.js", "music-widget.js")
+STAMPED = ("tokens.css", "site.css", "side.js", "donors-widget.js", "music-widget.js", "thanks-widget.js")
 
 
 def stamp(text):
     import hashlib
     for name in STAMPED:
-        digest = hashlib.sha1((DOCS / name).read_bytes()).hexdigest()[:8]
+        # переводы строк не в счёт: на Windows git отдаёт файл с CRLF, в Actions — с LF,
+        # и без этого метки расходились, а index.html переписывался туда-обратно
+        digest = hashlib.sha1((DOCS / name).read_bytes().replace(b"\r\n", b"\n")).hexdigest()[:8]
         text = re.sub(r'"%s(\?v=[0-9a-f]*)?"' % re.escape(name),
                       lambda m: f'"{name}?v={digest}"', text)
     return text
