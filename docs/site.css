@@ -677,7 +677,7 @@ a:hover { text-decoration: underline; }
   will-change: opacity, filter;
 }
 .music-bg-layer.on { opacity: .14; }
-body.music-playing .music-bg-layer { filter: blur(60px) saturate(1.3) brightness(.55); }
+body.music-playing .music-bg-layer { filter: blur(40px) saturate(1.3) brightness(.55); }
 body.music-playing .music-bg-layer.on { opacity: .24; }
 /* на широком экране плеер занимает низ колонки — панель донатеров уступает */
 body.has-music .donors.wide .donors-panel { max-height: calc(100vh - 63px - 90px); }
