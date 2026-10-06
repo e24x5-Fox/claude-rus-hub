@@ -11,10 +11,12 @@
    Посещения считает Abacus (abacus.jasoncameron.dev): у GitHub Pages своего
    сервера нет, записать число некуда. Два счётчика:
      views    — заходы в каталог; перезагрузка вкладки заходом не считается;
-     visitors — разные посетители: +1, только если этот браузер тут впервые.
+     visitors — разные посетители: +1, только если этот браузер тут впервые;
+     pleased  — сколько раз ответили лису «Пожалуйста ♡» на плашке после
+                скачивания (thanks-widget.js зовёт CRH_SIDE.please()).
    Аккаунтов у посетителей нет, поэтому «разные» — это разные браузеры:
-   человек с телефона и с компьютера посчитается дважды. С file:// счётчики
-   только читаются — открыв страницу с диска, число не накрутишь.
+   человек с телефона и с компьютера посчитается дважды. С file:// и с
+   локального сервера счётчики только читаются — проверками число не накрутишь.
    ───────────────────────────────────────────────────────────────────────── */
 
 (function () {
@@ -78,6 +80,7 @@
     row.appendChild(el('span', 'k', label));
     if (hint) { row.title = hint; }
     box.appendChild(row);
+    return row;
   }
 
   /* ── Сводка по каталогу: всё из games.js, сеть не нужна ───────────────── */
@@ -161,6 +164,14 @@
 
   /* ── Посещения ────────────────────────────────────────────────────────── */
 
+  /* Страница с диска или с локального сервера (проверки перед заливкой) —
+     счётчики только читаются. 06.10.2026 локальные проверки с 127.0.0.1
+     успели накрутить заходы и «пожалуйста», отсюда проверка не только file:. */
+  function isLocal() {
+    return location.protocol === 'file:'
+      || /^(localhost|127\.\d+\.\d+\.\d+|\[::1\])$/.test(location.hostname);
+  }
+
   function counter(key, bump) {
     return fetch(COUNTER + '/' + (bump ? 'hit' : 'get') + '/' + NS + '/' + key)
       .then(function (r) { return r.ok ? r.json() : (r.status === 404 ? { value: 0 } : Promise.reject(r.status)); })
@@ -178,18 +189,24 @@
   function visits() {
     var box = $('side-visits');
     if (!box) { return; }
-    var local = location.protocol === 'file:';
+    var local = isLocal();
     var newView = !local && !flag(sessionStorage, 'crh-counted');
     var newVisitor = !local && !flag(localStorage, 'crh-visitor');
 
-    Promise.all([counter('views', newView), counter('visitors', newVisitor)])
+    Promise.all([counter('views', newView), counter('visitors', newVisitor),
+                 counter(PLEASE_KEY, false).catch(function () { return null; })])
       .then(function (v) {
         box.innerHTML = '';
+        pleases = v[2];
         stat(box, num(v[0]), plural(v[0], 'заход', 'захода', 'заходов') + ' в каталог',
              'Каждое открытие страницы. Перезагрузка вкладки не считается.');
         stat(box, num(v[1]), plural(v[1], 'посетитель', 'посетителя', 'посетителей') + ' без повторов',
              'Разные браузеры: вернувшийся посетитель второй раз не считается. '
              + 'Один человек с телефона и с компьютера — два посетителя.');
+        if (pleases !== null) {
+          pleaseRow = stat(box, '', '', 'Нажатия «Пожалуйста ♡» на плашке, которая благодарит за скачивание.');
+          drawPlease();
+        }
       })
       .catch(function () {
         box.innerHTML = '';
@@ -245,7 +262,27 @@
     kick();
   }
 
-  window.CRH_SIDE = { downloads: downloads };
+  /* ── «Пожалуйста ♡» на плашке после скачивания ── */
+
+  /* Ключ новый, а не pleases: тот накрутили проверки, а обнулить ключ
+     Abacus без админ-ключа нельзя. */
+  var PLEASE_KEY = 'pleased';
+  var pleases = null, pleaseRow = null;
+
+  function drawPlease() {
+    if (!pleaseRow || pleases === null) { return; }
+    pleaseRow.querySelector('.v').textContent = num(pleases);
+    pleaseRow.querySelector('.k').textContent =
+      plural(pleases, 'раз', 'раза', 'раз') + ' лису ответили «пожалуйста»';
+  }
+
+  function please() {
+    if (isLocal()) { return; }
+    if (pleases !== null) { pleases += 1; drawPlease(); }   /* сразу, не дожидаясь сети */
+    counter(PLEASE_KEY, true).then(function (v) { pleases = v; drawPlease(); }, function () {});
+  }
+
+  window.CRH_SIDE = { downloads: downloads, please: please };
   parallax();
 
   summary(window.CATALOG);

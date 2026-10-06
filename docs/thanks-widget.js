@@ -52,7 +52,11 @@
     timer = setTimeout(hide, HIDE_MS);
   }
 
-  ok.addEventListener('click', hide);
+  ok.addEventListener('click', function () {
+    /* счётчик «пожалуйста» — в колонке статистики (side.js) */
+    if (window.CRH_SIDE && window.CRH_SIDE.please) { window.CRH_SIDE.please(); }
+    hide();
+  });
   wrap.addEventListener('click', function (e) { if (e.target === wrap) { hide(); } });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { hide(); } });
 
