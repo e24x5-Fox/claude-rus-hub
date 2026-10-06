@@ -619,137 +619,100 @@ a:hover { text-decoration: underline; }
 }
 
 /* ── Музыка автора: плеер под донатерами (music-widget.js) ─────────────────
-   Широкий экран — карточка в левом нижнем углу; уже — пилюля «♪» над
-   пилюлей донатеров. Иконки — масками из SVG, цветом текста: так они не
+   Одна строка: обложка · название и громкость · «играть». Свёрнутый — только
+   обложка и «играть». Иконки — масками из SVG, цветом текста: так они не
    превращаются в цветные эмодзи на Windows. */
 .music {
   position: fixed;
   left: 16px;
   bottom: 62px;            /* над пилюлей донатеров */
   z-index: 21;
-  font-size: var(--fs-note);
-}
-.music.wide { bottom: 16px; }
-/* на широком экране плеер занимает низ колонки — панель донатеров уступает */
-body.has-music .donors.wide .donors-panel { max-height: calc(100vh - 63px - 200px); }
-
-.music-pill {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 8px 14px;
-  border-radius: var(--r-pill);
-  border: 1px solid var(--bg3);
-  background: var(--bg2);
-  color: var(--text2);
-  font: inherit;
-  cursor: pointer;
-  box-shadow: 0 4px 18px rgba(0,0,0,.45);
-  transition: border-color var(--t-fast), color var(--t-fast);
-}
-.music-pill:hover { border-color: var(--accent); color: var(--text); }
-.music-note { color: var(--accent2); }
-.music.playing .music-note { animation: music-bob 1.2s ease-in-out infinite; }
-@keyframes music-bob { 50% { transform: translateY(-2px); } }
-.music.open .music-pill { display: none; }
-
-.music-panel {
-  display: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   width: min(260px, calc(100vw - 32px));
   box-sizing: border-box;
+  padding: 8px 10px 8px 8px;
   background: var(--bg2);
   border: 1px solid var(--bg3);
   border-radius: var(--r-card);
-  padding: 12px 14px;
   box-shadow: 0 8px 28px rgba(0,0,0,.5);
+  font-size: var(--fs-note);
 }
-.music.wide .music-panel { box-shadow: none; }
-.music.open .music-panel { display: block; }
+.music.wide { bottom: 16px; box-shadow: none; }
+/* на широком экране плеер занимает низ колонки — панель донатеров уступает */
+body.has-music .donors.wide .donors-panel { max-height: calc(100vh - 63px - 90px); }
+/* на узком открытая панель донатеров выше плеера — прячем его, чтобы не налезал */
+.donors.open:not(.wide) ~ .music { display: none; }
 
-.music-head { display: flex; gap: 10px; align-items: center; }
-.music-cover {
-  width: 56px; height: 56px; flex: none;
-  border-radius: 8px; object-fit: cover; background: var(--bg3);
+.music.folded { width: auto; gap: 8px; padding: 6px; border-radius: var(--r-pill); }
+.music.folded .music-info, .music.folded .music-fold { display: none; }
+
+.music-cover-btn {
+  flex: none; padding: 0; border: 0; background: none; border-radius: 8px;
+  cursor: default; line-height: 0;
 }
+.music.folded .music-cover-btn { cursor: pointer; border-radius: 50%; }
+.music-cover {
+  width: 48px; height: 48px; display: block;
+  border-radius: inherit; object-fit: cover; background: var(--bg3);
+}
+.music.folded .music-cover { width: 38px; height: 38px; }
 .music.playing .music-cover { box-shadow: 0 0 0 2px var(--accent-soft); }
+.music.folded.playing .music-cover { animation: music-spin 12s linear infinite; }
+@keyframes music-spin { to { transform: rotate(360deg); } }
+
 .music-info { min-width: 0; flex: 1; }
 .music-title {
   color: var(--text); font-weight: 600;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.music-artist { color: var(--text3); font-size: var(--fs-hint); margin-top: 2px; }
-.music-close {
-  align-self: flex-start; flex: none;
-  background: none; border: 0; padding: 0 2px;
-  color: var(--text3); font: inherit; font-size: 18px; line-height: 1; cursor: pointer;
-}
-.music-close:hover { color: var(--text); }
-.music.wide .music-close { display: none; }
+.music-artist { color: var(--text3); font-size: var(--fs-hint); margin-top: 1px; }
 
-.music input[type="range"] {
+.music-vol-row { display: flex; align-items: center; gap: 6px; margin-top: 5px; cursor: pointer; }
+.music-vol {
   -webkit-appearance: none; appearance: none;
-  height: 4px; border-radius: 2px; background: var(--bg3);
-  accent-color: var(--accent); cursor: pointer; margin: 0;
+  flex: 1; min-width: 0; height: 4px; margin: 0; border-radius: 2px;
+  background: var(--bg3); accent-color: var(--accent); cursor: pointer;
 }
-.music input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%;
+.music-vol::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 11px; height: 11px; border-radius: 50%;
   background: var(--accent2); border: 0;
 }
-.music input[type="range"]::-moz-range-thumb {
-  width: 12px; height: 12px; border-radius: 50%; background: var(--accent2); border: 0;
-}
-.music-seek { display: block; width: 100%; margin-top: 12px !important; }
-.music-times {
-  display: flex; justify-content: space-between;
-  color: var(--text3); font-size: var(--fs-micro); margin-top: 4px;
-  font-variant-numeric: tabular-nums;
+.music-vol::-moz-range-thumb {
+  width: 11px; height: 11px; border-radius: 50%; background: var(--accent2); border: 0;
 }
 
-.music-ctrls { display: flex; align-items: center; gap: 4px; margin-top: 6px; }
-.music-btn {
-  width: 28px; height: 28px; flex: none;
+.music-play {
+  flex: none; width: 34px; height: 34px; padding: 0;
   display: inline-flex; align-items: center; justify-content: center;
-  background: none; border: 0; border-radius: 50%; padding: 0;
-  color: var(--text2); cursor: pointer;
-  transition: color var(--t-fast), background var(--t-fast);
+  border: 0; border-radius: 50%;
+  background: var(--accent); color: #fff; cursor: pointer;
+  transition: background var(--t-fast);
 }
-.music-btn:hover, .music-btn.on { color: var(--text); background: var(--bg3); }
-.music-play { width: 34px; height: 34px; background: var(--accent); color: #fff; }
-.music-play:hover { background: var(--accent2); color: #fff; }
-.music-btn::before, .music-vol-ico {
-  content: ""; display: block; width: 14px; height: 14px;
+.music-play:hover { background: var(--accent2); }
+.music-play::before, .music-vol-ico {
+  content: ""; display: block; flex: none; width: 13px; height: 13px;
   background: currentColor;
   -webkit-mask: var(--ico) center / contain no-repeat;
   mask: var(--ico) center / contain no-repeat;
 }
 .ico-play  { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 2.5v11l9-5.5z'/%3E%3C/svg%3E"); }
 .ico-pause { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z'/%3E%3C/svg%3E"); }
-.ico-prev  { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 3h2v10H3zM14 3v10L6 8z'/%3E%3C/svg%3E"); }
-.ico-next  { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M11 3h2v10h-2zM2 3v10l8-5z'/%3E%3C/svg%3E"); }
-.ico-list  { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 3h12v2H2zM2 7h12v2H2zM2 11h8v2H2z'/%3E%3C/svg%3E"); }
 .music-vol-ico {
-  flex: none; margin-left: 6px; color: var(--text3);
+  width: 12px; height: 12px; color: var(--text3);
   --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 6h3l4-3.5v11L5 10H2z'/%3E%3Cpath d='M11 5.5a3.5 3.5 0 0 1 0 5' fill='none' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E");
 }
-.music-vol { flex: 1; min-width: 40px; }
 
-.music-list {
-  display: none; list-style: none; margin: 10px 0 0; padding: 6px 0 0;
-  border-top: 1px solid var(--bg3);
-  max-height: 180px; overflow-y: auto;
+.music-fold {
+  align-self: flex-start; flex: none;
+  background: none; border: 0; padding: 0 2px; margin-left: -4px;
+  color: var(--text3); font: inherit; font-size: 16px; line-height: 1; cursor: pointer;
 }
-.music.list-open .music-list { display: block; }
-.music-item {
-  display: flex; gap: 8px; width: 100%; align-items: baseline;
-  padding: 5px 4px; border: 0; border-radius: 6px; background: none;
-  color: var(--text2); font: inherit; text-align: left; cursor: pointer;
-}
-.music-item:hover { background: var(--bg3); color: var(--text); }
-.music-item-n { color: var(--text3); font-size: var(--fs-micro); width: 1.2em; text-align: right; flex: none; }
-.music-item-t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.music-list li.on .music-item { color: var(--accent2); }
-.music-list li.on .music-item-n { color: var(--accent2); }
+.music-fold:hover { color: var(--text); }
 
 @media (prefers-reduced-motion: reduce) {
-  .music.playing .music-note { animation: none; }
+  .music.folded.playing .music-cover { animation: none; }
 }
 
 /* Список переводов обычным HTML (tools/seo.py) — для поисковиков и для тех,
