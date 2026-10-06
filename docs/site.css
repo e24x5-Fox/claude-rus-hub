@@ -666,7 +666,13 @@ a:hover { text-decoration: underline; }
 /* фон страницы — обложка текущего трека, тёмная и размытая почти до пятна.
    Слой лежит под содержимым (z-index -1 над фоном холста); два слоя — чтобы
    старая обложка гасла, пока проявляется новая. Пока музыка играет, фон
-   чуть заметнее и чуть резче. */
+   чуть заметнее и чуть резче.
+
+   Размытие не считается браузером на каждом кадре: music-widget.js один раз
+   рисует обложку на два холста — сильно размытый (.soft, пауза) и слабо
+   (.sharp, играет), — и на плей .sharp проявляется поверх .soft. Меняется
+   только прозрачность, а это для браузера почти бесплатно. Где холст не
+   умеет размывать (старый Safari), слой получает .css-blur и живой фильтр. */
 .music-bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
 .music-bg-layer {
   /* квадрат шире экрана: края размытия — за экраном, а по высоте есть запас,
@@ -674,14 +680,26 @@ a:hover { text-decoration: underline; }
   position: absolute; left: -15%; top: -15vh; width: 130%;
   aspect-ratio: 1; min-height: 130vh;
   background: center / cover no-repeat;
-  filter: blur(90px) saturate(1.3) brightness(.55);
   opacity: 0;
-  transition: opacity 3.5s ease, filter 2.5s ease;
-  will-change: opacity, filter, transform;
+  transition: opacity 3.5s ease;
+  will-change: opacity, transform;
 }
 .music-bg-layer.on { opacity: .14; }
-body.music-playing .music-bg-layer { filter: blur(24px) saturate(1.3) brightness(.55); }
 body.music-playing .music-bg-layer.on { opacity: .24; }
+.music-bg-layer canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+.music-bg-layer canvas.sharp { opacity: 0; transition: opacity 2.5s ease; }
+body.music-playing .music-bg-layer canvas.sharp { opacity: 1; }
+/* что не видно, то и не рисуется: угасшая обложка и холст под проявившимся
+   .sharp прячутся, когда переход закончился, и возвращаются сразу */
+.music-bg-layer:not(.on) { visibility: hidden; transition: opacity 3.5s ease, visibility 0s 3.5s; }
+body.music-playing .music-bg-layer canvas.soft { visibility: hidden; transition: visibility 0s 2.5s; }
+/* запасной путь: размытие фильтром на каждом кадре */
+.music-bg-layer.css-blur { filter: blur(90px) saturate(1.3) brightness(.55); transition: opacity 3.5s ease, filter 2.5s ease; }
+body.music-playing .music-bg-layer.css-blur { filter: blur(24px) saturate(1.3) brightness(.55); }
+.music-bg-layer.css-blur:not(.on) { transition: opacity 3.5s ease, filter 2.5s ease, visibility 0s 3.5s; }
 /* на широком экране плеер занимает низ колонки — панель донатеров уступает */
 body.has-music .donors.wide .donors-panel { max-height: calc(100vh - 63px - 90px); }
 /* на узком открытая панель донатеров выше плеера — прячем его, чтобы не налезал */

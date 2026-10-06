@@ -103,6 +103,33 @@
   window.addEventListener('scroll', panTo, { passive: true });
   window.addEventListener('resize', function () { placeBg(); panTo(); });
   var front = 0, bgSrc = '';
+
+  /* Размытие — заранее, на холсте, по разу на обложку. BLUR_SOFT и BLUR_SHARP —
+     в пикселях экрана, как было у CSS-фильтра; на холсте обложка мельче, чем
+     на экране, поэтому радиус пересчитывается в её масштаб. */
+  var BLUR_SOFT = 90, BLUR_SHARP = 24, TONE = ' saturate(1.3) brightness(.55)';
+  var canBlur = (function () {
+    try {
+      var c = document.createElement('canvas').getContext('2d');
+      c.filter = 'blur(1px)';
+      return c.filter === 'blur(1px)';
+    } catch (e) { return false; }
+  })();
+  function blurred(img, screenPx, cls) {
+    var n = img.naturalWidth || 256;
+    var scale = n / Math.max(1, layers[0].offsetWidth);   /* пиксель обложки в пикселях экрана */
+    var r = screenPx * scale;
+    /* края гаснут в прозрачность так же, как гасли у CSS-фильтра, —
+       они всё равно за экраном (слой шире экрана на 15 % с каждой стороны) */
+    var c = document.createElement('canvas');
+    c.width = c.height = n;
+    c.className = cls;
+    var ctx = c.getContext('2d');
+    ctx.filter = 'blur(' + r.toFixed(2) + 'px)' + TONE;
+    ctx.drawImage(img, 0, 0, n, n);
+    return c;
+  }
+
   function setBg(src) {
     if (src === bgSrc) { return; }
     bgSrc = src;
@@ -111,8 +138,17 @@
       if (src !== bgSrc) { return; }
       var old = layers[front];
       front ^= 1;
-      layers[front].style.backgroundImage = 'url("' + src + '")';
-      layers[front].classList.add('on');
+      var l = layers[front];
+      l.textContent = '';
+      if (canBlur) {
+        l.style.backgroundImage = '';
+        l.appendChild(blurred(img, BLUR_SOFT, 'soft'));
+        l.appendChild(blurred(img, BLUR_SHARP, 'sharp'));
+      } else {
+        l.classList.add('css-blur');
+        l.style.backgroundImage = 'url("' + src + '")';
+      }
+      l.classList.add('on');
       old.classList.remove('on');
     };
     img.src = src;
