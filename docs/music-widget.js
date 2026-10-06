@@ -93,13 +93,15 @@
 
   /* ── воспроизведение ── */
   var fadeTimer = null;
-  function fadeIn() {
+  /* fromHere — нарастать с текущей громкости, а не с нуля (разворот торможения) */
+  function fadeIn(fromHere) {
     clearInterval(fadeTimer);
     var start = Date.now();
-    audio.volume = 0;
+    var v0 = fromHere ? audio.volume : 0;
+    audio.volume = v0;
     fadeTimer = setInterval(function () {
       var k = Math.min(1, (Date.now() - start) / FADE_MS);
-      audio.volume = volume * k;
+      audio.volume = v0 + (volume - v0) * k;
       if (k >= 1) { clearInterval(fadeTimer); }
     }, 50);
   }
@@ -132,7 +134,11 @@
     if (p && p.catch) { p.catch(function () { /* браузер не дал — ждём следующего нажатия */ }); }
   }
 
-  play.addEventListener('click', function () { if (!stopping) { audio.paused ? go() : audio.pause(); } });
+  play.addEventListener('click', function () {
+    if (stopping) { return; }
+    stoppedByDownload = false;              /* сам нажал — сам и решает */
+    audio.paused ? go() : audio.pause();
+  });
   audio.addEventListener('ended', function () { pick(cur + 1); go(); });
 
   audio.addEventListener('play', function () {
@@ -157,6 +163,7 @@
   audio.webkitPreservesPitch = false;
 
   var rate = 1, target = 1, raf = 0, stopping = false;
+  var stoppedByDownload = false, resuming = false, stopRun = 0;
   function tick() {
     rate += (target - rate) * 0.12;
     if (Math.abs(target - rate) < 0.003) { rate = target; }
@@ -179,6 +186,13 @@
   }, { passive: true });
   /* смена трека сбрасывает скорость браузером — возвращаем её на место */
   audio.addEventListener('play', function () {
+    if (resuming) {                       /* после «Скачать» — разгон с нуля */
+      resuming = false;
+      rate = MIN_RATE;
+      audio.playbackRate = rate;
+      glide(depthRate());
+      return;
+    }
     rate = target = depthRate();
     audio.playbackRate = rate;
   });
@@ -187,10 +201,12 @@
   document.addEventListener('crh:download', function () {
     if (audio.paused || stopping) { return; }
     stopping = true;
+    var run = ++stopRun;
     cancelAnimationFrame(raf); raf = 0;
     clearInterval(fadeTimer);
     var from = audio.playbackRate, v0 = audio.volume, t0 = Date.now(), DUR = 1000;
     (function step() {
+      if (run !== stopRun) { return; }       /* плашку закрыли раньше, чем трек встал */
       var k = Math.min(1, (Date.now() - t0) / DUR);
       var e = k * k;                          /* сначала медленно, потом обрыв */
       audio.playbackRate = Math.max(MIN_RATE, from - (from - MIN_RATE) * e);
@@ -201,8 +217,28 @@
       audio.playbackRate = rate;
       audio.volume = volume;
       stopping = false;
+      stoppedByDownload = true;
     })();
   });
+
+  /* Плашку закрыли — трек разгоняется обратно до скорости, положенной по
+     месту на странице, как кассета после паузы. Если его не «Скачать»
+     остановило (уже стоял, или его поставили на паузу сами), — не трогаем. */
+  document.addEventListener('crh:thanks-closed', function () {
+    if (stopping) {                         /* ещё тормозил — разворачиваем на ходу */
+      stopRun++;
+      stopping = false;
+      rate = audio.playbackRate;
+      glide(depthRate());
+      fadeIn(true);
+      return;
+    }
+    if (!stoppedByDownload) { return; }
+    stoppedByDownload = false;
+    resuming = true;
+    go();
+  });
+  audio.addEventListener('pause', function () { if (!stopping) { resuming = false; } });
 
   vol.addEventListener('input', function () {
     volume = vol.value / 100;

@@ -3,8 +3,9 @@
 
    Кнопки скачивания в карточках помечены data-download (их строит index.html).
    Скачивание не задерживаем: ссылка отрабатывает как обычно, плашка просто
-   появляется поверх страницы. Заодно шлём событие crh:download — по нему
-   плеер (music-widget.js) резко тормозит трек.
+   появляется поверх страницы. Заодно шлём события для плеера
+   (music-widget.js): crh:download — он резко тормозит трек,
+   crh:thanks-closed — плашку закрыли, трек разгоняется обратно.
    ───────────────────────────────────────────────────────────────────────── */
 
 (function () {
@@ -38,7 +39,10 @@
   var timer = null;
   function hide() {
     clearTimeout(timer);
+    if (!wrap.classList.contains('show')) { return; }
     wrap.classList.remove('show');
+    /* плеер разгоняет трек обратно, если его остановило «Скачать» */
+    document.dispatchEvent(new CustomEvent('crh:thanks-closed'));
   }
   function show() {
     if (!wrap.parentNode) { document.body.appendChild(wrap); }
