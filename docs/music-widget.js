@@ -14,6 +14,11 @@
 
    Чем ниже по странице, тем медленнее идёт трек; «Скачать» (событие
    crh:download из thanks-widget.js) тормозит его до нуля.
+
+   Музыка качается только по «играть»; следующий трек подкачивается заранее,
+   за PREFETCH_S секунд до конца текущего, чтобы переход шёл без паузы.
+   Фон страницы — обложка текущего трека, тёмная и сильно размытая; при смене
+   трека она плавно перетекает в следующую.
    ───────────────────────────────────────────────────────────────────────── */
 
 (function () {
@@ -56,6 +61,28 @@
 
   var audio = new Audio();
   audio.preload = 'none';                 /* не качать музыку, пока не попросили */
+
+  /* ── фон: размытая обложка, два слоя для перетекания ── */
+  var bg = el('div', 'music-bg');
+  bg.setAttribute('aria-hidden', 'true');
+  var layers = [el('div', 'music-bg-layer'), el('div', 'music-bg-layer')];
+  bg.appendChild(layers[0]);
+  bg.appendChild(layers[1]);
+  var front = 0, bgSrc = '';
+  function setBg(src) {
+    if (src === bgSrc) { return; }
+    bgSrc = src;
+    var img = new Image();
+    img.onload = function () {               /* показываем, только когда уже скачалась */
+      if (src !== bgSrc) { return; }
+      var old = layers[front];
+      front ^= 1;
+      layers[front].style.backgroundImage = 'url("' + src + '")';
+      layers[front].classList.add('on');
+      old.classList.remove('on');
+    };
+    img.src = src;
+  }
 
   /* ── разметка ── */
   var box = el('aside', 'music');
@@ -117,12 +144,38 @@
       title.title = t.title;
     }
     cover.src = 'music/' + t.file + '.jpg';
+    setBg(cover.src);
     coverBtn.title = t.title + ' — развернуть';
   }
 
+  /* следующий трек качается целиком заранее, в blob: так он точно в памяти,
+     а не «где-то в кэше», и переход идёт без паузы на загрузку */
+  var PREFETCH_S = 30;
+  var next = null, blobUrl = null;
+  function prefetch() {
+    var i = (cur + 1) % tracks.length;
+    if (next && next.i === i) { return; }
+    var n = next = { i: i, url: null };
+    new Image().src = 'music/' + tracks[i].file + '.jpg';   /* и обложку для фона */
+    if (!window.fetch || !window.URL || !URL.createObjectURL) { return; }
+    fetch('music/' + tracks[i].file + '.mp3').then(function (r) {
+      if (!r.ok) { throw new Error(r.status); }
+      return r.blob();
+    }).then(function (b) {
+      if (next === n) { n.url = URL.createObjectURL(b); }
+    }).catch(function () { /* не вышло — возьмём по сети в момент смены */ });
+  }
+  audio.addEventListener('timeupdate', function () {
+    if (audio.duration && audio.duration - audio.currentTime < PREFETCH_S) { prefetch(); }
+  });
+
   function pick(i) {
     cur = (i + tracks.length) % tracks.length;
-    audio.src = 'music/' + tracks[cur].file + '.mp3';
+    var url = next && next.i === cur && next.url ? next.url : 'music/' + tracks[cur].file + '.mp3';
+    next = null;
+    if (blobUrl && blobUrl !== url) { URL.revokeObjectURL(blobUrl); }
+    blobUrl = url.indexOf('blob:') === 0 ? url : null;
+    audio.src = url;
     show();
     save();
   }
@@ -145,11 +198,13 @@
     play.classList.replace('ico-play', 'ico-pause');
     play.setAttribute('aria-label', 'Пауза'); play.title = 'Пауза';
     box.classList.add('playing');
+    document.body.classList.add('music-playing');
   });
   audio.addEventListener('pause', function () {
     play.classList.replace('ico-pause', 'ico-play');
     play.setAttribute('aria-label', 'Играть'); play.title = 'Играть';
     box.classList.remove('playing');
+    document.body.classList.remove('music-playing');
   });
 
   /* ── скорость: чем ниже по странице, тем медленнее; «Скачать» — стоп ──
@@ -162,17 +217,27 @@
   audio.mozPreservesPitch = false;
   audio.webkitPreservesPitch = false;
 
-  var rate = 1, target = 1, raf = 0, stopping = false;
+  /* Скорость догоняет цель через промежуточную точку mid — два сглаживания
+     подряд: так она трогается мягко, без рывка на первом кадре, и так же
+     мягко садится. TAU — постоянная времени одной ступени, по часам, а не по
+     кадрам: на 144 Гц и на 60 Гц звучит одинаково. */
+  var TAU = 0.35;
+  var rate = 1, mid = 1, target = 1, raf = 0, last = 0, stopping = false;
   var stoppedByDownload = false, resuming = false, stopRun = 0;
-  function tick() {
-    rate += (target - rate) * 0.12;
-    if (Math.abs(target - rate) < 0.003) { rate = target; }
+  function setRate(v) { rate = mid = v; audio.playbackRate = v; }
+  function tick(now) {
+    var dt = last ? Math.min(0.1, (now - last) / 1000) : 1 / 60;
+    last = now;
+    var a = 1 - Math.exp(-dt / TAU);
+    mid += (target - mid) * a;
+    rate += (mid - rate) * a;
+    if (Math.abs(target - rate) < 0.001 && Math.abs(target - mid) < 0.001) { rate = mid = target; }
     audio.playbackRate = rate;
-    raf = rate === target ? 0 : requestAnimationFrame(tick);
+    if (rate === target) { raf = 0; last = 0; } else { raf = requestAnimationFrame(tick); }
   }
   function glide(to) {
     target = to;
-    if (!raf) { raf = requestAnimationFrame(tick); }
+    if (!raf) { last = 0; raf = requestAnimationFrame(tick); }
   }
 
   /* скорость для текущего места на странице: 1 наверху, BOTTOM_RATE внизу */
@@ -188,13 +253,13 @@
   audio.addEventListener('play', function () {
     if (resuming) {                       /* после «Скачать» — разгон с нуля */
       resuming = false;
-      rate = MIN_RATE;
-      audio.playbackRate = rate;
+      setRate(MIN_RATE);
       glide(depthRate());
       return;
     }
-    rate = target = depthRate();
-    audio.playbackRate = rate;
+    cancelAnimationFrame(raf); raf = 0;
+    target = depthRate();
+    setRate(target);
   });
 
   /* «Скачать» — трек тормозит до нуля за секунду, как остановленная кассета */
@@ -213,8 +278,8 @@
       audio.volume = v0 * (1 - Math.max(0, (k - 0.6) / 0.4));
       if (k < 1) { requestAnimationFrame(step); return; }
       audio.pause();
-      rate = target = depthRate();
-      audio.playbackRate = rate;
+      target = depthRate();
+      setRate(target);
       audio.volume = volume;
       stopping = false;
       stoppedByDownload = true;
@@ -228,7 +293,7 @@
     if (stopping) {                         /* ещё тормозил — разворачиваем на ходу */
       stopRun++;
       stopping = false;
-      rate = audio.playbackRate;
+      setRate(audio.playbackRate);
       glide(depthRate());
       fadeIn(true);
       return;
@@ -268,6 +333,7 @@
   else if (WIDE.addListener) { WIDE.addListener(fit); }
 
   show();
+  document.body.insertBefore(bg, document.body.firstChild);
   document.body.appendChild(box);
   document.body.classList.add('has-music');
   fit();

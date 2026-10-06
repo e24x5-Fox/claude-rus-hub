@@ -37,6 +37,7 @@
   wrap.appendChild(card);
 
   var timer = null;
+  var game = '';           /* какую игру скачали — «пожалуйста» считается раз на игру */
   function hide() {
     clearTimeout(timer);
     if (!wrap.classList.contains('show')) { return; }
@@ -54,7 +55,7 @@
 
   ok.addEventListener('click', function () {
     /* счётчик «пожалуйста» — в колонке статистики (side.js) */
-    if (window.CRH_SIDE && window.CRH_SIDE.please) { window.CRH_SIDE.please(); }
+    if (window.CRH_SIDE && window.CRH_SIDE.please) { window.CRH_SIDE.please(game); }
     hide();
   });
   wrap.addEventListener('click', function (e) { if (e.target === wrap) { hide(); } });
@@ -63,6 +64,7 @@
   document.addEventListener('click', function (e) {
     var a = e.target.closest && e.target.closest('[data-download]');
     if (!a) { return; }
+    game = a.getAttribute('data-download') || '';
     /* без { detail } — плееру важен сам факт */
     document.dispatchEvent(new CustomEvent('crh:download'));
     show();

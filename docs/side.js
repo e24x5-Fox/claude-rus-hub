@@ -13,7 +13,8 @@
      views    — заходы в каталог; перезагрузка вкладки заходом не считается;
      visitors — разные посетители: +1, только если этот браузер тут впервые;
      pleased  — сколько раз ответили лису «Пожалуйста ♡» на плашке после
-                скачивания (thanks-widget.js зовёт CRH_SIDE.please()).
+                скачивания (thanks-widget.js зовёт CRH_SIDE.please(игра)):
+                с одного браузера — раз на игру и её версию: вышла новая — снова можно.
    Аккаунтов у посетителей нет, поэтому «разные» — это разные браузеры:
    человек с телефона и с компьютера посчитается дважды. С file:// и с
    локального сервера счётчики только читаются — проверками число не накрутишь.
@@ -276,8 +277,23 @@
       plural(pleases, 'раз', 'раза', 'раз') + ' лису ответили «пожалуйста»';
   }
 
-  function please() {
-    if (isLocal()) { return; }
+  /* Раз на игру с одного браузера: иначе «Скачать» → «Пожалуйста» по кругу
+     накручивает счётчик. Список игр, за которые уже сказали, — в localStorage;
+     хранилище закрыто — не считаем вовсе, как и с посетителями. */
+  function firstPlease(game) {
+    var KEY = 'crh-pleased', done;
+    try {
+      done = JSON.parse(localStorage.getItem(KEY)) || [];
+      if (!Array.isArray(done)) { done = []; }
+      if (done.indexOf(game) >= 0) { return false; }
+      done.push(game);
+      localStorage.setItem(KEY, JSON.stringify(done));
+    } catch (e) { return false; }
+    return true;
+  }
+
+  function please(game) {
+    if (isLocal() || !firstPlease(String(game || ''))) { return; }
     if (pleases !== null) { pleases += 1; drawPlease(); }   /* сразу, не дожидаясь сети */
     counter(PLEASE_KEY, true).then(function (v) { pleases = v; drawPlease(); }, function () {});
   }

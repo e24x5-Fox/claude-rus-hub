@@ -289,7 +289,7 @@
 </script>
 <!-- /seo:head -->
 <link rel="stylesheet" href="tokens.css?v=e5c898f0">
-<link rel="stylesheet" href="site.css?v=86c90bcc">
+<link rel="stylesheet" href="site.css?v=0dab99cd">
 </head>
 <body>
 
@@ -428,12 +428,12 @@
 <script src="games.js"></script>
 <script src="downloads.js"></script>
 <script src="virustotal.js"></script>
-<script src="side.js?v=827e57cf"></script>
+<script src="side.js?v=75b53423"></script>
 <script src="donors.js"></script>
 <script src="donors-widget.js?v=c57e3713"></script>
-<script src="thanks-widget.js?v=9de97774"></script>
+<script src="thanks-widget.js?v=9157636a"></script>
 <script src="music.js"></script>
-<script src="music-widget.js?v=3f9d2587"></script>
+<script src="music-widget.js?v=a0a9c35e"></script>
 <script>
 /* Страница строится из window.CATALOG (games.js). Править разметку карточек
    при добавлении игры не нужно — только данные. */
@@ -522,7 +522,8 @@
     var vt = virustotal(game);
     if (links.download) {
       dl = link(links.download, 'btn btn-primary', 'Скачать русификатор');
-      dl.setAttribute('data-download', '');   /* плашка «спасибо» — thanks-widget.js */
+      /* плашка «спасибо» — thanks-widget.js; «пожалуйста» считается раз на игру и версию */
+      dl.setAttribute('data-download', (game.slug || '') + '@' + (game.version || ''));
       actions.appendChild(dl);
     }
     /* Значок проверки — сразу за «Скачать»: его должны увидеть до скачивания. */
@@ -670,6 +671,7 @@
       /* Версия — из тега: dragnwash-v1.2 → v1.2 */
       var ver = rel.tag_name.slice(item.game.release.tag_prefix.length);
       if (item.ver && ver) { item.ver.textContent = /^v/i.test(ver) ? ver : 'v' + ver; }
+      if (item.dl && ver) { item.dl.setAttribute('data-download', item.game.slug + '@' + ver.replace(/^v/i, '')); }
 
       if (item.size) {
         var parts = [];
