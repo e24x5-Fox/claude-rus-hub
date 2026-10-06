@@ -614,6 +614,28 @@ a:hover { text-decoration: underline; }
 .donors-more { display: block; margin: 4px 0 0; padding: 0; }
 .donors-btn { display: block; text-align: center; margin-top: 12px; }
 
+.donors-rules-btn {
+  display: block; width: 100%; margin-top: 6px; padding: 4px 0;
+  background: none; border: 0; color: var(--text3); font: inherit; font-size: var(--fs-hint);
+  cursor: pointer; text-decoration: underline; text-underline-offset: 3px;
+}
+.donors-rules-btn:hover { color: var(--accent2); }
+
+/* окно «Правила донатов» */
+.donors-rules {
+  width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 48px);
+  padding: 22px 24px 20px; overflow: auto;
+  background: var(--bg2); color: var(--text); border: 1px solid var(--bg3);
+  border-radius: var(--r-card); box-shadow: 0 16px 48px rgba(0,0,0,.6);
+  font-size: var(--fs-note); line-height: 1.6;
+}
+.donors-rules::backdrop { background: rgba(0,0,0,.6); }
+.donors-rules .donors-close { position: absolute; top: 12px; right: 12px; }
+.donors-rules .side-title { margin: 0 0 6px; }
+.donors-rules h3 { margin: 16px 0 6px; color: var(--accent2); font-size: inherit; }
+.donors-rules ul { margin: 0; padding-left: 18px; color: var(--text2); }
+.donors-rules li + li { margin-top: 4px; }
+
 @media (prefers-reduced-motion: reduce) {
   .donors-row { transition: none; transform: none; }
 }

@@ -3,12 +3,18 @@
 У GitHub Pages нет сервера, а API DonationAlerts требует ключ, которому на
 открытой странице не место. Поэтому ключ живёт в секрете репозитория
 DA_TOKEN, а страница получает готовую выжимку в docs/donors.js: ник, общая
-сумма и последнее сообщение, без дат. Донаты одного человека складываются в
+сумма, последнее сообщение и до какого дня строка висит в списке. Донаты одного человека складываются в
 одну строку.
 
 Сообщение пишет кто угодно, а показывается оно на сайте, поэтому ссылки из
 него вырезаются, почта заменяется на «[почта скрыта]», длина обрезается, а ники из tools/donors_hide.txt остаются
 в списке без сообщения. Голосовые сообщения не показываются: текста у них нет.
+
+Сколько донат висит в списке, зависит от суммы: BASE_DAYS дней плюс день
+за каждые RUB_PER_DAY рублей. Донаты одного человека складываются по
+очереди: новый, пришедший раньше, чем истёк прошлый, продлевает срок с конца
+прошлого, а не с сегодня. Истёк — строка уходит со следующим прогоном. Числа
+правил пишутся в donors.js (rules), окно «Правила донатов» берёт их оттуда.
 
 Ключа нет — скрипт ничего не трогает и выходит без ошибки: тогда donors.js
 можно вести руками, в том же формате.
@@ -43,6 +49,13 @@ LINK = re.compile(r"(https?://|www\.)\S+|\b[\w-]+\.(ru|com|net|org|io|gg|me|tv|s
 # откуда донат, DonationAlerts не сообщает, поэтому граница — по дате.
 # 2026-09-20 — первый релиз каталога, dragnwash-v1.0.
 SINCE = "2026-09-20"
+
+# Срок в списке: BASE_DAYS + сумма / RUB_PER_DAY дней (100 ₽ — 17 дней).
+BASE_DAYS = 7
+RUB_PER_DAY = 10
+# Если DonationAlerts не перевёл сумму в рубли — грубо, по порядку величин:
+# срок считается в днях, точный курс тут не нужен.
+RATES = {"RUB": 1, "USD": 90, "EUR": 100, "UAH": 2.2, "KZT": 0.18, "BYN": 28}
 
 HEADER = """/* Донатеры для виджета слева: пишет tools/donors_snapshot.py из GitHub
    Actions по списку донатов DonationAlerts. Ник, сумма и последнее сообщение.
@@ -157,7 +170,17 @@ def clean(text, limit=MSG_MAX):
     return text
 
 
-def build(donations, hide):
+def created(d):
+    """created_at DonationAlerts — «2026-10-03 15:33:56», UTC."""
+    return datetime.datetime.strptime(d["created_at"][:19], "%Y-%m-%d %H:%M:%S").replace(
+        tzinfo=datetime.timezone.utc)
+
+
+def days_for(value, cur):
+    return BASE_DAYS + value * RATES.get(cur or "RUB", 1) / RUB_PER_DAY
+
+
+def build(donations, hide, now):
     main_cur = "RUB"
     rows = {}
     # от старых к новым: у каждого остаётся последнее непустое сообщение
@@ -169,13 +192,17 @@ def build(donations, hide):
         key = (name.lower(), cur)
         row = rows.setdefault(key, {"name": name, "amount": 0.0, "currency": cur})
         row["amount"] += value
+        # срок продлевается с конца прошлого, если тот ещё не истёк
+        start = max(row.get("_until") or created(d), created(d))
+        row["_until"] = start + datetime.timedelta(days=days_for(value, cur))
         if d.get("message_type", "text") == "text" and name.lower() not in hide:
             msg = clean(d.get("message"))
             if msg:
                 row["message"] = msg
 
-    donors = sorted(rows.values(), key=lambda r: -r["amount"])
+    donors = sorted((r for r in rows.values() if r["_until"] > now), key=lambda r: -r["amount"])
     for r in donors:
+        r["until"] = r.pop("_until").strftime("%Y-%m-%d")
         r["amount"] = round(r["amount"], 2)
         if r["amount"] == int(r["amount"]):
             r["amount"] = int(r["amount"])
@@ -214,9 +241,13 @@ def main():
 
     donations = [d for d in donations if (d.get("created_at") or "") >= SINCE]
 
-    donors = build(donations, hidden())
+    now = datetime.datetime.now(datetime.timezone.utc)
+    donors = build(donations, hidden(), now)
 
-    data = {"updated": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%MZ"),
+    # rules — ради окна правил на сайте: числа те же, что здесь
+    data = {"updated": now.strftime("%Y-%m-%dT%H:%MZ"),
+            "rules": {"base_days": BASE_DAYS, "rub_per_day": RUB_PER_DAY,
+                      "msg_max": MSG_MAX, "name_max": NAME_MAX, "since": SINCE},
             "donors": donors}
     body = json.dumps(data, ensure_ascii=False, indent=1)
     # U+2028/2029 — перевод строки для старых движков JS: в строковом литерале ломает файл
