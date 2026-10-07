@@ -599,18 +599,38 @@
       if (shown[j] > 0.004) { quiet = false; }
     }
     var lvl = shown[8], beat = shown[9], bass = (shown[0] + shown[1]) / 2;
-    box.style.setProperty('--viz-bass', bass.toFixed(3));
-    box.style.setProperty('--viz-beat', beat.toFixed(3));
+    /* покачивание: на каждой доле — в другую сторону, размах — по громкости */
+    if (acc[9] > 0.6 && swayArmed) { swaySide = -swaySide; swayArmed = false; }
+    else if (acc[9] < 0.3) { swayArmed = true; }
+    sway += ((playing ? swaySide * Math.min(1, lvl * 1.2) : 0) - sway) * (1 - Math.exp(-dt / 0.18));
+    if (Math.abs(sway) > 0.004) { quiet = false; }
+    setVar('--viz-bass', bass);
+    setVar('--viz-beat', beat);
+    setVar('--viz-level', lvl);
+    setVar('--viz-sway', sway);
     bg.style.opacity = (0.8 + 0.2 * lvl).toFixed(3);
     drawViz(shown);
     if (playing || !quiet) { vizRaf = requestAnimationFrame(vizTick); } else { resetViz(); }
   }
 
+  /* Переменные — на <html>, их может взять любой элемент страницы:
+       --viz-bass   бас, 0…1            --viz-level  громкость, 0…1
+       --viz-beat   вспышка на долю     --viz-sway   покачивание, −1…1
+     Пишутся, только когда изменились: каждая запись — пересчёт стилей. Без
+     музыки и без движения их нет, и var(--viz-…, 0) даёт ноль — всё стоит. */
+  var vizRoot = document.documentElement, vizPut = {};
+  var sway = 0, swaySide = 1, swayArmed = true;
+  function setVar(name, v) {
+    var s = v.toFixed(3);
+    if (vizPut[name] !== s) { vizRoot.style.setProperty(name, s); vizPut[name] = s; }
+  }
+
   function resetViz() {
     cancelAnimationFrame(vizRaf); vizRaf = 0; vizLast = 0;
     shown = null;
-    box.style.removeProperty('--viz-bass');
-    box.style.removeProperty('--viz-beat');
+    sway = 0;
+    for (var name in vizPut) { vizRoot.style.removeProperty(name); }
+    vizPut = {};
     bg.style.opacity = '';
     if (vctx) { vctx.clearRect(0, 0, vizCanvas.width, vizCanvas.height); }
   }

@@ -61,6 +61,17 @@ a:hover { text-decoration: underline; }
   filter: var(--mascot-shadow);
 }
 .mascot img { display: block; width: 100%; height: auto; }
+/* лисёнок пританцовывает под музыку автора (переменные --viz-… ставит
+   music-widget.js на <html>): стоит на лапах, на басу приседает, на долю
+   подпрыгивает, на каждой доле качается в другую сторону. Без музыки
+   переменных нет — стоит смирно. */
+.mascot img {
+  transform-origin: 50% 100%;
+  transform:
+    translateY(calc(var(--viz-beat, 0) * -5px))
+    rotate(calc(var(--viz-sway, 0) * 5deg))
+    scale(calc(1 + var(--viz-bass, 0) * .04), calc(1 - var(--viz-bass, 0) * .035));
+}
 
 /* ── Секции ─────────────────────────────────────────────────────────────── */
 
