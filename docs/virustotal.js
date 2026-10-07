@@ -39,6 +39,15 @@ window.CRH_VT = {
    "McAfeeD": "ti!8C4EC879B51C"
   }
  },
+ "lucidcats": {
+  "sha256": "f92fcf0fddd4ad41da4957f5da6002e61a2c46bfa9de2a1a8d8b6cf3303afba1",
+  "link": "https://www.virustotal.com/gui/file/f92fcf0fddd4ad41da4957f5da6002e61a2c46bfa9de2a1a8d8b6cf3303afba1",
+  "date": "08.10.2026",
+  "malicious": 0,
+  "suspicious": 0,
+  "engines": 60,
+  "flagged": {}
+ },
  "oddremedy": {
   "sha256": "d8b3741ff01dd293fe77944ec32c0f375db02c2b77073caae0d0d1b30145e9c3",
   "link": "https://www.virustotal.com/gui/file/d8b3741ff01dd293fe77944ec32c0f375db02c2b77073caae0d0d1b30145e9c3",

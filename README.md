@@ -28,6 +28,7 @@
 | **Bodycam** <br><sub>Unreal Engine 5</sub> | ✅ готово, v1.0.1 | интерфейс, меню, снаряжение, режимы, описания — 3674 строки, ~15 тыс. слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/bodycam-v1.0.1) |
 | **Odd Remedy** <br><sub>Unity · ранний доступ</sub> | ✅ готово, v0.2.1 | словарь игры (143 ключа), сцены и данные (1092 строки), строки в коде (514 мест), ~6 тыс. слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/oddremedy-v0.2.1) |
 | **ATLYSS** <br><sub>Unity · мультиплеер</sub> | ✅ готово, v1.0.3 | диалоги, задания, предметы, навыки, интерфейс (3013 строк), ~20 тыс. слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/atlyss-v1.0.3) |
+| **Lucid Cats** <br><sub>Unity · мультиплеер</sub> | ✅ готово, v1.0 | меню, настройки, задания, магазин, комнаты, интерфейс (474 места), строки в коде (67 мест), ~800 слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/lucidcats-v1.0) |
 
 Список на сайте строится из [`docs/games.js`](docs/games.js) — новая игра
 добавляется одной записью, разметку страницы править не нужно.
@@ -46,7 +47,7 @@
 тег каждого релиза начинается с префикса своей игры.
 
 ```
-dragnwash-v1.0   dragnwash-v1.1   protogen-v1.0   protogen-v1.1   protogen2-v1.0   protogen2-v1.1   amorous-v1.0   bodycam-v1.0   oddremedy-v0.1   oddremedy-v0.2   atlyss-v1.0   atlyss-v1.0.1   dragnwash-v1.2   dragnwash-v1.2.1   protogen-v1.1.1   protogen2-v1.1.1   amorous-v1.0.1   bodycam-v1.0.1   oddremedy-v0.2.1   atlyss-v1.0.2   …
+dragnwash-v1.0   dragnwash-v1.1   protogen-v1.0   protogen-v1.1   protogen2-v1.0   protogen2-v1.1   amorous-v1.0   bodycam-v1.0   oddremedy-v0.1   oddremedy-v0.2   atlyss-v1.0   atlyss-v1.0.1   dragnwash-v1.2   dragnwash-v1.2.1   protogen-v1.1.1   protogen2-v1.1.1   amorous-v1.0.1   bodycam-v1.0.1   oddremedy-v0.2.1   atlyss-v1.0.2   lucidcats-v1.0   …
 ```
 
 Префикс записан в `docs/games.js` (`release.tag_prefix`), и кнопка «Скачать»
