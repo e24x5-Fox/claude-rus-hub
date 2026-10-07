@@ -9,7 +9,8 @@
    сразу. Уже него она свёрнута в пилюлю в левом нижнем углу и открывается
    по нажатию: закрывать ею каталог нельзя.
 
-   Под кнопкой «Поддержать» — «Правила донатов»: окно с тем, сколько донат
+   Кнопка «Поддержать» (и любая ссылка на донат на странице) сначала
+   открывает «Правила донатов» — окно с тем, сколько донат
    висит в списке, что в сообщении показывается и что вырезается. Числа
    правил — из donors.js (rules), их пишет тот же скрипт, что их применяет.
    ───────────────────────────────────────────────────────────────────────── */
@@ -170,11 +171,30 @@
       'Если автору придётся скрыть сообщения конкретного ника (за спам или оскорбления), ник и сумма тоже останутся — пропадёт только текст.',
       'Сам донат из-за содержания сообщения не скрывается никогда.'
     ]);
+    /* правила — перед донатом: сюда ведут все кнопки «Поддержать» на странице,
+       а на DonationAlerts — только эта, после прочитанного */
+    var go = el('a', 'btn btn-primary donors-btn donors-rules-go', 'Понятно — к донату ♡');
+    go.href = DONATE;
+    go.rel = 'noopener';
+    go.target = '_blank';
+    go.addEventListener('click', function () { dialog.close(); });
+    dialog.appendChild(go);
     dialog.addEventListener('click', function (e) { if (e.target === dialog) { dialog.close(); } });
     document.body.appendChild(dialog);
     dialog.showModal();
   }
   rulesBtn.addEventListener('click', rules);
+
+  /* Любая ссылка на донат — в панели, в подвале, в колонке справа — сначала
+     открывает правила. Клик колёсиком или с Ctrl/Shift ведёт сразу: кто так
+     открывает вкладку, тот знает, куда идёт. */
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="' + DONATE + '"]');
+    if (!a || (dialog && dialog.contains(a))) { return; }
+    if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) { return; }
+    e.preventDefault();
+    rules();
+  });
 
   /* Строки по одной: сверху самая крупная сумма, дальше по убыванию. */
   function reveal(from, to) {

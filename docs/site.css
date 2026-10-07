@@ -676,6 +676,7 @@ a:hover { text-decoration: underline; }
 .donors-rules h3 { margin: 16px 0 6px; color: var(--accent2); font-size: inherit; }
 .donors-rules ul { margin: 0; padding-left: 18px; color: var(--text2); }
 .donors-rules li + li { margin-top: 4px; }
+.donors-rules-go { margin-top: 20px; }
 
 /* без движения — см. fx.js */
 .fx-still .donors-row { transition: none; transform: none; }
