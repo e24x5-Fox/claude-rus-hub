@@ -533,7 +533,16 @@
      а разогнанный — быстрее. Полосы — столбиками по низу плеера, бас качает
      обложку, доля — подсветка вокруг неё, громкость — яркость фона.
      На переходе кадры обеих дек смешиваются по их громкости. Без движения
-     (fx-still) ничего этого нет. Нет .viz — плеер просто стоит, как раньше. */
+     (fx-still) ничего этого нет. Нет .viz — плеер просто стоит, как раньше.
+
+     Танец лисят ведут доли (формат v2): моменты долей и их сила записаны в
+     .viz, и по currentTime известно, где трек внутри доли. Прыжок — на сам
+     удар, качание из стороны в сторону — с крайними точками ровно на долях.
+     Характер танца у каждого трека свой (tools/music_viz.py считает его из
+     промта Suno и самого звука): жёсткий фонк — резкий прыжок на каждую долю
+     и рывок из стороны в сторону, лоу-фай и грустное — мягкий кивок и
+     качание раз в 2–4 доли. Сила доли и громкость в этом месте — сила
+     движения: на тихом брейке лисёнок почти стоит. */
   var viz = {};            /* имя файла → кадры, null — нет и не будет, 'wait' — качается */
   function loadViz(file) {
     if (file in viz || !window.fetch || !window.DataView) { return; }
@@ -543,12 +552,47 @@
       return r.arrayBuffer();
     }).then(function (buf) {
       var h = new DataView(buf);
-      if (buf.byteLength < 12 || h.getUint32(0) !== 0x43524856 || h.getUint8(4) !== 1) { throw new Error('format'); }
-      var bands = h.getUint8(6);
-      viz[file] = { fps: h.getUint8(5), bands: bands, stride: bands + 2,
-                    frames: h.getUint32(8, true), data: new Uint8Array(buf, 12) };
+      var ver = buf.byteLength >= 12 && h.getUint32(0) === 0x43524856 ? h.getUint8(4) : 0;
+      if (ver !== 1 && ver !== 2) { throw new Error('format'); }
+      var bands = h.getUint8(6), frames = h.getUint32(8, true), off = 12, nb = 0, prof = null;
+      if (ver === 2) {
+        nb = h.getUint32(12, true);
+        prof = { hop: h.getUint8(17) / 255, sharp: h.getUint8(18) / 255, squash: h.getUint8(19) / 255,
+                 sway: h.getUint8(20) / 255, per: h.getUint8(21) || 1 };
+        off = 24;
+      }
+      var size = frames * (bands + 2), at = off + size;
+      var beats = new Float32Array(nb);
+      for (var i = 0; i < nb; i++) { beats[i] = h.getFloat32(at + 4 * i, true); }
+      viz[file] = { fps: h.getUint8(5), bands: bands, stride: bands + 2, frames: frames,
+                    data: new Uint8Array(buf, off, size), beats: beats,
+                    force: new Uint8Array(buf, at + 4 * nb, nb), prof: prof };
       startViz();
     }).catch(function () { viz[file] = null; });
+  }
+
+  /* Танец деки в момент её currentTime; w — её вес на переходе. Нет долей
+     (старый .viz, брейк длиннее двух секунд, вступление до первой доли) —
+     эта дека не танцует. */
+  function dance(d, w, out) {
+    var v = d && d.file && viz[d.file];
+    if (!v || typeof v !== 'object' || !v.prof || !v.beats.length || w <= 0) { return; }
+    var b = v.beats, n = b.length, t = d.currentTime;
+    if (t < b[0] || t > b[n - 1] + 1.5) { return; }
+    var lo = 0, hi = n - 1;
+    while (lo < hi) { var m = (lo + hi + 1) >> 1; if (b[m] <= t) { lo = m; } else { hi = m - 1; } }
+    var gap = lo + 1 < n ? b[lo + 1] - b[lo] : (lo > 0 ? b[lo] - b[lo - 1] : 0.5);
+    if (gap > 2) { return; }
+    var p = Math.min(1, (t - b[lo]) / gap), P = v.prof, force = v.force[lo] / 255;
+    /* прыжок: жёсткий — сразу вверх и быстро вниз, мягкий — волна-кивок */
+    var soft = 0.5 + 0.5 * Math.cos(2 * Math.PI * p), sharp = Math.pow(1 - p, 3);
+    out.hop += w * P.hop * force * (soft + (sharp - soft) * P.sharp);
+    /* качание: крайние точки — на долях; у жёсткого трека дольше стоит в
+       крайних и рывком проскакивает середину */
+    var c = Math.cos(Math.PI * (lo + p) / P.per);
+    out.sway += w * P.sway * (c < 0 ? -1 : 1) * Math.pow(Math.abs(c), 1 - 0.6 * P.sharp);
+    out.squash += w * P.squash;
+    out.w += w;
   }
 
   var vctx = vizCanvas.getContext && vizCanvas.getContext('2d');
@@ -596,12 +640,15 @@
     if (now - vizScan > 1000) { vizScan = now; vizTargets = document.querySelectorAll('[data-viz]'); vizPut = {}; }
     var playing = !audio.paused;
     var acc = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    var mv = { hop: 0, sway: 0, squash: 0, w: 0 };
     if (playing) {
       if (xf) {
         var sum = audio.volume + xf.from.volume || 1;
         sample(audio, audio.volume / sum, acc);
         sample(xf.from, xf.from.volume / sum, acc);
-      } else { sample(audio, 1, acc); }
+        dance(audio, audio.volume / sum, mv);
+        dance(xf.from, xf.from.volume / sum, mv);
+      } else { sample(audio, 1, acc); dance(audio, 1, mv); }
     }
     if (!shown) { shown = acc.slice(); }
     /* кадры уже с плавным спадом; здесь — только мягкий уход в ноль на паузе */
@@ -610,14 +657,22 @@
       shown[j] += (acc[j] - shown[j]) * a;
       if (shown[j] > 0.004) { quiet = false; }
     }
-    var lvl = shown[8], beat = shown[9], bass = (shown[0] + shown[1]) / 2;
-    /* покачивание: на каждой доле — в другую сторону, размах — по громкости */
-    if (acc[9] > 0.6 && swayArmed) { swaySide = -swaySide; swayArmed = false; }
-    else if (acc[9] < 0.3) { swayArmed = true; }
-    sway += ((playing ? swaySide * Math.min(1, lvl * 1.2) : 0) - sway) * (1 - Math.exp(-dt / 0.18));
-    if (Math.abs(sway) > 0.004) { quiet = false; }
-    setVar('--viz-bass', bass);
-    setVar('--viz-beat', beat);
+    var lvl = shown[8], bass = (shown[0] + shown[1]) / 2;
+    /* танец — по долям; без долей прыжок — по вспышке из кадров, качания нет.
+       Пока доли идут, движение берётся как есть: его форма уже задана временем
+       трека, а сглаживание запаздывало за долей на 100+ мс — глазу заметно.
+       Сглаживается только то, что без него дёрнулось бы: спад прыжка на стыке
+       долей разной силы, уход в ноль на паузе и на брейке без долей */
+    var tHop = mv.w ? mv.hop : acc[9], tSway = mv.w ? mv.sway * (0.35 + 0.65 * lvl) : 0;
+    var tSquash = mv.w ? mv.squash / mv.w : 1;
+    var live = playing && mv.w > 0;
+    var k = 1 - Math.exp(-dt / (live ? 0.03 : 0.3));
+    hop = live && tHop > hop ? tHop : hop + (tHop - hop) * k;
+    sway = live ? tSway : sway + (tSway - sway) * k;
+    squash += (tSquash - squash) * k;
+    if (Math.abs(sway) > 0.004 || hop > 0.004) { quiet = false; }
+    setVar('--viz-bass', bass * squash);
+    setVar('--viz-beat', hop);
     setVar('--viz-level', lvl);
     setVar('--viz-sway', sway);
     bg.style.opacity = (0.8 + 0.2 * lvl).toFixed(3);
@@ -635,7 +690,7 @@
      движения их нет, и var(--viz-…, 0) даёт ноль — всё стоит. */
   var VIZ_HZ = 60;
   var vizTargets = [], vizScan = 0, vizPut = {};
-  var sway = 0, swaySide = 1, swayArmed = true;
+  var sway = 0, hop = 0, squash = 1;
   function setVar(name, v) {
     var s = v.toFixed(3);
     if (vizPut[name] === s) { return; }
@@ -646,7 +701,7 @@
   function resetViz() {
     cancelAnimationFrame(vizRaf); vizRaf = 0; vizLast = 0;
     shown = null;
-    sway = 0;
+    sway = hop = 0; squash = 1;
     var all = document.querySelectorAll('[data-viz]');
     for (var i = 0; i < all.length; i++) {
       for (var name in vizPut) { all[i].style.removeProperty(name); }

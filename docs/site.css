@@ -79,7 +79,7 @@ a:hover { text-decoration: underline; }
   transform-origin: 50% 100%;
   will-change: transform;
   transform:
-    translateY(calc(var(--viz-beat, 0) * -5px))
+    translateY(calc(var(--viz-beat, 0) * -8px))
     rotate(calc(var(--viz-sway, 0) * 5deg))
     scale(calc(1 + var(--viz-bass, 0) * .04), calc(1 - var(--viz-bass, 0) * .035));
 }
