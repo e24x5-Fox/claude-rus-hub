@@ -818,6 +818,26 @@ body.has-music .donors.wide .donors-panel { max-height: calc(100vh - 63px - 90px
 
 .fx-still .music.folded.playing .music-cover { animation: none; }
 
+/* ── пасхалка у верхнего края (top-egg.js): выезжает сверху ──────────────── */
+.top-egg {
+  position: fixed; top: 12px; left: 50%; z-index: 40;
+  display: flex; gap: 12px; align-items: center;
+  width: min(420px, calc(100vw - 32px)); box-sizing: border-box;
+  padding: 12px 40px 12px 14px;
+  background: var(--bg2); border: 1px solid var(--accent); border-radius: var(--r-card);
+  box-shadow: 0 12px 40px rgba(0,0,0,.6), 0 0 0 4px var(--accent-soft);
+  transform: translate(-50%, calc(-100% - 24px));
+  visibility: hidden;
+  transition: transform .45s cubic-bezier(.2,1.3,.4,1), visibility 0s .45s;
+}
+.top-egg.show { transform: translate(-50%, 0); visibility: visible; transition: transform .45s cubic-bezier(.2,1.3,.4,1); }
+.top-egg-mascot { width: 64px; height: auto; flex: none; filter: var(--mascot-shadow); }
+.top-egg.show .top-egg-mascot { animation: thanks-wave 1.2s ease-in-out .3s 2; transform-origin: 50% 90%; }
+.top-egg-text { margin: 0; color: var(--text); line-height: 1.5; }
+.top-egg-close { position: absolute; top: 8px; right: 10px; }
+.fx-still .top-egg, .fx-still .top-egg.show { transition: none; }
+.fx-still .top-egg.show .top-egg-mascot { animation: none; }
+
 /* ── «Спасибо, что скачали» (thanks-widget.js) ─────────────────────────── */
 .thanks {
   position: fixed; inset: 0; z-index: 50;

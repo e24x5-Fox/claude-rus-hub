@@ -12,7 +12,8 @@
    плеер запоминаются у посетителя в браузере; трек при каждом открытии
    страницы — случайный. Название ведёт на страницу трека в Suno.
 
-   Чем ниже по странице, тем медленнее идёт трек; «Скачать» (событие
+   Чем ниже по странице, тем медленнее идёт трек, а если наверху крутят
+   дальше вверх — разгоняется (crh:top-push из top-egg.js); «Скачать» (событие
    crh:download из thanks-widget.js) тормозит его до нуля.
 
    Музыка качается только по «играть»; следующий трек подкачивается заранее,
@@ -384,6 +385,8 @@
      Наверху трек идёт как есть, в самом низу — на BOTTOM_RATE, между ними
      плавно по положению прокрутки. */
   var BOTTOM_RATE = 0.88;  /* скорость в самом низу страницы */
+  var TOP_RATE = 1.4;      /* наверху крутят дальше вверх (top-egg.js) — разгон до неё */
+  var boost = 0;           /* сила этого напора, 0…1 */
   var MIN_RATE = 0.07;     /* ниже 0.0625 Chrome не пускает */
 
   /* Скорость догоняет цель через промежуточную точку mid — два сглаживания
@@ -413,15 +416,20 @@
     if (!raf) { last = 0; raf = requestAnimationFrame(tick); }
   }
 
-  /* скорость для текущего места на странице: 1 наверху, BOTTOM_RATE внизу */
+  /* скорость для текущего места на странице: 1 наверху, BOTTOM_RATE внизу,
+     а если наверху упорно крутят вверх — до TOP_RATE */
   function depthRate() {
     var max = document.documentElement.scrollHeight - window.innerHeight;
     var k = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
-    return 1 - (1 - BOTTOM_RATE) * k;
+    return (1 - (1 - BOTTOM_RATE) * k) * (1 + (TOP_RATE - 1) * boost);
   }
   window.addEventListener('scroll', function () {
     if (!stopping) { glide(depthRate()); }
   }, { passive: true });
+  document.addEventListener('crh:top-push', function (e) {
+    boost = e.detail || 0;
+    if (!stopping) { glide(depthRate()); }
+  });
   /* смена трека сбрасывает скорость браузером — возвращаем её на место */
   on('play', function () {
     if (xf) { applyRate(); return; }      /* входящая на переходе — скорость ведёт xfTick */
