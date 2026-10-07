@@ -201,17 +201,6 @@ a:hover { text-decoration: underline; }
 }
 .foot .links { flex: 1 1 auto; display: flex; flex-wrap: wrap; gap: 16px; }
 .foot .mascot { width: 62px; }
-/* «Эффекты: Авто / Все / Без» — fx.js; кнопки как у вида каталога, только мельче */
-.fx-pick { display: flex; align-items: center; gap: 4px; flex: none; }
-.fx-pick-label { margin-right: 4px; cursor: help; text-decoration: underline dotted; text-underline-offset: 3px; }
-.fx-pick button {
-  font: inherit; color: var(--text2);
-  background: var(--bg3); border: 1px solid var(--bg3); border-radius: var(--r-btn);
-  padding: 4px 9px; cursor: pointer;
-  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
-}
-.fx-pick button:hover { background: var(--bg4); color: var(--text); }
-.fx-pick button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 
 /* ── Пустое состояние и ошибка загрузки каталога ────────────────────────── */
 
@@ -229,9 +218,6 @@ a:hover { text-decoration: underline; }
   .mascot { width: 84px; }
   .head h1 { font-size: 22px; }
   .stat { flex-basis: 45%; }
-  .foot { flex-wrap: wrap; }
-  .foot .links { flex-basis: 100%; }
-  .fx-pick { flex: 1 1 auto; }
   /* плеер и донатеры висят внизу поверх страницы — подвал не должен уходить под них */
   body.has-music .foot { padding-bottom: 130px; }
 }
@@ -636,6 +622,45 @@ a:hover { text-decoration: underline; }
   cursor: pointer; text-decoration: underline; text-underline-offset: 3px;
 }
 .donors-rules-btn:hover { color: var(--accent2); }
+
+/* «Эффекты: Авто / Все / Без» (fx.js). На узком — кружок рядом с пилюлей,
+   карточка открывается над ним; на широком — строка внизу панели, кружка нет. */
+/* карточка отсчитывается от всего угла (.donors), а не от кружка — встаёт вровень с пилюлей */
+.fx-dock { display: inline-block; vertical-align: bottom; margin-left: 6px; }
+.donors.open:not(.wide) .fx-dock { display: none; }
+.fx-gear {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 37px; height: 37px; padding: 0; box-sizing: border-box;
+  border-radius: 50%; border: 1px solid var(--bg3);
+  background: var(--bg2); color: var(--text2); cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0,0,0,.45);
+  transition: border-color var(--t-fast), color var(--t-fast);
+}
+.fx-gear:hover, .fx-dock.open .fx-gear { border-color: var(--accent); color: var(--text); }
+.fx-gear svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.fx-pick { display: none; }
+.fx-dock.open .fx-pick {
+  display: block; position: absolute; left: 0; bottom: calc(100% + 8px);
+  width: 220px; padding: 12px 14px;
+  background: var(--bg2); border: 1px solid var(--bg3); border-radius: var(--r-card);
+  box-shadow: 0 8px 28px rgba(0,0,0,.5);
+}
+/* карточка поверх плеера, который висит над пилюлей */
+.donors:has(.fx-dock.open) { z-index: 22; }
+.fx-pick .side-title { margin: 0 0 8px; }
+.fx-pick-row { display: flex; gap: 4px; }
+.fx-pick-row button {
+  flex: 1 1 0; font: inherit; color: var(--text2);
+  background: var(--bg3); border: 1px solid var(--bg3); border-radius: var(--r-btn);
+  padding: 5px 0; cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+}
+.fx-pick-row button:hover { background: var(--bg4); color: var(--text); }
+.fx-pick-row button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.fx-pick-note { margin: 8px 0 0; color: var(--text3); font-size: var(--fs-hint); line-height: 1.45; }
+.donors.wide .fx-dock { display: block; margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--bg3); }
+.donors.wide .fx-gear { display: none; }
+.donors.wide .fx-pick { display: block; position: static; width: auto; padding: 0; background: none; border: 0; box-shadow: none; }
 
 /* окно «Правила донатов» */
 .donors-rules {

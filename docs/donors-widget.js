@@ -200,9 +200,17 @@
     if (e.key === 'Escape' && !WIDE.matches) { open(false); }
   });
 
+  /* «Эффекты» (fx.js): на узком — кружок рядом с пилюлей, на широком —
+     строка внизу открытой панели */
+  var fxDock = window.CRH_FX && CRH_FX.dock && CRH_FX.dock();
+
   /* Широкий экран — открыта сама; сузили окно — сворачивается. */
   function fit() {
     box.classList.toggle('wide', WIDE.matches);
+    if (fxDock) {
+      fxDock.classList.remove('open');
+      if (WIDE.matches) { panel.appendChild(fxDock); } else { box.insertBefore(fxDock, panel); }
+    }
     open(WIDE.matches);
   }
   if (WIDE.addEventListener) { WIDE.addEventListener('change', fit); }

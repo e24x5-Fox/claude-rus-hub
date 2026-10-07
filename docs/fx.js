@@ -14,7 +14,7 @@
      fx-flat  — выключены «Эффекты прозрачности» (prefers-reduced-transparency,
                 Chromium 118+), включена экономия трафика или машина слабая:
                 не больше двух ядер или не больше 2 ГБ памяти.
-   Кнопки в подвале («Авто / Все / Без») перекрывают это вручную, выбор
+   Кнопки «Авто / Все / Без» в левом углу, у донатеров, перекрывают это вручную, выбор
    запоминается в браузере. Переключили настройку Windows при открытой
    вкладке — страница подхватывает сразу, без перезагрузки.
 
@@ -94,13 +94,50 @@
 
   apply();
 
-  /* ── кнопки в подвале: подсказка на «Эффекты» объясняет, что выбрало «Авто» ── */
-  function pick() {
-    var box = document.getElementById('fx-pick');
-    if (!box) { return; }
-    var label = box.querySelector('.fx-pick-label');
+  /* ── «Эффекты: Авто / Все / Без» — блок для левого угла ──
+     Строит fx.js, ставит donors-widget.js (CRH_FX.dock()): на узком экране —
+     кружок с ползунками рядом с пилюлей «Поддержали», по нажатию над ним
+     открывается карточка; на широком — строка внизу открытой панели донатеров.
+     Под кнопками — что сейчас выбрало «Авто» и почему. */
+  var dock = null;
+  fx.dock = function () {
+    if (dock) { return dock; }
+    function el(tag, cls, text) {
+      var n = document.createElement(tag);
+      if (cls) { n.className = cls; }
+      if (text != null) { n.textContent = text; }
+      return n;
+    }
+    dock = el('div', 'fx-dock');
+    var gear = el('button', 'fx-gear');
+    gear.type = 'button';
+    gear.title = 'Эффекты страницы';
+    gear.setAttribute('aria-label', 'Эффекты страницы');
+    gear.setAttribute('aria-expanded', 'false');
+    gear.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/>' +
+      '<circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>';
+    var card = el('div', 'fx-pick');
+    card.setAttribute('role', 'group');
+    card.setAttribute('aria-label', 'Эффекты страницы');
+    card.appendChild(el('h2', 'side-title', 'Эффекты'));
+    var row = el('div', 'fx-pick-row');
+    [['auto', 'Авто', 'Как просит Windows и как тянет компьютер'],
+     ['full', 'Все', 'Всегда полностью'],
+     ['off', 'Без', 'Ничего не движется, размытого фона нет']].forEach(function (m) {
+      var b = el('button', null, m[1]);
+      b.type = 'button';
+      b.title = m[2];
+      b.setAttribute('data-fx', m[0]);
+      row.appendChild(b);
+    });
+    card.appendChild(row);
+    var note = el('p', 'fx-pick-note');
+    card.appendChild(note);
+    dock.appendChild(gear);
+    dock.appendChild(card);
+
     function show() {
-      var btns = box.querySelectorAll('button');
+      var btns = row.querySelectorAll('button');
       for (var i = 0; i < btns.length; i++) {
         var on = btns[i].getAttribute('data-fx') === fx.mode;
         btns[i].classList.toggle('on', on);
@@ -110,16 +147,25 @@
               : fx.still ? 'без движения'
               : fx.flat ? 'без размытого фона'
               : 'всё включено';
-      label.title = 'Сейчас: ' + now + (fx.mode === 'auto' && fx.why ? ' — ' + fx.why : '') +
-        '.\nАвто — как просит Windows и как тянет компьютер. Все — всегда полностью. Без — ничего не движется, фона нет.';
+      note.textContent = 'Сейчас: ' + now + (fx.mode === 'auto' && fx.why ? ' — ' + fx.why : '') + '.';
     }
-    box.addEventListener('click', function (e) {
+    function open(on) {
+      dock.classList.toggle('open', on);
+      gear.setAttribute('aria-expanded', on ? 'true' : 'false');
+    }
+    gear.addEventListener('click', function () { open(!dock.classList.contains('open')); });
+    row.addEventListener('click', function (e) {
       var b = e.target.closest && e.target.closest('button[data-fx]');
       if (b) { fx.set(b.getAttribute('data-fx')); }
     });
+    document.addEventListener('click', function (e) {
+      if (dock.classList.contains('open') && !dock.contains(e.target)) { open(false); }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && dock.classList.contains('open')) { open(false); gear.focus(); }
+    });
     document.addEventListener('crh:fx', show);
     show();
-  }
-  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', pick); }
-  else { pick(); }
+    return dock;
+  };
 })();
