@@ -13,8 +13,12 @@
    страницы — случайный. Название ведёт на страницу трека в Suno.
 
    Чем ниже по странице, тем медленнее идёт трек, а если наверху крутят
-   дальше вверх — разгоняется (crh:top-push из top-egg.js); «Скачать» (событие
+   дальше вверх — разгоняется (crh:top-push из top-egg.js), но только после
+   того, как вернулся к своему обычному темпу; «Скачать» (событие
    crh:download из thanks-widget.js) тормозит его до нуля.
+
+   Плеер шевелится под музыку по заранее записанным кадрам (music/<имя>.viz,
+   tools/music_viz.py), звук на странице не анализируется.
 
    Музыка качается только по «играть»; следующий трек подкачивается заранее,
    за PREFETCH_S секунд до конца текущего, чтобы переход шёл без паузы.
@@ -209,6 +213,11 @@
   var play = button('music-play ico-play', 'Играть', null);
   var fold = button('music-fold', 'Свернуть', '×');
 
+  /* столбики анимации — под всем остальным (см. «анимация плеера» ниже) */
+  var vizCanvas = el('canvas', 'music-viz');
+  vizCanvas.setAttribute('aria-hidden', 'true');
+
+  box.appendChild(vizCanvas);
   box.appendChild(coverBtn);
   box.appendChild(info);
   box.appendChild(play);
@@ -253,6 +262,7 @@
     if (next && next.i === i) { return; }
     var n = next = { i: i, url: null };
     new Image().src = 'music/' + tracks[i].file + '.jpg';   /* и обложку для фона */
+    loadViz(tracks[i].file);                                  /* и кадры анимации */
     if (!window.fetch || !window.URL || !URL.createObjectURL) { return; }
     fetch('music/' + tracks[i].file + '.mp3').then(function (r) {
       if (!r.ok) { throw new Error(r.status); }
@@ -274,6 +284,8 @@
     if (audio.blob && audio.blob !== url) { URL.revokeObjectURL(audio.blob); }
     audio.blob = url.indexOf('blob:') === 0 ? url : null;
     audio.src = url;
+    audio.file = tracks[cur].file;         /* по нему — кадры анимации */
+    loadViz(audio.file);
     show();
     save();
   }
@@ -332,6 +344,7 @@
     f.pause();
     if (f.blob) { URL.revokeObjectURL(f.blob); f.blob = null; }
     f.removeAttribute('src');
+    f.file = null;
     f.load();
   }
 
@@ -348,7 +361,10 @@
       var k = Math.min(1, (now - ramp.t0) / (XF_S * 1000));
       mult = IN_START + (1 - IN_START) * (1 - (1 - k) * (1 - k));
       if (ramp.vol) { audio.volume = volume * Math.sin(k * Math.PI / 2); }
-      if (k >= 1) { ramp = null; mult = 1; } else { live = true; }
+      if (k >= 1) {
+        ramp = null; mult = 1;
+        if (boost > 0 && !stopping) { glide(depthRate()); }   /* тронулся — теперь и разгон */
+      } else { live = true; }
     }
     if (xf) {
       var j = Math.min(1, (now - xf.t0) / (XF_S * 1000));
@@ -409,6 +425,9 @@
     rate += (mid - rate) * a;
     if (Math.abs(target - rate) < 0.001 && Math.abs(target - mid) < 0.001) { rate = mid = target; }
     applyRate();
+    /* наверху давят, а трек как раз дошёл до нормы — цель сменяется на ходу,
+       и он без остановки идёт дальше, в разгон */
+    if (boost > 0 && !stopping) { target = depthRate(); }
     if (rate === target) { raf = 0; last = 0; } else { raf = requestAnimationFrame(tick); }
   }
   function glide(to) {
@@ -417,11 +436,16 @@
   }
 
   /* скорость для текущего места на странице: 1 наверху, BOTTOM_RATE внизу,
-     а если наверху упорно крутят вверх — до TOP_RATE */
+     а если наверху упорно крутят вверх — до TOP_RATE. Разгон — только с нормы:
+     пока трек ещё не вернулся к своему темпу (поднялись снизу, где он шёл
+     медленнее, или он только трогается на переходе), напор копится, но
+     цель — норма; дошёл до неё — дальше уже разгон (см. tick и xfTick). */
   function depthRate() {
     var max = document.documentElement.scrollHeight - window.innerHeight;
     var k = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
-    return (1 - (1 - BOTTOM_RATE) * k) * (1 + (TOP_RATE - 1) * boost);
+    var base = 1 - (1 - BOTTOM_RATE) * k;
+    if (boost > 0 && (rate < base - 0.005 || mult < 1)) { return base; }
+    return base * (1 + (TOP_RATE - 1) * boost);
   }
   window.addEventListener('scroll', function () {
     if (!stopping) { glide(depthRate()); }
@@ -495,12 +519,126 @@
     save();
   });
 
+  /* ── анимация плеера — заранее записанная ──
+     Звук страница не слушает: у каждого трека есть music/<имя>.viz, кадры
+     анимации, посчитанные tools/music_viz.py (8 полос спектра, громкость,
+     вспышка на долю, 25 кадров в секунду). Здесь берётся кадр по
+     currentTime деки — поэтому замедленный трек и анимируется медленнее,
+     а разогнанный — быстрее. Полосы — столбиками по низу плеера, бас качает
+     обложку, доля — подсветка вокруг неё, громкость — яркость фона.
+     На переходе кадры обеих дек смешиваются по их громкости. Без движения
+     (fx-still) ничего этого нет. Нет .viz — плеер просто стоит, как раньше. */
+  var viz = {};            /* имя файла → кадры, null — нет и не будет, 'wait' — качается */
+  function loadViz(file) {
+    if (file in viz || !window.fetch || !window.DataView) { return; }
+    viz[file] = 'wait';
+    fetch('music/' + file + '.viz').then(function (r) {
+      if (!r.ok) { throw new Error(r.status); }
+      return r.arrayBuffer();
+    }).then(function (buf) {
+      var h = new DataView(buf);
+      if (buf.byteLength < 12 || h.getUint32(0) !== 0x43524856 || h.getUint8(4) !== 1) { throw new Error('format'); }
+      var bands = h.getUint8(6);
+      viz[file] = { fps: h.getUint8(5), bands: bands, stride: bands + 2,
+                    frames: h.getUint32(8, true), data: new Uint8Array(buf, 12) };
+      startViz();
+    }).catch(function () { viz[file] = null; });
+  }
+
+  var vctx = vizCanvas.getContext && vizCanvas.getContext('2d');
+  var VBARS = 24;          /* столбиков на ширину плеера: 8 полос растянуты плавно */
+  var shown = null, vizRaf = 0, vizLast = 0;
+
+  /* кадр деки в момент её currentTime, с интерполяцией между кадрами; w — её вес */
+  function sample(d, w, acc) {
+    var v = d && d.file && viz[d.file];
+    if (!v || typeof v !== 'object' || w <= 0) { return; }
+    var f = d.currentTime * v.fps, i = Math.floor(f), t = f - i;
+    if (i >= v.frames - 1) { i = v.frames - 2; t = 1; }
+    if (i < 0) { return; }
+    var a = i * v.stride, b = a + v.stride;
+    for (var j = 0; j < v.stride && j < acc.length; j++) {
+      acc[j] += w * (v.data[a + j] * (1 - t) + v.data[b + j] * t) / 255;
+    }
+  }
+
+  function drawViz(vals) {
+    var w = vizCanvas.width, h = vizCanvas.height;
+    if (!vctx || !w) { return; }
+    vctx.clearRect(0, 0, w, h);
+    if (box.classList.contains('folded')) { return; }
+    var n = vals.length - 2, gap = w / VBARS, bw = gap * 0.56;
+    var beat = vals[n + 1];
+    vctx.fillStyle = 'rgba(139,92,246,' + (0.2 + 0.18 * beat).toFixed(3) + ')';   /* --accent */
+    for (var k = 0; k < VBARS; k++) {
+      var p = k / (VBARS - 1) * (n - 1), i = Math.floor(p), t = p - i;
+      var v = vals[i] * (1 - t) + vals[Math.min(n - 1, i + 1)] * t;
+      var bh = Math.max(1, v * h * 0.48);         /* до ползунка громкости, не выше */
+      vctx.fillRect(k * gap + (gap - bw) / 2, h - bh, bw, bh);
+    }
+  }
+
+  function vizTick(now) {
+    vizRaf = 0;
+    var dt = vizLast ? Math.min(0.1, (now - vizLast) / 1000) : 1 / 60;
+    vizLast = now;
+    var playing = !audio.paused;
+    var acc = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    if (playing) {
+      if (xf) {
+        var sum = audio.volume + xf.from.volume || 1;
+        sample(audio, audio.volume / sum, acc);
+        sample(xf.from, xf.from.volume / sum, acc);
+      } else { sample(audio, 1, acc); }
+    }
+    if (!shown) { shown = acc.slice(); }
+    /* кадры уже с плавным спадом; здесь — только мягкий уход в ноль на паузе */
+    var a = 1 - Math.exp(-dt / (playing ? 0.04 : 0.3)), quiet = true;
+    for (var j = 0; j < acc.length; j++) {
+      shown[j] += (acc[j] - shown[j]) * a;
+      if (shown[j] > 0.004) { quiet = false; }
+    }
+    var lvl = shown[8], beat = shown[9], bass = (shown[0] + shown[1]) / 2;
+    box.style.setProperty('--viz-bass', bass.toFixed(3));
+    box.style.setProperty('--viz-beat', beat.toFixed(3));
+    bg.style.opacity = (0.8 + 0.2 * lvl).toFixed(3);
+    drawViz(shown);
+    if (playing || !quiet) { vizRaf = requestAnimationFrame(vizTick); } else { resetViz(); }
+  }
+
+  function resetViz() {
+    cancelAnimationFrame(vizRaf); vizRaf = 0; vizLast = 0;
+    shown = null;
+    box.style.removeProperty('--viz-bass');
+    box.style.removeProperty('--viz-beat');
+    bg.style.opacity = '';
+    if (vctx) { vctx.clearRect(0, 0, vizCanvas.width, vizCanvas.height); }
+  }
+
+  /* запускается на «играть» и когда докачались кадры; на паузе цикл сам
+     дорисовывает уход в ноль и встаёт */
+  function startViz() {
+    if (FX.still) { resetViz(); return; }
+    if (!vizCanvas.width) { sizeViz(); }
+    if (!vizRaf && !audio.paused) { vizLast = 0; vizRaf = requestAnimationFrame(vizTick); }
+  }
+
+  function sizeViz() {
+    var r = window.devicePixelRatio || 1;
+    vizCanvas.width = Math.round(box.offsetWidth * r);
+    vizCanvas.height = Math.round(box.offsetHeight * r);
+  }
+  on('play', startViz);
+  document.addEventListener('crh:fx', startViz);
+  window.addEventListener('resize', sizeViz);
+
   /* ── свёрнут / развёрнут ── */
   function apply() {
     var f = folded === null ? !WIDE.matches : folded;
     box.classList.toggle('folded', f);
     coverBtn.setAttribute('aria-expanded', f ? 'false' : 'true');
     coverBtn.setAttribute('aria-label', f ? 'Развернуть плеер' : 'Обложка');
+    sizeViz();
   }
   coverBtn.addEventListener('click', function () {
     if (!box.classList.contains('folded')) { return; }
