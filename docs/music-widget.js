@@ -26,6 +26,7 @@
   var tracks = data.tracks || [];
   if (!tracks.length) { return; }
 
+  var FX = window.CRH_FX || { still: false, flat: false };   /* fx.js */
   var VOLUME = 0.15;       /* громкость по умолчанию — тихо, фоном */
   var FADE_MS = 1800;      /* плавный старт */
   var KEY = 'crh-music';
@@ -73,7 +74,6 @@
      Только очень медленно: две ступени сглаживания по BG_TAU секунд, фон
      доплывает до места секунды через три после того, как прокрутка встала. */
   var BG_TAU = 0.9;
-  var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var pan = 0, panMid = 0, panTarget = 0, panRaf = 0, panLast = 0;
   function scrollShare() {
     var max = document.documentElement.scrollHeight - window.innerHeight;
@@ -97,10 +97,11 @@
   }
   function panTo() {
     panTarget = scrollShare();
-    if (calm) { pan = panMid = panTarget; placeBg(); return; }
+    if (FX.still) { cancelAnimationFrame(panRaf); panRaf = 0; pan = panMid = panTarget; placeBg(); return; }
     if (!panRaf) { panLast = 0; panRaf = requestAnimationFrame(panTick); }
   }
   window.addEventListener('scroll', panTo, { passive: true });
+  document.addEventListener('crh:fx', function () { setBg(cover.src); panTo(); });
   window.addEventListener('resize', function () { placeBg(); panTo(); });
   var front = 0, bgSrc = '';
 
@@ -130,7 +131,10 @@
     return c;
   }
 
+  /* без тяжёлых эффектов фон не рисуется вовсе — ни холстов, ни загрузки;
+     включили обратно — появляется обложка текущего трека */
   function setBg(src) {
+    if (FX.flat) { bgSrc = ''; return; }
     if (src === bgSrc) { return; }
     bgSrc = src;
     var img = new Image();

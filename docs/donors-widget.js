@@ -176,14 +176,12 @@
   }
   rulesBtn.addEventListener('click', rules);
 
-  var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
   /* Строки по одной: сверху самая крупная сумма, дальше по убыванию. */
   function reveal(from, to) {
     donors.slice(from, to).forEach(function (d, k) {
       var li = row(d, from + k);
       list.appendChild(li);
-      if (still) { li.classList.add('in'); return; }
+      if (window.CRH_FX && CRH_FX.still) { li.classList.add('in'); return; }
       setTimeout(function () { li.classList.add('in'); }, 60 + k * STEP_MS);
     });
   }

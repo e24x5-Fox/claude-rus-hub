@@ -226,7 +226,6 @@
     var side = document.querySelector('.side');
     var layout = side && side.parentElement;
     if (!side || !layout) { return; }
-    var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     var shown = 0, target = 0, ticking = false;
 
     function measure() {
@@ -243,6 +242,7 @@
       ticking = false;
       measure();
       var d = target - shown;
+      var calm = window.CRH_FX && CRH_FX.still;
       shown = (calm || Math.abs(d) < 0.5) ? target : shown + d * 0.18;
       side.style.transform = shown ? 'translateY(' + shown.toFixed(1) + 'px)' : '';
       if (shown !== target) { kick(); }
@@ -254,6 +254,7 @@
 
     window.addEventListener('scroll', kick, { passive: true });
     window.addEventListener('resize', kick);
+    document.addEventListener('crh:fx', kick);   /* выключили движение на ходу — колонка встаёт сразу */
     /* высота меняется сама: «Показать ещё», поиск, догрузившиеся картинки */
     if (window.ResizeObserver) {
       var ro = new ResizeObserver(kick);
