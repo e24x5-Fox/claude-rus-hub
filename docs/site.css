@@ -23,7 +23,16 @@ body {
   font-size: 15px;
   line-height: 1.6;
   border-top: 3px solid var(--accent);   /* отсылка к рамке окна установщика */
+  /* Страница — витрина, а не текст для копирования: выделение мешает больше,
+     чем помогает. Десять быстрых нажатий на лисёнка (fox-stage.js) — это
+     несколько тройных щелчков подряд, и браузер выделял всю страницу синим. */
+  -webkit-user-select: none;
+  user-select: none;
 }
+/* в поле поиска набранное выделять можно — иначе его не поправить */
+input, textarea, [contenteditable] { -webkit-user-select: text; user-select: text; }
+/* картинки не тащатся мышью: лисёнка нажимают, а не перетаскивают */
+img { -webkit-user-drag: none; }
 
 a { color: var(--accent2); text-decoration: none; }
 a:hover { text-decoration: underline; }
