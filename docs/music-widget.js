@@ -19,6 +19,12 @@
    за PREFETCH_S секунд до конца текущего, чтобы переход шёл без паузы.
    Фон страницы — обложка текущего трека, тёмная и сильно размытая; при смене
    трека она плавно перетекает в следующую.
+
+   Треки не обрываются в тишину, а заезжают друг на друга, как на пульте с
+   двумя деками: за XF_S секунд до конца уходящий тормозит, как пластинка, и
+   гаснет, а следующий в это же время трогается медленно, с IN_START,
+   разгоняется до нормы и набирает громкость. Первый трек по «играть» тоже
+   трогается с разгона.
    ───────────────────────────────────────────────────────────────────────── */
 
 (function () {
@@ -60,8 +66,23 @@
     return b;
   }
 
-  var audio = new Audio();
-  audio.preload = 'none';                 /* не качать музыку, пока не попросили */
+  /* две деки: на переходе играют обе. audio — та, что сейчас главная */
+  function deck() {
+    var a = new Audio();
+    a.preload = 'none';                   /* не качать музыку, пока не попросили */
+    /* высоту тона не сохраняем: замедление звучит как притормозившая
+       пластинка, а не как растянутый голос */
+    a.preservesPitch = a.mozPreservesPitch = a.webkitPreservesPitch = false;
+    return a;
+  }
+  var decks = [deck(), deck()];
+  var audio = decks[0];
+  /* события — только от главной деки: уходящая на переходе своё отыграла */
+  function on(type, fn) {
+    decks.forEach(function (d) {
+      d.addEventListener(type, function (e) { if (e.target === audio) { fn(e); } });
+    });
+  }
 
   /* ── фон: размытая обложка, два слоя для перетекания ── */
   var bg = el('div', 'music-bg');
@@ -225,7 +246,7 @@
   /* следующий трек качается целиком заранее, в blob: так он точно в памяти,
      а не «где-то в кэше», и переход идёт без паузы на загрузку */
   var PREFETCH_S = 30;
-  var next = null, blobUrl = null;
+  var next = null;
   function prefetch() {
     var i = (cur + 1) % tracks.length;
     if (next && next.i === i) { return; }
@@ -239,16 +260,18 @@
       if (next === n) { n.url = URL.createObjectURL(b); }
     }).catch(function () { /* не вышло — возьмём по сети в момент смены */ });
   }
-  audio.addEventListener('timeupdate', function () {
+  on('timeupdate', function () {
     if (audio.duration && audio.duration - audio.currentTime < PREFETCH_S) { prefetch(); }
+    if (needXfade()) { startXfade(); }
   });
 
+  /* blob держит та дека, что его играет: на переходе уходящая ещё читает свой */
   function pick(i) {
     cur = (i + tracks.length) % tracks.length;
     var url = next && next.i === cur && next.url ? next.url : 'music/' + tracks[cur].file + '.mp3';
     next = null;
-    if (blobUrl && blobUrl !== url) { URL.revokeObjectURL(blobUrl); }
-    blobUrl = url.indexOf('blob:') === 0 ? url : null;
+    if (audio.blob && audio.blob !== url) { URL.revokeObjectURL(audio.blob); }
+    audio.blob = url.indexOf('blob:') === 0 ? url : null;
     audio.src = url;
     show();
     save();
@@ -256,25 +279,101 @@
 
   function go() {
     if (!audio.src) { pick(cur); }
+    if (audio.currentTime < 0.3 && !resuming) { rampIn(false); }   /* с начала — с разгона */
     fadeIn();
     var p = audio.play();
     if (p && p.catch) { p.catch(function () { /* браузер не дал — ждём следующего нажатия */ }); }
   }
 
+  /* ── переход между треками ──
+     mult — множитель скорости главной деки поверх скорости по прокрутке;
+     у уходящей свой, xf.mult. Уходящая тормозит сначала едва, потом всё
+     круче (k²); входящая — наоборот, трогается быстро и мягко садится на
+     норму. Громкости — по четверти синуса, чтобы общая не проваливалась
+     посередине. Таймер, а не requestAnimationFrame: в фоновой вкладке кадров
+     нет, а звук идёт, и переход застыл бы на полпути. */
+  var XF_S = 6;            /* сколько секунд треки звучат вместе */
+  var OUT_END = 0.5;       /* до какой скорости тормозит уходящий */
+  var IN_START = 0.6;      /* с какой скорости трогается входящий */
+  var mult = 1, xf = null, ramp = null, xfTimer = 0;
+
+  /* уходящий за переход проиграет XF_S·(1 − (1 − OUT_END)/3) секунд записи —
+     столько и должно оставаться, когда переход начинается */
+  function needXfade() {
+    if (xf || stopping || audio.paused || !(audio.duration > XF_S * 3)) { return false; }
+    var left = audio.duration - audio.currentTime;
+    return left <= rate * (XF_S * (1 - (1 - OUT_END) / 3) + 0.3);
+  }
+
+  function rampIn(withVolume) {
+    ramp = { t0: Date.now(), vol: withVolume };
+    mult = IN_START;
+    applyRate();
+    if (!xfTimer) { xfTimer = setInterval(xfTick, 40); }
+  }
+
+  function startXfade() {
+    clearInterval(fadeTimer);
+    var from = audio;
+    xf = { from: from, t0: Date.now(), mult: mult };
+    audio = from === decks[0] ? decks[1] : decks[0];
+    audio.volume = 0;
+    pick(cur + 1);
+    rampIn(true);
+    var p = audio.play();
+    if (p && p.catch) { p.catch(function () {}); }
+  }
+
+  function dropOut() {
+    if (!xf) { return; }
+    var f = xf.from;
+    xf = null;
+    f.pause();
+    if (f.blob) { URL.revokeObjectURL(f.blob); f.blob = null; }
+    f.removeAttribute('src');
+    f.load();
+  }
+
+  /* дотянуть переход разом: пауза, «Скачать» */
+  function settle() {
+    dropOut();
+    clearInterval(xfTimer); xfTimer = 0;
+    if (ramp) { ramp = null; mult = 1; audio.volume = volume; applyRate(); }
+  }
+
+  function xfTick() {
+    var now = Date.now(), live = false;
+    if (ramp) {
+      var k = Math.min(1, (now - ramp.t0) / (XF_S * 1000));
+      mult = IN_START + (1 - IN_START) * (1 - (1 - k) * (1 - k));
+      if (ramp.vol) { audio.volume = volume * Math.sin(k * Math.PI / 2); }
+      if (k >= 1) { ramp = null; mult = 1; } else { live = true; }
+    }
+    if (xf) {
+      var j = Math.min(1, (now - xf.t0) / (XF_S * 1000));
+      xf.mult = 1 - (1 - OUT_END) * j * j;
+      xf.from.volume = volume * Math.cos(j * Math.PI / 2);
+      if (j >= 1 || xf.from.ended) { dropOut(); } else { live = true; }
+    }
+    applyRate();
+    if (!live) { clearInterval(xfTimer); xfTimer = 0; }
+  }
+
   play.addEventListener('click', function () {
     if (stopping) { return; }
     stoppedByDownload = false;              /* сам нажал — сам и решает */
-    audio.paused ? go() : audio.pause();
+    if (audio.paused) { go(); } else { settle(); audio.pause(); }
   });
-  audio.addEventListener('ended', function () { pick(cur + 1); go(); });
+  /* перехода не было (трек короткий или стоял на паузе у самого конца) */
+  on('ended', function () { if (!xf) { pick(cur + 1); go(); } });
 
-  audio.addEventListener('play', function () {
+  on('play', function () {
     play.classList.replace('ico-play', 'ico-pause');
     play.setAttribute('aria-label', 'Пауза'); play.title = 'Пауза';
     box.classList.add('playing');
     document.body.classList.add('music-playing');
   });
-  audio.addEventListener('pause', function () {
+  on('pause', function () {
     play.classList.replace('ico-pause', 'ico-play');
     play.setAttribute('aria-label', 'Играть'); play.title = 'Играть';
     box.classList.remove('playing');
@@ -283,13 +382,9 @@
 
   /* ── скорость: чем ниже по странице, тем медленнее; «Скачать» — стоп ──
      Наверху трек идёт как есть, в самом низу — на BOTTOM_RATE, между ними
-     плавно по положению прокрутки. Высоту тона не сохраняем: так замедление
-     звучит как притормозившая пластинка, а не как растянутый голос. */
+     плавно по положению прокрутки. */
   var BOTTOM_RATE = 0.88;  /* скорость в самом низу страницы */
   var MIN_RATE = 0.07;     /* ниже 0.0625 Chrome не пускает */
-  audio.preservesPitch = false;
-  audio.mozPreservesPitch = false;
-  audio.webkitPreservesPitch = false;
 
   /* Скорость догоняет цель через промежуточную точку mid — два сглаживания
      подряд: так она трогается мягко, без рывка на первом кадре, и так же
@@ -298,7 +393,11 @@
   var TAU = 0.35;
   var rate = 1, mid = 1, target = 1, raf = 0, last = 0, stopping = false;
   var stoppedByDownload = false, resuming = false, stopRun = 0;
-  function setRate(v) { rate = mid = v; audio.playbackRate = v; }
+  function applyRate() {
+    audio.playbackRate = Math.max(MIN_RATE, rate * mult);
+    if (xf) { xf.from.playbackRate = Math.max(MIN_RATE, rate * xf.mult); }
+  }
+  function setRate(v) { rate = mid = v; applyRate(); }
   function tick(now) {
     var dt = last ? Math.min(0.1, (now - last) / 1000) : 1 / 60;
     last = now;
@@ -306,7 +405,7 @@
     mid += (target - mid) * a;
     rate += (mid - rate) * a;
     if (Math.abs(target - rate) < 0.001 && Math.abs(target - mid) < 0.001) { rate = mid = target; }
-    audio.playbackRate = rate;
+    applyRate();
     if (rate === target) { raf = 0; last = 0; } else { raf = requestAnimationFrame(tick); }
   }
   function glide(to) {
@@ -324,7 +423,8 @@
     if (!stopping) { glide(depthRate()); }
   }, { passive: true });
   /* смена трека сбрасывает скорость браузером — возвращаем её на место */
-  audio.addEventListener('play', function () {
+  on('play', function () {
+    if (xf) { applyRate(); return; }      /* входящая на переходе — скорость ведёт xfTick */
     if (resuming) {                       /* после «Скачать» — разгон с нуля */
       resuming = false;
       setRate(MIN_RATE);
@@ -339,6 +439,7 @@
   /* «Скачать» — трек тормозит до нуля за секунду, как остановленная кассета */
   document.addEventListener('crh:download', function () {
     if (audio.paused || stopping) { return; }
+    settle();
     stopping = true;
     var run = ++stopRun;
     cancelAnimationFrame(raf); raf = 0;
@@ -377,7 +478,7 @@
     resuming = true;
     go();
   });
-  audio.addEventListener('pause', function () { if (!stopping) { resuming = false; } });
+  on('pause', function () { if (!stopping) { resuming = false; } });
 
   vol.addEventListener('input', function () {
     volume = vol.value / 100;
