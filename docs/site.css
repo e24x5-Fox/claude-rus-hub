@@ -821,7 +821,7 @@ body.has-music .donors.wide .donors-panel { max-height: calc(100vh - 63px - 90px
   transition: background var(--t-fast);
 }
 .music-play:hover { background: var(--accent2); }
-.music-play::before, .music-vol-ico {
+.music-play::before, .music-skip::before, .music-vol-ico {
   content: ""; display: block; flex: none; width: 13px; height: 13px;
   background: currentColor;
   -webkit-mask: var(--ico) center / contain no-repeat;
@@ -922,3 +922,86 @@ body.has-music .donors.wide .donors-panel { max-height: calc(100vh - 63px - 90px
 .vt-ok:hover   { border-color: var(--green); }
 .vt-warn:hover { border-color: var(--yellow); }
 .vt-note { margin: 10px 0 0; color: var(--text3); font-size: var(--fs-note); }
+
+/* ── сцена (fox-stage.js): лисёнка нажали десять раз ─────────────────────────
+   Лисёнок вылетает в середину экрана, интерфейс гаснет, плеер растягивается
+   на весь низ и получает «назад» и «вперёд». */
+.fox-boop { transition: transform .18s cubic-bezier(.3, 1.8, .5, 1); cursor: pointer; }
+
+.fox-stage-lock, .fox-stage-lock body { overflow: hidden; }
+/* гаснет всё, кроме плеера, фона и самой сцены; анимацией, а не transition,
+   чтобы не перебить собственные переходы у панелей */
+body.fox-stage-on > :not(.music):not(.music-bg):not(.fox-stage) {
+  animation: fox-stage-hide .6s ease forwards; pointer-events: none;
+}
+body.fox-stage-back > :not(.music):not(.music-bg):not(.fox-stage) {
+  animation: fox-stage-show .6s ease .3s backwards;
+}
+@keyframes fox-stage-hide { to { opacity: 0; visibility: hidden; } }
+@keyframes fox-stage-show { from { opacity: 0; } }
+/* на сцене обложка на фоне — как свет на сцене: ярче */
+body.fox-stage-on .music-bg-layer.on { opacity: .5; }
+
+.fox-stage { position: fixed; inset: 0; z-index: 20; pointer-events: none; }
+.fox-stage-fly {
+  /* место лисёнка на сцене: по центру, над плеером; ширину даёт aspect-ratio
+     картинки (fox-stage.js) — тогда полёт считается ещё до её загрузки */
+  position: absolute; left: 0; right: 0; margin: 0 auto;
+  bottom: calc(150px + env(safe-area-inset-bottom, 0px));
+  height: min(calc(100vh - 230px), 80vw);
+  transform-origin: 0 0;
+  transition: transform .9s cubic-bezier(.34, 1.25, .5, 1);
+}
+.fox-stage-img {
+  display: block; width: 100%; height: 100%;
+  filter: var(--mascot-shadow);
+  transform-origin: 50% 100%;
+  transform:
+    translateY(calc(var(--viz-beat, 0) * -3%))
+    rotate(calc(var(--viz-sway, 0) * 4deg))
+    scale(calc(1 + var(--viz-bass, 0) * .035), calc(1 - var(--viz-bass, 0) * .03));
+}
+.fox-stage-close {
+  position: absolute; right: 16px; top: calc(16px + env(safe-area-inset-top, 0px));
+  width: 40px; height: 40px; padding: 0;
+  border: 1px solid var(--bg3); border-radius: 50%;
+  background: var(--bg2); color: var(--text2);
+  font: inherit; font-size: 22px; line-height: 1; cursor: pointer;
+  pointer-events: auto;
+  opacity: 0; transition: opacity .4s ease .5s, color var(--t-fast);
+}
+.fox-stage.on .fox-stage-close { opacity: 1; }
+.fox-stage:not(.on) .fox-stage-close { transition-delay: 0s; }   /* уходит сразу, без задержки появления */
+.fox-stage-close:hover { color: var(--text); border-color: var(--accent); }
+.fx-still .fox-stage-fly { transition: none; }
+
+/* плеер на сцене: островок во всю ширину низа */
+.music-skip { display: none; }
+.music.stage {
+  left: 16px; right: 16px; width: auto;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  gap: 14px; padding: 14px 16px 14px 14px; z-index: 30;
+  box-shadow: 0 12px 40px rgba(0,0,0,.6), 0 0 0 1px var(--accent-soft);
+  animation: music-stage-in .5s cubic-bezier(.3, 1.3, .5, 1);
+}
+@keyframes music-stage-in { from { transform: translateY(16px); opacity: .5; } }
+.donors.open:not(.wide) ~ .music.stage { display: flex; }
+.music.stage .music-cover { width: 72px; height: 72px; }
+.music.stage .music-title { font-size: var(--fs-title); }
+.music.stage .music-vol-row { max-width: 240px; }
+.music.stage .music-fold { display: none; }
+.music.stage .music-skip {
+  display: inline-flex; flex: none; width: 34px; height: 34px; padding: 0;
+  align-items: center; justify-content: center;
+  border: 0; border-radius: 50%;
+  background: var(--bg3); color: var(--text); cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.music.stage .music-skip:hover { background: var(--accent-soft); color: var(--accent2); }
+.ico-prev { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 3h2v10H3zM14 3v10L6 8z'/%3E%3C/svg%3E"); }
+.ico-next { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M11 3h2v10h-2zM2 3v10l8-5z'/%3E%3C/svg%3E"); }
+@media (max-width: 600px) {
+  .music.stage { gap: 10px; }
+  .music.stage .music-cover { width: 52px; height: 52px; }
+}
+.fx-still .music.stage { animation: none; }

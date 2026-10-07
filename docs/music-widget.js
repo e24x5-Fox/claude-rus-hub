@@ -212,6 +212,9 @@
 
   var play = button('music-play ico-play', 'Играть', null);
   var fold = button('music-fold', 'Свернуть', '×');
+  /* переключать треки можно только на сцене (fox-stage.js) — в углу их нет */
+  var prev = button('music-skip ico-prev', 'Предыдущий трек', null);
+  var nextBtn = button('music-skip ico-next', 'Следующий трек', null);
 
   /* столбики анимации — под всем остальным (см. «анимация плеера» ниже) */
   var vizCanvas = el('canvas', 'music-viz');
@@ -220,7 +223,9 @@
   box.appendChild(vizCanvas);
   box.appendChild(coverBtn);
   box.appendChild(info);
+  box.appendChild(prev);
   box.appendChild(play);
+  box.appendChild(nextBtn);
   box.appendChild(fold);
 
   /* ── воспроизведение ── */
@@ -567,11 +572,13 @@
     if (!vctx || !w) { return; }
     vctx.clearRect(0, 0, w, h);
     if (box.classList.contains('folded')) { return; }
-    var n = vals.length - 2, gap = w / VBARS, bw = gap * 0.56;
+    /* на сцене плеер во всю ширину — столбиков больше, а не толще */
+    var bars = Math.max(VBARS, Math.round(w / (window.devicePixelRatio || 1) / 11));
+    var n = vals.length - 2, gap = w / bars, bw = gap * 0.56;
     var beat = vals[n + 1];
     vctx.fillStyle = 'rgba(139,92,246,' + (0.2 + 0.18 * beat).toFixed(3) + ')';   /* --accent */
-    for (var k = 0; k < VBARS; k++) {
-      var p = k / (VBARS - 1) * (n - 1), i = Math.floor(p), t = p - i;
+    for (var k = 0; k < bars; k++) {
+      var p = k / (bars - 1) * (n - 1), i = Math.floor(p), t = p - i;
       var v = vals[i] * (1 - t) + vals[Math.min(n - 1, i + 1)] * t;
       var bh = Math.max(1, v * h * 0.48);         /* до ползунка громкости, не выше */
       vctx.fillRect(k * gap + (gap - bw) / 2, h - bh, bw, bh);
@@ -652,9 +659,32 @@
   document.addEventListener('crh:fx', startViz);
   window.addEventListener('resize', sizeViz);
 
+  /* ── сцена: плеер на весь низ экрана (fox-stage.js) ──
+     Там он всегда развёрнут, а «назад» и «вперёд» переключают трек сразу:
+     старый обрывается, новый трогается с разгона, как по «играть». */
+  var staged = false;
+  function skip(dir) {
+    if (stopping) { return; }
+    stoppedByDownload = false;
+    settle();
+    audio.pause();
+    pick(cur + dir);
+    go();
+  }
+  prev.addEventListener('click', function () { skip(-1); });
+  nextBtn.addEventListener('click', function () { skip(1); });
+  box.addEventListener('transitionend', function (e) { if (e.target === box) { sizeViz(); } });
+
+  window.CRH_PLAYER = {
+    stage: function (on) { staged = !!on; box.classList.toggle('stage', staged); apply(); },
+    skip: skip,
+    playing: function () { return !audio.paused; },
+    play: function () { if (audio.paused && !stopping) { stoppedByDownload = false; go(); } }
+  };
+
   /* ── свёрнут / развёрнут ── */
   function apply() {
-    var f = folded === null ? !WIDE.matches : folded;
+    var f = staged ? false : folded === null ? !WIDE.matches : folded;
     box.classList.toggle('folded', f);
     coverBtn.setAttribute('aria-expanded', f ? 'false' : 'true');
     coverBtn.setAttribute('aria-label', f ? 'Развернуть плеер' : 'Обложка');
