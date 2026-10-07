@@ -62,11 +62,13 @@ a:hover { text-decoration: underline; }
 }
 .mascot img { display: block; width: 100%; height: auto; }
 /* лисёнок пританцовывает под музыку автора (переменные --viz-… ставит
-   music-widget.js на <html>): стоит на лапах, на басу приседает, на долю
-   подпрыгивает, на каждой доле качается в другую сторону. Без музыки
-   переменных нет — стоит смирно. */
+   music-widget.js на элементы с data-viz): стоит на лапах, на басу приседает,
+   на долю подпрыгивает, на каждой доле качается в другую сторону. Без музыки
+   переменных нет — стоит смирно. Свой слой (will-change): двигается готовой
+   картинкой, тень не перерисовывается на каждом кадре. */
 .mascot img {
   transform-origin: 50% 100%;
+  will-change: transform;
   transform:
     translateY(calc(var(--viz-beat, 0) * -5px))
     rotate(calc(var(--viz-sway, 0) * 5deg))
@@ -725,7 +727,7 @@ a:hover { text-decoration: underline; }
    (.sharp, играет), — и на плей .sharp проявляется поверх .soft. Меняется
    только прозрачность, а это для браузера почти бесплатно. Где холст не
    умеет размывать (старый Safari), слой получает .css-blur и живой фильтр. */
-.music-bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.music-bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; will-change: opacity; }
 .music-bg-layer {
   /* квадрат шире экрана: края размытия — за экраном, а по высоте есть запас,
      по которому music-widget.js ведёт картинку сверху вниз вслед за прокруткой */
@@ -956,6 +958,7 @@ body.fox-stage-on .music-bg-layer.on { opacity: .5; }
   display: block; width: 100%; height: 100%;
   filter: var(--mascot-shadow);
   transform-origin: 50% 100%;
+  will-change: transform;
   transform:
     translateY(calc(var(--viz-beat, 0) * -3%))
     rotate(calc(var(--viz-sway, 0) * 4deg))

@@ -45,6 +45,7 @@
   function build(src) {
     layer = el('div', 'fox-stage');
     fly = el('div', 'fox-stage-fly');
+    fly.setAttribute('data-viz', '');      /* танцует по --viz-… (music-widget.js) */
     img = el('img', 'fox-stage-img');
     img.alt = '';
     img.src = src;

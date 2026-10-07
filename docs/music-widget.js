@@ -187,6 +187,7 @@
   /* ── разметка ── */
   var box = el('aside', 'music');
   box.setAttribute('aria-label', 'Музыка автора');
+  box.setAttribute('data-viz', '');        /* обложка качается под музыку */
 
   var coverBtn = button('music-cover-btn', 'Развернуть плеер', null);
   var cover = el('img', 'music-cover');
@@ -587,8 +588,12 @@
 
   function vizTick(now) {
     vizRaf = 0;
+    /* не чаще VIZ_HZ: кадров в данных 25 в секунду, а на мониторе 144 Гц
+       каждая лишняя запись переменных — лишний пересчёт стилей */
+    if (vizLast && now - vizLast < 1000 / VIZ_HZ - 2) { vizRaf = requestAnimationFrame(vizTick); return; }
     var dt = vizLast ? Math.min(0.1, (now - vizLast) / 1000) : 1 / 60;
     vizLast = now;
+    if (now - vizScan > 1000) { vizScan = now; vizTargets = document.querySelectorAll('[data-viz]'); vizPut = {}; }
     var playing = !audio.paused;
     var acc = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     if (playing) {
@@ -620,24 +625,33 @@
     if (playing || !quiet) { vizRaf = requestAnimationFrame(vizTick); } else { resetViz(); }
   }
 
-  /* Переменные — на <html>, их может взять любой элемент страницы:
+  /* Переменные получает любой элемент с атрибутом data-viz — он и всё внутри него:
        --viz-bass   бас, 0…1            --viz-level  громкость, 0…1
        --viz-beat   вспышка на долю     --viz-sway   покачивание, −1…1
-     Пишутся, только когда изменились: каждая запись — пересчёт стилей. Без
-     музыки и без движения их нет, и var(--viz-…, 0) даёт ноль — всё стоит. */
-  var vizRoot = document.documentElement, vizPut = {};
+     Не на <html>: тогда при каждой записи браузер пересчитывал стили всей
+     страницы — на 144 Гц это было 40 % времени главного потока. Помеченные
+     элементы ищутся раз в секунду, так что появившиеся позже (сцена) тоже
+     получают переменные. Пишутся, только когда изменились. Без музыки и без
+     движения их нет, и var(--viz-…, 0) даёт ноль — всё стоит. */
+  var VIZ_HZ = 60;
+  var vizTargets = [], vizScan = 0, vizPut = {};
   var sway = 0, swaySide = 1, swayArmed = true;
   function setVar(name, v) {
     var s = v.toFixed(3);
-    if (vizPut[name] !== s) { vizRoot.style.setProperty(name, s); vizPut[name] = s; }
+    if (vizPut[name] === s) { return; }
+    vizPut[name] = s;
+    for (var i = 0; i < vizTargets.length; i++) { vizTargets[i].style.setProperty(name, s); }
   }
 
   function resetViz() {
     cancelAnimationFrame(vizRaf); vizRaf = 0; vizLast = 0;
     shown = null;
     sway = 0;
-    for (var name in vizPut) { vizRoot.style.removeProperty(name); }
-    vizPut = {};
+    var all = document.querySelectorAll('[data-viz]');
+    for (var i = 0; i < all.length; i++) {
+      for (var name in vizPut) { all[i].style.removeProperty(name); }
+    }
+    vizPut = {}; vizScan = 0;
     bg.style.opacity = '';
     if (vctx) { vctx.clearRect(0, 0, vizCanvas.width, vizCanvas.height); }
   }
@@ -676,7 +690,7 @@
   box.addEventListener('transitionend', function (e) { if (e.target === box) { sizeViz(); } });
 
   window.CRH_PLAYER = {
-    stage: function (on) { staged = !!on; box.classList.toggle('stage', staged); apply(); },
+    stage: function (on) { staged = !!on; box.classList.toggle('stage', staged); vizScan = 0; apply(); },
     skip: skip,
     playing: function () { return !audio.paused; },
     play: function () { if (audio.paused && !stopping) { stoppedByDownload = false; go(); } }
