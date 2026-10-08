@@ -762,8 +762,8 @@ body.music-playing .music-bg-layer canvas.soft { visibility: hidden; transition:
 /* без тяжёлых эффектов (fx.js) фона нет вовсе: music-widget.js его и не рисует */
 .fx-flat .music-bg { display: none; }
 /* запасной путь: размытие фильтром на каждом кадре */
-.music-bg-layer.css-blur { filter: blur(90px) saturate(1.3) brightness(.55); transition: opacity 3.5s ease, filter 2.5s ease; }
-body.music-playing .music-bg-layer.css-blur { filter: blur(24px) saturate(1.3) brightness(.55); }
+.music-bg-layer.css-blur { filter: blur(90px) saturate(1.3) brightness(var(--bg-bright, .55)); transition: opacity 3.5s ease, filter 2.5s ease; }
+body.music-playing .music-bg-layer.css-blur { filter: blur(24px) saturate(1.3) brightness(var(--bg-bright, .55)); }
 .music-bg-layer.css-blur:not(.on) { transition: opacity 3.5s ease, filter 2.5s ease, visibility 0s 3.5s; }
 /* на широком экране плеер занимает низ колонки — панель донатеров уступает */
 body.has-music .donors.wide .donors-panel { max-height: calc(100vh - 63px - 90px); }

@@ -102,6 +102,12 @@
   var BG_TAU = 0.9;
   var pan = 0, panMid = 0, panTarget = 0, panRaf = 0, panLast = 0;
   function scrollShare() {
+    /* на сцене (fox-stage.js) прокрутки нет — обложка встаёт серединой в середину экрана */
+    if (staged) {
+      var h = layers[0].offsetHeight, vh = window.innerHeight;
+      var room = Math.max(0, h - vh * 1.3);
+      return room > 0 ? Math.min(1, Math.max(0, (h / 2 - vh * 0.65) / room)) : 0;
+    }
     var max = document.documentElement.scrollHeight - window.innerHeight;
     return max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
   }
@@ -134,7 +140,25 @@
   /* Размытие — заранее, на холсте, по разу на обложку. BLUR_SOFT и BLUR_SHARP —
      в пикселях экрана, как было у CSS-фильтра; на холсте обложка мельче, чем
      на экране, поэтому радиус пересчитывается в её масштаб. */
-  var BLUR_SOFT = 90, BLUR_SHARP = 24, TONE = ' saturate(1.3) brightness(.55)';
+  var BLUR_SOFT = 90, BLUR_SHARP = 24, TONE = ' saturate(1.3) brightness(';
+
+  /* Яркость фона — по самой обложке: тёмная обложка (ночной город, чёрный фон)
+     под общим затемнением почти пропадала, поэтому её яркость подтягивается
+     к средней светлой. Светлые не трогаются — им хватает .55. Мера — средняя
+     яркость обложки 32×32: размытие среднее не меняет. */
+  var BRIGHT = 0.55, LUM_TARGET = 0.32, LIFT_MAX = 3;
+  function brightOf(img) {
+    try {
+      var c = document.createElement('canvas'), n = 32;
+      c.width = c.height = n;
+      var g = c.getContext('2d');
+      g.drawImage(img, 0, 0, n, n);
+      var d = g.getImageData(0, 0, n, n).data, sum = 0;
+      for (var i = 0; i < d.length; i += 4) { sum += 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]; }
+      var lum = sum / (n * n * 255);
+      return BRIGHT * Math.min(LIFT_MAX, Math.max(1, LUM_TARGET / Math.max(0.01, lum)));
+    } catch (e) { return BRIGHT; }
+  }
   var canBlur = (function () {
     try {
       var c = document.createElement('canvas').getContext('2d');
@@ -142,7 +166,7 @@
       return c.filter === 'blur(1px)';
     } catch (e) { return false; }
   })();
-  function blurred(img, screenPx, cls) {
+  function blurred(img, screenPx, cls, bright) {
     var n = img.naturalWidth || 256;
     var scale = n / Math.max(1, layers[0].offsetWidth);   /* пиксель обложки в пикселях экрана */
     var r = screenPx * scale;
@@ -152,7 +176,7 @@
     c.width = c.height = n;
     c.className = cls;
     var ctx = c.getContext('2d');
-    ctx.filter = 'blur(' + r.toFixed(2) + 'px)' + TONE;
+    ctx.filter = 'blur(' + r.toFixed(2) + 'px)' + TONE + bright.toFixed(3) + ')';
     ctx.drawImage(img, 0, 0, n, n);
     return c;
   }
@@ -170,11 +194,13 @@
       front ^= 1;
       var l = layers[front];
       l.textContent = '';
+      var bright = brightOf(img);
       if (canBlur) {
         l.style.backgroundImage = '';
-        l.appendChild(blurred(img, BLUR_SOFT, 'soft'));
-        l.appendChild(blurred(img, BLUR_SHARP, 'sharp'));
+        l.appendChild(blurred(img, BLUR_SOFT, 'soft', bright));
+        l.appendChild(blurred(img, BLUR_SHARP, 'sharp', bright));
       } else {
+        l.style.setProperty('--bg-bright', bright.toFixed(3));
         l.classList.add('css-blur');
         l.style.backgroundImage = 'url("' + src + '")';
       }
@@ -792,7 +818,7 @@
   box.addEventListener('transitionend', function (e) { if (e.target === box) { sizeViz(); } });
 
   window.CRH_PLAYER = {
-    stage: function (on) { staged = !!on; box.classList.toggle('stage', staged); vizScan = 0; apply(); },
+    stage: function (on) { staged = !!on; box.classList.toggle('stage', staged); vizScan = 0; apply(); panTo(); },
     skip: skip,
     playing: function () { return !audio.paused; },
     /* сила сейчас и сколько дропов уже прошло — огоньки на сцене (fox-stage.js) */
