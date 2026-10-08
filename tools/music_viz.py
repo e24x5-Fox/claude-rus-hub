@@ -15,6 +15,19 @@
     f32 × долей — моменты долей в секундах записи
     u8 × долей  — сила каждой доли
 
+Формат v3 — то же плюс сильные места и дропы (радуга и огоньки на сцене):
+    в каждом кадре после «на бит» ещё байт — сила этого места трека (0…255)
+    u32 дропов, f32 × дропов — их моменты, u8 × дропов — сила
+
+Сильное место и дроп считаются по самому звуку, а не по кадрам анимации:
+кадры сделаны для столбиков — децибелы, подогнанные под процентили, с
+резким спадом, — и на ровно сведённом треке (глитч, драм-н-бейс) «сила»
+из них вспыхивала где попало, а настоящие части трека пропускала.
+Здесь — громкость (в разах, не в дБ), бас и верха в окне около секунды:
+мощная часть трека — когда громко и разом звучат низ и верх. Сильно — верхняя
+треть этой шкалы самого трека; дроп — где следующие две секунды заметно
+мощнее четырёх предыдущих и попадают в мощную часть, не чаще раза в 10 с.
+
 Полосы нормированы по самому треку (5-й и 99-й процентиль), а не по всем
 трекам сразу: тихая баллада шевелит полосы так же заметно, как фонк. Спад
 после удара считается здесь же — быстро вверх, плавно вниз, — и странице
@@ -180,10 +193,46 @@ def analyse(mp3, tags):
                    per_sway=per_sway, bpm=bpm, sound=sound_e, tag=tag_e,
                    perc=perc_share, attacks=attacks)
 
-    n = min(frames, len(bands), len(level), len(pulse))
-    out = np.concatenate([bands[:n], level[:n, None], pulse[:n, None]], axis=1)
+    power, drops = surge(y, hop)
+    n = min(frames, len(bands), len(level), len(pulse), len(power))
+    out = np.concatenate([bands[:n], level[:n, None], pulse[:n, None], power[:n, None]], axis=1)
     data = np.round(np.clip(out, 0, 1) * 255).astype(np.uint8)
+    profile["drops"] = drops
     return data, beat_times.astype(np.float32), beat_force, profile, dur
+
+
+def surge(y, hop):
+    """Сила места трека по кадрам (0…1) и дропы [(секунда, сила 0…1)]."""
+    fps = SR / hop
+    S = np.abs(librosa.stft(y, n_fft=2048, hop_length=hop))
+    f = librosa.fft_frequencies(sr=SR, n_fft=2048)
+
+    def win(x, sec):                     # среднее в окне sec секунд вокруг кадра
+        n = max(1, int(fps * sec))
+        c = np.cumsum(np.r_[0, x])
+        i = np.arange(len(x))
+        lo = np.clip(i - n // 2, 0, len(x))
+        hi = np.clip(i - n // 2 + n, 0, len(x))
+        return (c[hi] - c[lo]) / np.maximum(1, hi - lo)
+
+    def pct(x):
+        return norm(x, 5, 98)
+
+    rms = np.sqrt((S ** 2).mean(axis=0))
+    low, high = S[f < 150].mean(axis=0), S[f > 3000].mean(axis=0)
+    power = pct(0.5 * pct(win(rms, 1)) + 0.25 * pct(win(low, 1)) + 0.25 * pct(win(high, 1)))
+    level = win(np.clip((power - 0.68) / 0.27, 0, 1), 0.6)
+
+    fut, past = win(power, 2), win(power, 4)
+    k2, k4, near = int(fps), int(fps * 2), int(fps * 3)
+    jump = np.zeros_like(power)
+    jump[k4:len(power) - k2] = fut[k4 + k2:] - past[:len(power) - k2 - k4]
+    drops = []
+    for i in range(near, len(power) - k2):
+        if jump[i] > 0.3 and fut[i + k2] > 0.6 and jump[i] >= jump[i - near:i + near].max():
+            if not drops or i / fps - drops[-1][0] > 10:
+                drops.append((i / fps, float(min(1, jump[i] / 0.6))))
+    return level, drops
 
 
 def byte(x):
@@ -202,16 +251,21 @@ def main():
     style = styles([m.stem for m in todo])
     for mp3 in todo:
         data, times, force, p, dur = analyse(mp3, style.get(mp3.stem))
-        head = b"CRHV" + struct.pack("<BBBBII", 2, FPS, BANDS, 0, len(data), len(times))
+        head = b"CRHV" + struct.pack("<BBBBII", 3, FPS, BANDS, 0, len(data), len(times))
         head += bytes([byte(p["energy"]), byte(p["hop"]), byte(p["sharp"]), byte(p["squash"]),
                        byte(p["sway"]), p["per_sway"], int(min(255, round(p["bpm"]))), 0])
         body = data.tobytes() + times.astype("<f4").tobytes() + bytes(byte(f) for f in force)
+        drops = p["drops"]
+        body += struct.pack("<I", len(drops)) + struct.pack("<%df" % len(drops), *(t for t, _ in drops))
+        body += bytes(byte(f) for _, f in drops)
         viz = mp3.with_suffix(".viz")
         viz.write_bytes(head + body)
         tag = "—" if p["tag"] is None else f"{p['tag']:.2f}"
         print(f"{mp3.stem:<24} энергия {p['energy']:.2f} (промт {tag}, звук {p['sound']:.2f}: "
               f"ударные {p['perc']:.2f}, атак {p['attacks']:.1f}/с)  {p['bpm']:.0f} BPM, "
-              f"качок раз в {p['per_sway']} д.  {len(times)} долей, {viz.stat().st_size // 1024} КБ")
+              f"качок раз в {p['per_sway']} д.  {len(times)} долей, "
+              f"сильно {100 * (data[:, -1] > 64).mean():.0f}%, дропы {' '.join('%.0f' % t for t, _ in drops) or '—'}, "
+              f"{viz.stat().st_size // 1024} КБ")
 
 
 if __name__ == "__main__":

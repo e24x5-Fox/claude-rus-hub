@@ -553,78 +553,44 @@
     }).then(function (buf) {
       var h = new DataView(buf);
       var ver = buf.byteLength >= 12 && h.getUint32(0) === 0x43524856 ? h.getUint8(4) : 0;
-      if (ver !== 1 && ver !== 2) { throw new Error('format'); }
+      if (ver < 1 || ver > 3) { throw new Error('format'); }
       var bands = h.getUint8(6), frames = h.getUint32(8, true), off = 12, nb = 0, prof = null;
-      if (ver === 2) {
+      var stride = bands + (ver === 3 ? 3 : 2);   /* v3: ещё байт силы места */
+      if (ver >= 2) {
         nb = h.getUint32(12, true);
         prof = { hop: h.getUint8(17) / 255, sharp: h.getUint8(18) / 255, squash: h.getUint8(19) / 255,
                  sway: h.getUint8(20) / 255, per: h.getUint8(21) || 1 };
         off = 24;
       }
-      var size = frames * (bands + 2), at = off + size;
+      var size = frames * stride, at = off + size;
       var beats = new Float32Array(nb);
       for (var i = 0; i < nb; i++) { beats[i] = h.getFloat32(at + 4 * i, true); }
-      viz[file] = { fps: h.getUint8(5), bands: bands, stride: bands + 2, frames: frames,
-                    data: new Uint8Array(buf, off, size), beats: beats,
-                    force: new Uint8Array(buf, at + 4 * nb, nb), prof: prof };
-      surgeOf(viz[file]);
+      var v = viz[file] = { fps: h.getUint8(5), bands: bands, stride: stride, frames: frames,
+                            data: new Uint8Array(buf, off, size), beats: beats,
+                            force: new Uint8Array(buf, at + 4 * nb, nb), prof: prof, drops: [] };
+      if (ver === 3) {
+        var d0 = at + 5 * nb, nd = h.getUint32(d0, true);
+        for (i = 0; i < nd; i++) {
+          v.drops.push({ t: h.getFloat32(d0 + 4 + 4 * i, true), force: h.getUint8(d0 + 4 + 4 * nd + i) / 255 });
+        }
+        v.surge = bands + 2;                     /* столбец силы в кадре */
+      }
       startViz();
     }).catch(function () { viz[file] = null; });
   }
 
   /* ── сильные места и дропы — для сцены (fox-stage.js) ──
-     Из тех же кадров: «сила» — громкость с басом, сглаженная на 0,4 с.
-     Сильное место — где она выше 70-го процентиля самого трека (у каждого
-     трека свои, так тихий трек тоже где-то «взрывается»); к 95-му — в полную
-     силу. Дроп — где следующая секунда резко громче трёх предыдущих: разница
-     больше половины размаха трека, самая большая в округе ±2 с и не чаще
-     раза в 8 с. На треках это 2–6 дропов, сильных мест — около пятой части. */
-  function surgeOf(v) {
-    var n = v.frames, fps = v.fps, E = new Float32Array(n);
-    for (var i = 0; i < n; i++) {
-      var a = i * v.stride;
-      E[i] = (0.6 * v.data[a + v.bands] + 0.2 * v.data[a] + 0.2 * v.data[a + 1]) / 255;
-    }
-    function box(x, w) {                          /* среднее по окну w кадров вокруг */
-      var out = new Float32Array(n), s = 0, h = w >> 1, lo, hi;
-      var pre = new Float64Array(n + 1);
-      for (var k = 0; k < n; k++) { pre[k + 1] = pre[k] + x[k]; }
-      for (k = 0; k < n; k++) {
-        lo = Math.max(0, k - h); hi = Math.min(n, k - h + w);
-        out[k] = (pre[hi] - pre[lo]) / Math.max(1, hi - lo);
-      }
-      return out;
-    }
-    var S = box(E, Math.round(fps * 0.4));
-    var sorted = Array.prototype.slice.call(S).sort(function (a, b) { return a - b; });
-    function pct(p) { return sorted[Math.min(n - 1, Math.floor(p * n))] || 0; }
-    var p10 = pct(0.1), p70 = pct(0.7), p95 = pct(0.95);
-    var range = Math.max(1e-3, p95 - p10), top = Math.max(1e-3, p95 - p70);
-    var level = new Float32Array(n);
-    for (i = 0; i < n; i++) { level[i] = Math.max(0, Math.min(1, (S[i] - p70) / top)); }
-    var fut = box(S, fps), past = box(S, fps * 3), D = new Float32Array(n);
-    var half = Math.round(fps / 2), back = Math.round(fps * 1.5);
-    for (i = back; i < n - half; i++) { D[i] = (fut[i + half] - past[i - back]) / range; }
-    var drops = [], near = fps * 2;
-    for (i = fps * 3; i < n - fps; i++) {
-      if (D[i] <= 0.45) { continue; }
-      var peak = true;
-      for (var j = Math.max(0, i - near); j < Math.min(n, i + near) && peak; j++) { if (D[j] > D[i]) { peak = false; } }
-      if (peak && (!drops.length || i / fps - drops[drops.length - 1].t > 8)) {
-        drops.push({ t: i / fps, force: Math.min(1, D[i]) });
-      }
-    }
-    v.level = level;
-    v.drops = drops;
-  }
-
+     Считает их tools/music_viz.py по самому звуку и пишет в .viz v3: в
+     каждом кадре сила места трека (громкость, бас и верха в окне около
+     секунды, верхняя треть шкалы самого трека), отдельно — моменты дропов.
+     У старого .viz (v1, v2) их нет — и радуги с огоньками тоже. */
   /* сила в момент currentTime деки: сильное место, а сразу после дропа —
      вспышка, гаснущая за пару секунд */
   function surgeAt(d) {
     var v = d && d.file && viz[d.file];
-    if (!v || typeof v !== 'object' || !v.level) { return 0; }
+    if (!v || typeof v !== 'object' || !v.surge) { return 0; }
     var t = d.currentTime, i = Math.min(v.frames - 1, Math.max(0, Math.round(t * v.fps)));
-    var s = Math.pow(v.level[i], 1.5) * 0.8;
+    var s = v.data[i * v.stride + v.surge] / 255 * 0.85;
     for (var k = 0; k < v.drops.length; k++) {
       var dt = t - v.drops[k].t;
       if (dt >= 0 && dt < 4) { s = Math.max(s, (0.6 + 0.4 * v.drops[k].force) * Math.exp(-dt / 1.6)); }
