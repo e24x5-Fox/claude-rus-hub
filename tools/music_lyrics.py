@@ -7,6 +7,9 @@
     python tools/music_lyrics.py --fetch    взять тайминг у Suno (нужен вход)
     python tools/music_lyrics.py            из кеша — в docs/music/*.lyr
 
+Если есть tools/asr_lyrics.json (tools/music_asr.py — тайминг по звуку
+нейросетью, и у треков, где текста в Suno нет), он берётся первым.
+
 Тайминг (api/gen/<id>/aligned_lyrics/v2/) Suno отдаёт только вошедшему, а
 токен у страницы suno.com спрятан внутри её кода. Поэтому --fetch не берёт
 токен вовсе: в отладочном браузере (Edge с профилем RuGuideEdge, порт 9222 —
@@ -37,6 +40,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MUSIC = ROOT / "docs" / "music"
 CACHE = Path(__file__).resolve().parent / "suno_lyrics.json"
+ASR = Path(__file__).resolve().parent / "asr_lyrics.json"
 PORT = 9222
 # на машине владельца стоит HTTP_PROXY, и без этого к 127.0.0.1 ходили бы через него
 os.environ["NO_PROXY"] = os.environ["no_proxy"] = "127.0.0.1,localhost"
@@ -187,16 +191,24 @@ def clean(words):
 
 
 def build(cache):
+    # тайминг нейросети (tools/music_asr.py) точнее и есть у треков без текста
+    # в Suno — он первый; кеш Suno — запасной
+    try:
+        asr = json.loads(ASR.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        asr = {}
     for name, _ in tracks():
         path = MUSIC / (name + ".lyr")
-        words = clean(cache[name]) if name in cache else []
+        src = asr.get(name) or cache.get(name) or []
+        words = clean(src) if src else []
         if not words:
             if path.exists():
                 path.unlink()
             continue
         path.write_text(json.dumps({"w": words}, ensure_ascii=False, separators=(",", ":")),
                         encoding="utf-8")
-        print("%-24s %3d слов → %s" % (name, len(words), path.name))
+        print("%-24s %3d слов → %s (%s)" % (name, len(words), path.name,
+                                             "нейросеть" if asr.get(name) else "Suno"))
 
 
 def main():
