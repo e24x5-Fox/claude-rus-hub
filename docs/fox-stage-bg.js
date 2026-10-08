@@ -8,7 +8,14 @@
      · волны от лисёнка — расходятся на каждой сильной доле;
      · неоновый пол — сетка в перспективе, едет навстречу тем быстрее, чем
        громче, и разгорается на басу.
-   В сильных местах (CRH_PLAYER surge) цвета уходят от фиолетового в радугу.
+   Цвета — свои у каждого трека: два главных цвета его обложки (пока она не
+   разобрана — акцент страницы); в сильных местах (CRH_PLAYER surge) они уходят
+   в радугу.
+
+   И сама обложка за всем этим (.music-bg, music-widget.js) на сцене ловит бас:
+   на ударе резко наезжает и дрожит, потом медленно отпускает. Удар — бас
+   выше своего недавнего среднего, а не просто громкий бас: на басовом треке
+   иначе фон стоял бы приближенным и трясся без перерыва.
 
    Данные — CRH_PLAYER.bands(): те же кадры .viz, что у столбиков плеера, так
    что фон ни на кадр не расходится с ними. Без движения (fx-still) фона нет.
@@ -23,7 +30,9 @@
 
   var cv = null, ctx = null, raf = 0, last = 0;
   var spin = 0, floorPos = 0, prevBeat = 0, waves = [], hue = 0;
-  var acc = [139, 92, 246], acc2 = [167, 139, 250];
+  var acc = [139, 92, 246], acc2 = [167, 139, 250];      /* цвета сейчас */
+  var want = null, want2 = null, coverSrc = '';          /* к каким плывут */
+  var bgEl = null, bassAvg = 0, zoom = 1, shake = { x: 0, y: 0, r: 0, at: 0 }, kick = 0;
 
   function player() { return window.CRH_PLAYER; }
   function still() { return (window.CRH_FX || {}).still; }
@@ -46,6 +55,84 @@
       r += (c[0] - r) * m; g += (c[1] - g) * m; b += (c[2] - b) * m;
     }
     return 'rgba(' + (r | 0) + ',' + (g | 0) + ',' + (b | 0) + ',' + Math.max(0, Math.min(1, a)).toFixed(3) + ')';
+  }
+
+  /* ── цвета трека: два самых заметных оттенка обложки ──
+     Обложка ужимается до 32×32, оттенки раскладываются по 12 корзинам с весом
+     «насыщенность × яркость»; первый цвет — самая тяжёлая корзина, второй —
+     самая тяжёлая из далёких от неё по кругу. Серая обложка — цвета страницы. */
+  function palette(img) {
+    var n = 32, c = document.createElement('canvas');
+    c.width = c.height = n;
+    var g = c.getContext('2d'), px;
+    try { g.drawImage(img, 0, 0, n, n); px = g.getImageData(0, 0, n, n).data; } catch (e) { return null; }
+    var bins = [];
+    for (var k = 0; k < 12; k++) { bins.push({ w: 0, r: 0, g: 0, b: 0 }); }
+    var total = 0;
+    for (var i = 0; i < px.length; i += 4) {
+      var r = px[i], gg = px[i + 1], b = px[i + 2], mx = Math.max(r, gg, b), mn = Math.min(r, gg, b);
+      if (mx < 40 || mx === mn) { continue; }
+      var sat = (mx - mn) / mx, w = sat * sat * mx / 255;
+      var h = mx === r ? (gg - b) / (mx - mn) : mx === gg ? 2 + (b - r) / (mx - mn) : 4 + (r - gg) / (mx - mn);
+      var bin = bins[Math.floor(((h + 6) % 6) * 2) % 12];
+      bin.w += w; bin.r += r * w; bin.g += gg * w; bin.b += b * w;
+      total += w;
+    }
+    if (total < n * n * 0.03) { return null; }
+    var best = 0, second = -1;
+    for (k = 1; k < 12; k++) { if (bins[k].w > bins[best].w) { best = k; } }
+    for (k = 0; k < 12; k++) {
+      var far = Math.min((k - best + 12) % 12, (best - k + 12) % 12) >= 2;
+      if (far && bins[k].w > total * 0.04 && (second < 0 || bins[k].w > bins[second].w)) { second = k; }
+    }
+    function bright(bn) {                 /* средний цвет корзины, вытянутый до неона */
+      var c3 = [bn.r / bn.w, bn.g / bn.w, bn.b / bn.w], m = Math.max(c3[0], c3[1], c3[2]) || 1;
+      return c3.map(function (x) { return Math.min(255, x * 235 / m); });
+    }
+    var a = bright(bins[best]);
+    var b2 = second >= 0 ? bright(bins[second]) : a.map(function (x, j) { return Math.min(255, x * 0.7 + 255 * 0.3); });
+    return [a, b2];
+  }
+
+  function watchCover() {
+    var img = document.querySelector('.music-cover');
+    var src = img && img.src;
+    if (!src || src === coverSrc) { return; }
+    coverSrc = src;
+    var im = new Image();
+    im.onload = function () {
+      if (src !== coverSrc) { return; }
+      var p = palette(im);
+      want = p ? p[0] : rgbOf('--accent', [139, 92, 246]);
+      want2 = p ? p[1] : rgbOf('--accent2', [167, 139, 250]);
+    };
+    im.src = src;
+  }
+
+  function drift(c, to, k) { if (to) { for (var j = 0; j < 3; j++) { c[j] += (to[j] - c[j]) * k; } } }
+
+  /* ── обложка на фоне: наезд и дрожь на басовом ударе ── */
+  function bump(d, dt, on) {
+    bgEl = bgEl || document.querySelector('.music-bg');
+    if (!bgEl) { return; }
+    var bass = (d.b[0] + d.b[1]) / 2;
+    bassAvg += (bass - bassAvg) * (1 - Math.exp(-dt / 0.5));
+    var hit = on ? Math.min(1, Math.max(0, bass - bassAvg) * 6 + d.beat * 0.7) : 0;
+    kick = hit > kick ? hit : kick * Math.exp(-dt / 0.18);       /* удар сразу, отпускает плавно */
+    var zT = on ? 1.06 + 0.1 * kick + 0.04 * d.surge : 1;
+    zoom += (zT - zoom) * (zT > zoom ? 1 - Math.exp(-dt / 0.03) : 1 - Math.exp(-dt / 0.35));
+    /* дрожь: новая случайная точка каждые 35 мс, размах — по удару */
+    var amp = on ? kick * (12 + 18 * d.surge) : 0;
+    shake.at -= dt;
+    if (shake.at <= 0) {
+      shake.at = 0.035;
+      shake.x = (Math.random() * 2 - 1) * amp;
+      shake.y = (Math.random() * 2 - 1) * amp * 0.6;
+      shake.r = (Math.random() * 2 - 1) * amp * 0.04;
+    }
+    bgEl.style.transform = on
+      ? 'translate3d(' + shake.x.toFixed(1) + 'px,' + shake.y.toFixed(1) + 'px,0) rotate(' + shake.r.toFixed(2) + 'deg) scale(' + zoom.toFixed(4) + ')'
+      : '';
   }
 
   function size() {
@@ -163,7 +250,12 @@
     raf = 0;
     /* рисует, пока сцена в документе: уходя, она гаснет вместе с фоном (site.css) */
     var stage = document.querySelector('.fox-stage');
-    if (!stage || still()) { if (cv && cv.parentNode) { cv.parentNode.removeChild(cv); } waves = []; return; }
+    if (!stage || still()) {
+      if (cv && cv.parentNode) { cv.parentNode.removeChild(cv); }
+      if (bgEl) { bgEl.style.transform = ''; }
+      waves = []; zoom = 1; kick = 0;
+      return;
+    }
     raf = requestAnimationFrame(tick);
     if (cv.parentNode !== stage) { stage.insertBefore(cv, stage.firstChild); size(); }
     var dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60;
@@ -174,6 +266,10 @@
     spin += dt * (0.3 + 1.2 * d.level);
     floorPos += dt * (0.4 + 2.6 * d.level + 1.5 * d.surge);
     hue = (hue + dt * (40 + 120 * d.surge)) % 360;
+    watchCover();
+    var ck = 1 - Math.exp(-dt / 1.2);                         /* новый трек — цвета перетекают */
+    drift(acc, want, ck); drift(acc2, want2, ck);
+    bump(d, dt, stage.classList.contains('on'));
 
     var w = cv.width, h = cv.height, fox = foxBox();
     ctx.globalCompositeOperation = 'source-over';
@@ -200,8 +296,9 @@
       ctx = cv.getContext && cv.getContext('2d');
       if (!ctx) { cv = null; return; }
     }
-    acc = rgbOf('--accent', acc);
-    acc2 = rgbOf('--accent2', acc2);
+    acc = rgbOf('--accent', acc).slice();
+    acc2 = rgbOf('--accent2', acc2).slice();
+    coverSrc = '';                         /* разобрать обложку заново */
     last = 0;
     if (!raf) { raf = requestAnimationFrame(tick); }
   }

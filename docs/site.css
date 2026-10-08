@@ -952,6 +952,9 @@ body.fox-stage-back > :not(.music):not(.music-bg):not(.fox-stage) {
 @keyframes fox-stage-show { from { opacity: 0; } }
 /* на сцене обложка на фоне — как свет на сцене: ярче */
 body.fox-stage-on .music-bg-layer.on { opacity: .5; }
+/* обложку на сцене трясёт fox-stage-bg.js (transform); уходя со сцены — отпускает плавно */
+.music-bg { transition: transform .8s ease; }
+body.fox-stage-on .music-bg { transition: none; will-change: opacity, transform; }
 
 .fox-stage { position: fixed; inset: 0; z-index: 20; pointer-events: none; }
 .fox-stage-fly {
