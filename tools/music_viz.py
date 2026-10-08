@@ -250,22 +250,27 @@ def main():
             or m.with_suffix(".viz").stat().st_mtime < m.stat().st_mtime]
     style = styles([m.stem for m in todo])
     for mp3 in todo:
-        data, times, force, p, dur = analyse(mp3, style.get(mp3.stem))
-        head = b"CRHV" + struct.pack("<BBBBII", 3, FPS, BANDS, 0, len(data), len(times))
-        head += bytes([byte(p["energy"]), byte(p["hop"]), byte(p["sharp"]), byte(p["squash"]),
-                       byte(p["sway"]), p["per_sway"], int(min(255, round(p["bpm"]))), 0])
-        body = data.tobytes() + times.astype("<f4").tobytes() + bytes(byte(f) for f in force)
-        drops = p["drops"]
-        body += struct.pack("<I", len(drops)) + struct.pack("<%df" % len(drops), *(t for t, _ in drops))
-        body += bytes(byte(f) for _, f in drops)
-        viz = mp3.with_suffix(".viz")
-        viz.write_bytes(head + body)
-        tag = "—" if p["tag"] is None else f"{p['tag']:.2f}"
-        print(f"{mp3.stem:<24} энергия {p['energy']:.2f} (промт {tag}, звук {p['sound']:.2f}: "
-              f"ударные {p['perc']:.2f}, атак {p['attacks']:.1f}/с)  {p['bpm']:.0f} BPM, "
-              f"качок раз в {p['per_sway']} д.  {len(times)} долей, "
-              f"сильно {100 * (data[:, -1] > 64).mean():.0f}%, дропы {' '.join('%.0f' % t for t, _ in drops) or '—'}, "
-              f"{viz.stat().st_size // 1024} КБ")
+        write_viz(mp3, mp3.with_suffix(".viz"), style.get(mp3.stem), mp3.stem)
+
+
+def write_viz(src, viz, tags, name):
+    """Звук src → кадры в viz. Звук не обязан лежать в music/: tools/suno_sync.py
+    считает по m4a, скачанному с Suno во временную папку."""
+    data, times, force, p, dur = analyse(src, tags)
+    head = b"CRHV" + struct.pack("<BBBBII", 3, FPS, BANDS, 0, len(data), len(times))
+    head += bytes([byte(p["energy"]), byte(p["hop"]), byte(p["sharp"]), byte(p["squash"]),
+                   byte(p["sway"]), p["per_sway"], int(min(255, round(p["bpm"]))), 0])
+    body = data.tobytes() + times.astype("<f4").tobytes() + bytes(byte(f) for f in force)
+    drops = p["drops"]
+    body += struct.pack("<I", len(drops)) + struct.pack("<%df" % len(drops), *(t for t, _ in drops))
+    body += bytes(byte(f) for _, f in drops)
+    viz.write_bytes(head + body)
+    tag = "—" if p["tag"] is None else f"{p['tag']:.2f}"
+    print(f"{name:<24} энергия {p['energy']:.2f} (промт {tag}, звук {p['sound']:.2f}: "
+          f"ударные {p['perc']:.2f}, атак {p['attacks']:.1f}/с)  {p['bpm']:.0f} BPM, "
+          f"качок раз в {p['per_sway']} д.  {len(times)} долей, "
+          f"сильно {100 * (data[:, -1] > 64).mean():.0f}%, дропы {' '.join('%.0f' % t for t, _ in drops) or '—'}, "
+          f"{viz.stat().st_size // 1024} КБ")
 
 
 if __name__ == "__main__":

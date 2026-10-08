@@ -1,7 +1,9 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    music-widget.js — плеер с музыкой автора в левом углу, под донатерами.
 
-   Данные — window.CRH_MUSIC из music.js.
+   Данные — window.CRH_MUSIC из music.js (его пишет tools/suno_sync.py по
+   плейлисту Suno). Звук идёт прямо с Suno (t.audio, видео трека .mp4 — <audio> берёт из него звук); не ответил —
+   берётся свой music/<имя>.mp3, если он есть (t.mp3). Обложки — свои.
 
    Одна строка: обложка, название с громкостью под ним, справа «играть».
    Свёрнутый — только обложка и «играть»; нажатие на обложку разворачивает.
@@ -82,6 +84,19 @@
   }
   var decks = [deck(), deck()];
   var audio = decks[0];
+
+  /* звук трека: поток Suno, а свой mp3 — запасной */
+  function srcOf(t) { return t.audio || 'music/' + t.file + '.mp3'; }
+  decks.forEach(function (d) {
+    d.addEventListener('error', function () {
+      var t = tracks.filter(function (x) { return x.file === d.file; })[0];
+      if (!t || !t.audio || !t.mp3 || d.fellBack) { return; }
+      d.fellBack = true;                  /* Suno не ответил — играем свой mp3 */
+      var playing = !d.paused || d === audio;
+      d.src = 'music/' + t.file + '.mp3';
+      if (playing) { var p = d.play(); if (p && p.catch) { p.catch(function () {}); } }
+    });
+  });
   /* события — только от главной деки: уходящая на переходе своё отыграла */
   function on(type, fn) {
     decks.forEach(function (d) {
@@ -296,7 +311,7 @@
     new Image().src = 'music/' + tracks[i].file + '.jpg';   /* и обложку для фона */
     loadViz(tracks[i].file);                                  /* и кадры анимации */
     if (!window.fetch || !window.URL || !URL.createObjectURL) { return; }
-    fetch('music/' + tracks[i].file + '.mp3').then(function (r) {
+    fetch(srcOf(tracks[i])).then(function (r) {
       if (!r.ok) { throw new Error(r.status); }
       return r.blob();
     }).then(function (b) {
@@ -311,10 +326,11 @@
   /* blob держит та дека, что его играет: на переходе уходящая ещё читает свой */
   function pick(i) {
     cur = (i + tracks.length) % tracks.length;
-    var url = next && next.i === cur && next.url ? next.url : 'music/' + tracks[cur].file + '.mp3';
+    var url = next && next.i === cur && next.url ? next.url : srcOf(tracks[cur]);
     next = null;
     if (audio.blob && audio.blob !== url) { URL.revokeObjectURL(audio.blob); }
     audio.blob = url.indexOf('blob:') === 0 ? url : null;
+    audio.fellBack = false;
     audio.src = url;
     audio.file = tracks[cur].file;         /* по нему — кадры анимации */
     loadViz(audio.file);

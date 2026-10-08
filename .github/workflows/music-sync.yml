@@ -1,0 +1,41 @@
+# Раз в сутки сверяет плеер с плейлистом Suno (tools/suno_sync.py): новые треки
+# попадают в docs/music.js, их обложки и тексты — в docs/music/, кадры анимации
+# (.viz) считаются по звуку. Слова с таймингом (.lyr) здесь не добыть — Suno
+# отдаёт их только вошедшему, это tools/music_lyrics.py --fetch на машине автора.
+name: Музыка из Suno
+
+on:
+  schedule:
+    - cron: "41 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: music-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Зависимости
+        run: |
+          command -v ffmpeg || (sudo apt-get update -q && sudo apt-get install -yq ffmpeg)
+          pip install -q numpy librosa pillow
+      - name: Синхронизация
+        run: python tools/suno_sync.py --viz
+      - name: Сохранить
+        run: |
+          git add docs/music.js docs/music tools/suno_tracks.json tools/suno_styles.json
+          git diff --cached --quiet && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898208+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Музыка из Suno $(date -u +%F)"
+          git pull --rebase -q
+          git push
