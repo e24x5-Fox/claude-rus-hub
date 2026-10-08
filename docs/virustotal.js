@@ -40,12 +40,12 @@ window.CRH_VT = {
   }
  },
  "lucidcats": {
-  "sha256": "dc7a7deb3965a3fbf3fe8713b4f376473e8b04c4d77f36a6c4bf5b752d7f6eb6",
-  "link": "https://www.virustotal.com/gui/file/dc7a7deb3965a3fbf3fe8713b4f376473e8b04c4d77f36a6c4bf5b752d7f6eb6",
-  "date": "08.10.2026",
+  "sha256": "ff2692e1ca5c543ce32c0a9d8528264d58ed638630fcab7aa6a6f71e3e4c2d5c",
+  "link": "https://www.virustotal.com/gui/file/ff2692e1ca5c543ce32c0a9d8528264d58ed638630fcab7aa6a6f71e3e4c2d5c",
+  "date": "09.10.2026",
   "malicious": 0,
   "suspicious": 0,
-  "engines": 62,
+  "engines": 51,
   "flagged": {}
  },
  "oddremedy": {
