@@ -748,6 +748,8 @@
     stage: function (on) { staged = !!on; box.classList.toggle('stage', staged); vizScan = 0; apply(); },
     skip: skip,
     playing: function () { return !audio.paused; },
+    /* что играет главная дека и где она в записи — по нему слова на сцене (fox-lyrics.js) */
+    now: function () { return { file: audio.file || null, t: audio.currentTime, paused: audio.paused }; },
     play: function () { if (audio.paused && !stopping) { stoppedByDownload = false; go(); } }
   };
 

@@ -3,7 +3,8 @@
    и дописать строку сюда. suno — id трека из ссылки suno.com/song/<id>
    (она же в метаданных mp3, поле WOAS): по ней название ведёт на Suno.
    mp3 — 128 кбит/с, чтобы страница не тяжелела. После этого — кадры анимации
-   плеера: python tools/music_viz.py (посчитает music/<имя>.viz для новых mp3). */
+   плеера: python tools/music_viz.py (посчитает music/<имя>.viz для новых mp3), а если в треке
+   поют — слова для сцены: python tools/music_lyrics.py --fetch (music/<имя>.lyr). */
 window.CRH_MUSIC = {
   artist: 'e24x5',
   tracks: [

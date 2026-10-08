@@ -1017,3 +1017,42 @@ body.fox-stage-on .music-bg-layer.on { opacity: .5; }
   .music.stage .music-cover { width: 52px; height: 52px; }
 }
 .fx-still .music.stage { animation: none; }
+
+/* ── слова песни на сцене (fox-lyrics.js) ──────────────────────────────────
+   По бокам лисёнка две колонки; новое слово встаёт наверх своей колонки,
+   прежние съезжают на строку вниз (--lyric-step, считает скрипт) и гаснут.
+   Колонки прижаты к лисёнку: левая — вправо, правая — влево. Нет места по
+   бокам — колонки встают над ним, каждая на свою половину. */
+.fox-lyrics { position: absolute; inset: 0; pointer-events: none; }
+.fox-lyrics-col {
+  position: absolute; left: 16px; right: calc(50% + 8px);
+  font-size: clamp(17px, 4.4vw, 26px); font-weight: 800; line-height: 1.15;
+}
+.fox-lyrics-col.right { left: calc(50% + 8px); right: 16px; text-align: left; }
+.fox-lyrics-col.left { text-align: right; }
+.fox-lyrics.aside .fox-lyrics-col { right: auto; left: auto; font-size: clamp(22px, 2.6vw, 46px); }
+.fox-lyric {
+  position: absolute; top: 0; left: 0; right: 0;
+  overflow-wrap: anywhere;
+  transition: transform .7s cubic-bezier(.3, 1.15, .45, 1), opacity .7s ease;
+  will-change: transform, opacity;
+}
+.fox-lyric-in {
+  display: inline-block;
+  color: var(--text);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .65);
+  animation: fox-lyric-in .55s cubic-bezier(.2, 1.4, .4, 1) backwards;
+  transition: color .25s ease, text-shadow .25s ease, transform .25s ease;
+}
+.fox-lyrics-col.left .fox-lyric-in { transform-origin: 100% 50%; }
+.fox-lyrics-col.right .fox-lyric-in { transform-origin: 0 50%; }
+/* то, что поют прямо сейчас */
+.fox-lyric.now .fox-lyric-in {
+  color: var(--accent2);
+  text-shadow: 0 0 18px var(--accent), 0 2px 14px rgba(0, 0, 0, .65);
+  transform: scale(1.08);
+}
+@keyframes fox-lyric-in {
+  from { opacity: 0; filter: blur(10px); transform: translateY(-.5em) scale(1.25); }
+}
+.fx-still .fox-lyric, .fx-still .fox-lyric-in { transition: none; animation: none; }
