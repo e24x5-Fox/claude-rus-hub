@@ -987,6 +987,37 @@ body.fox-stage-on .music-bg-layer.on { opacity: .5; }
 .fox-stage-close:hover { color: var(--text); border-color: var(--accent); }
 .fx-still .fox-stage-fly { transition: none; }
 
+/* Радуга по контуру (fox-stage.js): слой под картинкой — конический градиент
+   с маской по силуэту лисёнка, чуть крупнее его и размытый наружу; видна
+   только кайма вокруг. Горит по --viz-surge (сильные места и дропы), цвета
+   бегут по кругу. Размытие — на внешнем слое: фильтр применяется раньше
+   маски, и на том же слое маска срезала бы всё свечение снаружи. Танцует
+   вместе с картинкой — тот же transform. */
+.fox-stage-img { position: relative; }            /* над радугой */
+.fox-stage-glow {
+  position: absolute; inset: 0; pointer-events: none;
+  transform-origin: 50% 100%;
+  transform:
+    translateY(calc(var(--viz-beat, 0) * -3%))
+    rotate(calc(var(--viz-sway, 0) * 4deg))
+    scale(calc((1 + var(--viz-bass, 0) * .035) * (1.012 + var(--viz-surge, 0) * .02)),
+          calc((1 - var(--viz-bass, 0) * .03) * (1.012 + var(--viz-surge, 0) * .02)));
+  filter: blur(calc(7px + var(--viz-surge, 0) * 13px)) brightness(calc(1.1 + var(--viz-beat, 0) * .6));
+  opacity: calc(var(--viz-surge, 0) * 1.25);
+  will-change: transform, opacity, filter;
+}
+.fox-stage-rainbow {
+  position: absolute; inset: 0;
+  background: conic-gradient(from 0deg, #ff3b6b, #ff9f1c, #ffe14d, #3dff8f, #26c6ff, #8b5cf6, #ff4fd8, #ff3b6b);
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  animation: fox-rainbow 2.4s linear infinite;
+}
+@keyframes fox-rainbow { to { filter: hue-rotate(360deg); } }
+/* огоньки — на всю сцену, за лисёнком */
+.fox-stage-sparks { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.fx-still .fox-stage-glow, .fx-still .fox-stage-sparks { display: none; }
+
 /* плеер на сцене: островок во всю ширину низа */
 .music-skip { display: none; }
 .music.stage {

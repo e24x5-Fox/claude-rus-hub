@@ -567,8 +567,82 @@
       viz[file] = { fps: h.getUint8(5), bands: bands, stride: bands + 2, frames: frames,
                     data: new Uint8Array(buf, off, size), beats: beats,
                     force: new Uint8Array(buf, at + 4 * nb, nb), prof: prof };
+      surgeOf(viz[file]);
       startViz();
     }).catch(function () { viz[file] = null; });
+  }
+
+  /* ── сильные места и дропы — для сцены (fox-stage.js) ──
+     Из тех же кадров: «сила» — громкость с басом, сглаженная на 0,4 с.
+     Сильное место — где она выше 70-го процентиля самого трека (у каждого
+     трека свои, так тихий трек тоже где-то «взрывается»); к 95-му — в полную
+     силу. Дроп — где следующая секунда резко громче трёх предыдущих: разница
+     больше половины размаха трека, самая большая в округе ±2 с и не чаще
+     раза в 8 с. На треках это 2–6 дропов, сильных мест — около пятой части. */
+  function surgeOf(v) {
+    var n = v.frames, fps = v.fps, E = new Float32Array(n);
+    for (var i = 0; i < n; i++) {
+      var a = i * v.stride;
+      E[i] = (0.6 * v.data[a + v.bands] + 0.2 * v.data[a] + 0.2 * v.data[a + 1]) / 255;
+    }
+    function box(x, w) {                          /* среднее по окну w кадров вокруг */
+      var out = new Float32Array(n), s = 0, h = w >> 1, lo, hi;
+      var pre = new Float64Array(n + 1);
+      for (var k = 0; k < n; k++) { pre[k + 1] = pre[k] + x[k]; }
+      for (k = 0; k < n; k++) {
+        lo = Math.max(0, k - h); hi = Math.min(n, k - h + w);
+        out[k] = (pre[hi] - pre[lo]) / Math.max(1, hi - lo);
+      }
+      return out;
+    }
+    var S = box(E, Math.round(fps * 0.4));
+    var sorted = Array.prototype.slice.call(S).sort(function (a, b) { return a - b; });
+    function pct(p) { return sorted[Math.min(n - 1, Math.floor(p * n))] || 0; }
+    var p10 = pct(0.1), p70 = pct(0.7), p95 = pct(0.95);
+    var range = Math.max(1e-3, p95 - p10), top = Math.max(1e-3, p95 - p70);
+    var level = new Float32Array(n);
+    for (i = 0; i < n; i++) { level[i] = Math.max(0, Math.min(1, (S[i] - p70) / top)); }
+    var fut = box(S, fps), past = box(S, fps * 3), D = new Float32Array(n);
+    var half = Math.round(fps / 2), back = Math.round(fps * 1.5);
+    for (i = back; i < n - half; i++) { D[i] = (fut[i + half] - past[i - back]) / range; }
+    var drops = [], near = fps * 2;
+    for (i = fps * 3; i < n - fps; i++) {
+      if (D[i] <= 0.45) { continue; }
+      var peak = true;
+      for (var j = Math.max(0, i - near); j < Math.min(n, i + near) && peak; j++) { if (D[j] > D[i]) { peak = false; } }
+      if (peak && (!drops.length || i / fps - drops[drops.length - 1].t > 8)) {
+        drops.push({ t: i / fps, force: Math.min(1, D[i]) });
+      }
+    }
+    v.level = level;
+    v.drops = drops;
+  }
+
+  /* сила в момент currentTime деки: сильное место, а сразу после дропа —
+     вспышка, гаснущая за пару секунд */
+  function surgeAt(d) {
+    var v = d && d.file && viz[d.file];
+    if (!v || typeof v !== 'object' || !v.level) { return 0; }
+    var t = d.currentTime, i = Math.min(v.frames - 1, Math.max(0, Math.round(t * v.fps)));
+    var s = Math.pow(v.level[i], 1.5) * 0.8;
+    for (var k = 0; k < v.drops.length; k++) {
+      var dt = t - v.drops[k].t;
+      if (dt >= 0 && dt < 4) { s = Math.max(s, (0.6 + 0.4 * v.drops[k].force) * Math.exp(-dt / 1.6)); }
+    }
+    return s;
+  }
+
+  /* дроп, который трек только что прошёл, — для залпа огоньков; один раз */
+  var dropSeen = { file: null, t: -1 }, dropCount = 0, dropForce = 0;
+  function watchDrops(d) {
+    var v = d && d.file && viz[d.file], t = d ? d.currentTime : 0;
+    if (!v || typeof v !== 'object' || !v.drops) { return; }
+    if (dropSeen.file === d.file && t > dropSeen.t && t - dropSeen.t < 1) {
+      for (var k = 0; k < v.drops.length; k++) {
+        if (v.drops[k].t > dropSeen.t && v.drops[k].t <= t) { dropCount++; dropForce = v.drops[k].force; }
+      }
+    }
+    dropSeen.file = d.file; dropSeen.t = t;
   }
 
   /* Танец деки в момент её currentTime; w — её вес на переходе. Нет долей
@@ -675,6 +749,12 @@
     setVar('--viz-beat', hop);
     setVar('--viz-level', lvl);
     setVar('--viz-sway', sway);
+    /* сила: вспыхивает быстро, гаснет медленно — свечение не мигает на каждой доле */
+    var tSurge = playing ? surgeAt(audio) : 0;
+    surge += (tSurge - surge) * (1 - Math.exp(-dt / (tSurge > surge ? 0.08 : 0.6)));
+    if (surge > 0.004) { quiet = false; }
+    setVar('--viz-surge', surge);
+    if (playing) { watchDrops(audio); }
     bg.style.opacity = (0.8 + 0.2 * lvl).toFixed(3);
     drawViz(shown);
     if (playing || !quiet) { vizRaf = requestAnimationFrame(vizTick); } else { resetViz(); }
@@ -683,6 +763,7 @@
   /* Переменные получает любой элемент с атрибутом data-viz — он и всё внутри него:
        --viz-bass   бас, 0…1            --viz-level  громкость, 0…1
        --viz-beat   вспышка на долю     --viz-sway   покачивание, −1…1
+       --viz-surge  сильное место или только что прошедший дроп, 0…1
      Не на <html>: тогда при каждой записи браузер пересчитывал стили всей
      страницы — на 144 Гц это было 40 % времени главного потока. Помеченные
      элементы ищутся раз в секунду, так что появившиеся позже (сцена) тоже
@@ -690,7 +771,7 @@
      движения их нет, и var(--viz-…, 0) даёт ноль — всё стоит. */
   var VIZ_HZ = 60;
   var vizTargets = [], vizScan = 0, vizPut = {};
-  var sway = 0, hop = 0, squash = 1;
+  var sway = 0, hop = 0, squash = 1, surge = 0;
   function setVar(name, v) {
     var s = v.toFixed(3);
     if (vizPut[name] === s) { return; }
@@ -701,7 +782,7 @@
   function resetViz() {
     cancelAnimationFrame(vizRaf); vizRaf = 0; vizLast = 0;
     shown = null;
-    sway = hop = 0; squash = 1;
+    sway = hop = surge = 0; squash = 1;
     var all = document.querySelectorAll('[data-viz]');
     for (var i = 0; i < all.length; i++) {
       for (var name in vizPut) { all[i].style.removeProperty(name); }
@@ -749,6 +830,8 @@
     skip: skip,
     playing: function () { return !audio.paused; },
     /* что играет главная дека и где она в записи — по нему слова на сцене (fox-lyrics.js) */
+    /* сила сейчас и сколько дропов уже прошло — огоньки на сцене (fox-stage.js) */
+    surge: function () { return { level: FX.still ? 0 : surge, drops: dropCount, force: dropForce }; },
     now: function () { return { file: audio.file || null, t: audio.currentTime, paused: audio.paused }; },
     play: function () { if (audio.paused && !stopping) { stoppedByDownload = false; go(); } }
   };
