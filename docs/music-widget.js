@@ -795,9 +795,14 @@
     stage: function (on) { staged = !!on; box.classList.toggle('stage', staged); vizScan = 0; apply(); },
     skip: skip,
     playing: function () { return !audio.paused; },
-    /* что играет главная дека и где она в записи — по нему слова на сцене (fox-lyrics.js) */
     /* сила сейчас и сколько дропов уже прошло — огоньки на сцене (fox-stage.js) */
     surge: function () { return { level: FX.still ? 0 : surge, drops: dropCount, force: dropForce }; },
+    /* полосы спектра (8, от баса к верхам, 0…1) и танец — фон сцены (fox-stage-bg.js);
+       null, пока ничего не играет и всё стоит */
+    bands: function () {
+      return shown && !FX.still ? { b: shown.slice(0, 8), level: shown[8], beat: hop, sway: sway, surge: surge } : null;
+    },
+    /* что играет главная дека и где она в записи — по нему слова на сцене (fox-lyrics.js) */
     now: function () { return { file: audio.file || null, t: audio.currentTime, paused: audio.paused }; },
     play: function () { if (audio.paused && !stopping) { stoppedByDownload = false; go(); } }
   };
