@@ -1,6 +1,7 @@
 """Плейлист Suno → плеер каталога: docs/music.js, обложки и тексты песен.
 
     python tools/suno_sync.py           список, обложки, тексты
+    python tools/suno_sync.py --audio   и звук: mp3 новых треков — к нам
     python tools/suno_sync.py --viz     и кадры анимации (.viz) для новых треков
 
 Какие треки играют на сайте, решает плейлист в Suno: добавил песню туда —
@@ -149,20 +150,53 @@ def js_str(s):
     return "'" + s.replace("\\", "\\\\").replace("'", "\\'") + "'"
 
 
+# короткий жанр для сцены: из свободного промта Suno — по словарю, не больше двух
+PHONK_KIND = [("brazil", "бразильский фонк"), ("baile", "бразильский фонк"), ("drift", "дрифт-фонк"),
+              ("8-bit", "8-бит фонк"), ("8bit", "8-бит фонк"), ("pixel", "8-бит фонк"),
+              ("lo-fi", "лоу-фай фонк"), ("lofi", "лоу-фай фонк")]
+GENRES = [("breakcore", "брейккор"), ("jungle", "джангл"), ("sigilkore", "сигилкор"), ("digicore", "диджикор"),
+          ("witch house", "витч-хаус"), ("trap", "трэп"), ("drum & bass", "драм-н-бейс"),
+          ("drum and bass", "драм-н-бейс"), ("ambient", "эмбиент"), ("industrial", "индастриал"),
+          ("synthwave", "синтвейв"), ("petro wave", "синтвейв"), ("lo-fi", "лоу-фай"), ("lofi", "лоу-фай"),
+          ("rap", "рэп"), ("rock", "рок"), ("pop", "поп")]
+GENRES_FILE = ROOT / "tools" / "suno_genres.json"   # {"<file>": "свой жанр"} — поверх словаря
+
+
+def genre(tags):
+    """Жанр называют в начале промта («Ultra dark aggressive 8-bit phonk, …»), дальше идёт
+    описание звука («hard trap drums», «drifting pads») — его не читаем: оно и путает."""
+    head = re.split(r"[.;\n—]|, (?=[a-z ]*\d)", (tags or "").lower())[0][:90]
+
+    def at(k, prefix=False):          # prefix: «brazil» — и в «brazilian»
+        m = re.search(r"(?<![a-z])" + re.escape(k) + ("" if prefix else r"(?![a-z])"), head)
+        return m.start() if m else None
+
+    out = []
+    if at("phonk") is not None:
+        kinds = [(at(k, True), g) for k, g in PHONK_KIND if at(k, True) is not None]
+        out.append(min(kinds)[1] if kinds else "фонк")
+    found = sorted((at(k), g) for k, g in GENRES if at(k) is not None)
+    for _, g in found:
+        if len(out) < 2 and g not in out and not (g == "лоу-фай" and any("лоу-фай" in o for o in out)):
+            out.append(g)
+    return " · ".join(out)
+
+
 def write_music_js(rows):
     lines = []
     for r in rows:
         parts = ["title: " + js_str(r["title"]), "file: " + js_str(r["file"]), "suno: " + js_str(r["suno"])]
-        if r.get("audio"):
-            parts.append("audio: " + js_str(r["audio"]))
+        for key in ("genre", "date", "audio"):
+            if r.get(key):
+                parts.append(key + ": " + js_str(r[key]))
         if r.get("mp3"):
             parts.append("mp3: 1")
         lines.append("    { " + ", ".join(parts) + " }")
     text = ("/* Музыка для плеера в левом углу (music-widget.js). Треки автора, сделаны в Suno.\n"
             "   ФАЙЛ ПИШЕТ tools/suno_sync.py по плейлисту Suno — руками не править:\n"
             "   добавить трек = добавить его в плейлист «сайт каталог русификаторы».\n"
-            "   audio — звук у Suno (mp4); mp3: 1 — есть запасной music/<file>.mp3.\n"
-            "   Обложки music/<file>.jpg и тексты music/<file>.txt лежат у нас. */\n"
+            "   mp3: 1 — звук лежит у нас (music/<file>.mp3), audio — он же у Suno (запасной);\n"
+            "   genre и date — подпись на сцене. Обложки .jpg и тексты .txt — тоже у нас. */\n"
             "window.CRH_MUSIC = {\n"
             "  artist: " + js_str(ARTIST) + ",\n"
             "  tracks: [\n" + ",\n".join(lines) + "\n  ]\n};\n")
@@ -172,34 +206,61 @@ def write_music_js(rows):
     return False
 
 
+def ffmpeg(*args):
+    subprocess.run(["ffmpeg", "-v", "error", "-y", *map(str, args)], check=True)
+
+
+def make_mp3(r, tmp):
+    """Звук трека к нам: видео с Suno → mp3 128 кбит/с, как у прежних треков.
+    Кнопка «скачать» Suno (и её месячный лимит) тут не участвует: видео открыто."""
+    src = Path(tmp) / (r["file"] + ".mp4")
+    out = MUSIC / (r["file"] + ".mp3")
+    try:
+        src.write_bytes(get(r["audio"], timeout=300))
+        ffmpeg("-i", src, "-vn", "-c:a", "libmp3lame", "-b:a", "128k", "-ar", "44100",
+               "-id3v2_version", "3", "-metadata", "title=" + r["title"], "-metadata", "artist=" + ARTIST,
+               "-metadata", "comment=https://suno.com/song/" + r["suno"], out)
+        return True
+    except Exception as e:                           # один трек не сорвёт остальные
+        out.unlink(missing_ok=True)
+        print(f"  ! {r['file']}: mp3 не сделан ({e})")
+        return False
+    finally:
+        src.unlink(missing_ok=True)
+
+
 def make_viz(todo, styles):
     sys.path.insert(0, str(ROOT / "tools"))
     import music_viz
     with tempfile.TemporaryDirectory() as tmp:
         for r in todo:
-            src = Path(tmp) / (r["file"] + ".mp4")
-            wav = src.with_suffix(".wav")
+            mp3 = MUSIC / (r["file"] + ".mp3")
+            src = mp3 if mp3.exists() else Path(tmp) / (r["file"] + ".mp4")
+            wav = Path(tmp) / (r["file"] + ".wav")
             try:
-                src.write_bytes(get(r["audio"], timeout=180))
-                # mp4 librosa читает только через устаревший audioread — даём ей wav
-                subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-ac", "1",
-                                "-ar", str(music_viz.SR), str(wav)], check=True)
+                if src != mp3:
+                    src.write_bytes(get(r["audio"], timeout=180))
+                # librosa без устаревшего audioread читает только wav — даём ей wav
+                ffmpeg("-i", src, "-ac", "1", "-ar", music_viz.SR, wav)
                 music_viz.write_viz(wav, MUSIC / (r["file"] + ".viz"), styles.get(r["file"]), r["file"])
-            except Exception as e:                   # один трек не сорвёт остальные
+            except Exception as e:
                 print(f"  ! {r['file']}: .viz не посчитан ({e})")
             finally:
-                src.unlink(missing_ok=True)
+                if src != mp3:
+                    src.unlink(missing_ok=True)
                 wav.unlink(missing_ok=True)
 
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--audio", action="store_true", help="скачать к нам mp3 треков, которых ещё нет")
     ap.add_argument("--viz", action="store_true", help="посчитать .viz для треков без него")
     args = ap.parse_args()
 
     clips = playlist()
     cache = json.loads(CACHE.read_text(encoding="utf-8")) if CACHE.exists() else {}
     styles = json.loads(STYLES.read_text(encoding="utf-8")) if STYLES.exists() else {}
+    own = json.loads(GENRES_FILE.read_text(encoding="utf-8")) if GENRES_FILE.exists() else {}
     name_of = names(clips, cache)
     MUSIC.mkdir(parents=True, exist_ok=True)
 
@@ -215,13 +276,23 @@ def main():
             styles[file] = tags
         rows.append({"title": " ".join((c.get("title") or "").split()) or "Untitled",
                      "file": file, "suno": c["id"], "audio": audio_url(c),
-                     "mp3": (MUSIC / (file + ".mp3")).exists()})
+                     "genre": own.get(file) or genre(tags or styles.get(file)),
+                     "date": (c.get("created_at") or "")[:10]})
+
+    got = 0
+    if args.audio:
+        todo = [r for r in rows if r["audio"] and not (MUSIC / (r["file"] + ".mp3")).exists()]
+        print(f"mp3 скачать: {len(todo)}")
+        with tempfile.TemporaryDirectory() as tmp:
+            got = sum(make_mp3(r, tmp) for r in todo)
+    for r in rows:
+        r["mp3"] = (MUSIC / (r["file"] + ".mp3")).exists()
 
     js = write_music_js(rows)
     CACHE.write_text(json.dumps(cache, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     STYLES.write_text(json.dumps(styles, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-    print(f"треков в плейлисте {len(rows)}; обложек скачано {covers}, текстов записано {texts}; "
-          f"music.js {'обновлён' if js else 'без изменений'}")
+    print(f"треков в плейлисте {len(rows)}; обложек скачано {covers}, текстов записано {texts}, "
+          f"mp3 скачано {got}; music.js {'обновлён' if js else 'без изменений'}")
 
     if args.viz:
         todo = [r for r in rows if r["audio"] and not (MUSIC / (r["file"] + ".viz")).exists()]

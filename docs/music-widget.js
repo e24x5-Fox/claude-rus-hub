@@ -2,8 +2,8 @@
    music-widget.js — плеер с музыкой автора в левом углу, под донатерами.
 
    Данные — window.CRH_MUSIC из music.js (его пишет tools/suno_sync.py по
-   плейлисту Suno). Звук идёт прямо с Suno (t.audio, видео трека .mp4 — <audio> берёт из него звук); не ответил —
-   берётся свой music/<имя>.mp3, если он есть (t.mp3). Обложки — свои.
+   плейлисту Suno). Звук — свой music/<имя>.mp3 (t.mp3); не открылся — тот же
+   трек у Suno (t.audio, видео .mp4 — <audio> берёт из него звук). Обложки — свои.
 
    Одна строка: обложка, название с громкостью под ним, справа «играть».
    Свёрнутый — только обложка и «играть»; нажатие на обложку разворачивает.
@@ -12,7 +12,8 @@
    Музыка не должна пугать: сама не играет (только по нажатию), громкость по
    умолчанию маленькая, а старт — плавный, с нуля. Громкость и свёрнут ли
    плеер запоминаются у посетителя в браузере; трек при каждом открытии
-   страницы — случайный. Название ведёт на страницу трека в Suno.
+   страницы — случайный, дальше — по перемешанному кругу. Название ведёт на
+   страницу трека в Suno; на сцене под ним — жанр и дата (t.genre, t.date).
 
    Чем ниже по странице, тем медленнее идёт трек, а если наверху крутят
    дальше вверх — разгоняется (crh:top-push из top-egg.js), но только после
@@ -50,7 +51,16 @@
   }
   var saved = load();
   var volume = typeof saved.volume === 'number' ? Math.min(1, Math.max(0, saved.volume)) : VOLUME;
-  var cur = Math.floor(Math.random() * tracks.length);   /* каждый раз — случайный */
+  /* порядок — перемешанный круг: «вперёд», «назад» и автопереход идут по нему,
+     и пока не прозвучат все треки, ни один не повторится */
+  var order = tracks.map(function (t, i) { return i; });
+  for (var k = order.length - 1; k > 0; k--) {
+    var r = Math.floor(Math.random() * (k + 1)), tmp = order[k]; order[k] = order[r]; order[r] = tmp;
+  }
+  var pos = 0;
+  var cur = order[0];                                      /* каждый раз — случайный */
+  function step(dir) { pos = (pos + dir + order.length) % order.length; return order[pos]; }
+  function peek() { return order[(pos + 1) % order.length]; }
   var folded = typeof saved.folded === 'boolean' ? saved.folded : null;   /* null — по ширине экрана */
 
   function save() {
@@ -85,15 +95,17 @@
   var decks = [deck(), deck()];
   var audio = decks[0];
 
-  /* звук трека: поток Suno, а свой mp3 — запасной */
-  function srcOf(t) { return t.audio || 'music/' + t.file + '.mp3'; }
+  /* звук трека: свой mp3, а поток Suno — запасной (и наоборот, если mp3 ещё нет) */
+  function srcOf(t) { return t.mp3 || !t.audio ? 'music/' + t.file + '.mp3' : t.audio; }
+  function altOf(t) { return t.mp3 && t.audio ? t.audio : null; }
   decks.forEach(function (d) {
     d.addEventListener('error', function () {
       var t = tracks.filter(function (x) { return x.file === d.file; })[0];
-      if (!t || !t.audio || !t.mp3 || d.fellBack) { return; }
-      d.fellBack = true;                  /* Suno не ответил — играем свой mp3 */
+      var alt = t && altOf(t);
+      if (!alt || d.fellBack) { return; }
+      d.fellBack = true;                  /* свой не открылся — играем у Suno */
       var playing = !d.paused || d === audio;
-      d.src = 'music/' + t.file + '.mp3';
+      d.src = alt;
       if (playing) { var p = d.play(); if (p && p.catch) { p.catch(function () {}); } }
     });
   });
@@ -241,6 +253,7 @@
   title.target = '_blank';
   title.rel = 'noopener';
   var artist = el('div', 'music-artist', (data.artist || '') + ' · Suno');
+  var about = el('div', 'music-about');      /* жанр и дата — только на сцене */
   var volRow = el('label', 'music-vol-row');
   volRow.title = 'Громкость';
   var vol = el('input', 'music-vol');
@@ -250,6 +263,7 @@
   volRow.appendChild(vol);
   info.appendChild(title);
   info.appendChild(artist);
+  info.appendChild(about);
   info.appendChild(volRow);
 
   var play = button('music-play ico-play', 'Играть', null);
@@ -285,6 +299,13 @@
     }, 50);
   }
 
+  var MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа',
+                'сентября', 'октября', 'ноября', 'декабря'];
+  function dateRu(d) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d || '');
+    return m ? +m[3] + ' ' + MONTHS[+m[2] - 1] + ' ' + m[1] : '';
+  }
+
   function show() {
     var t = tracks[cur];
     title.textContent = t.title;
@@ -297,6 +318,7 @@
     }
     cover.src = 'music/' + t.file + '.jpg';
     setBg(cover.src);
+    about.textContent = [t.genre, dateRu(t.date)].filter(Boolean).join(' · ');
     coverBtn.title = t.title + ' — развернуть';
   }
 
@@ -305,7 +327,7 @@
   var PREFETCH_S = 30;
   var next = null;
   function prefetch() {
-    var i = (cur + 1) % tracks.length;
+    var i = peek();
     if (next && next.i === i) { return; }
     var n = next = { i: i, url: null };
     new Image().src = 'music/' + tracks[i].file + '.jpg';   /* и обложку для фона */
@@ -379,7 +401,7 @@
     xf = { from: from, t0: Date.now(), mult: mult };
     audio = from === decks[0] ? decks[1] : decks[0];
     audio.volume = 0;
-    pick(cur + 1);
+    pick(step(1));
     rampIn(true);
     var p = audio.play();
     if (p && p.catch) { p.catch(function () {}); }
@@ -430,7 +452,7 @@
     if (audio.paused) { go(); } else { settle(); audio.pause(); }
   });
   /* перехода не было (трек короткий или стоял на паузе у самого конца) */
-  on('ended', function () { if (!xf) { pick(cur + 1); go(); } });
+  on('ended', function () { if (!xf) { pick(step(1)); go(); } });
 
   on('play', function () {
     play.classList.replace('ico-play', 'ico-pause');
@@ -826,7 +848,7 @@
     stoppedByDownload = false;
     settle();
     audio.pause();
-    pick(cur + dir);
+    pick(step(dir));
     go();
   }
   prev.addEventListener('click', function () { skip(-1); });

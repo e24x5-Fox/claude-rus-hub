@@ -809,6 +809,7 @@ body.has-music .donors.wide .donors-panel { max-height: calc(100vh - 63px - 90px
 }
 .music-title[href]:hover { color: var(--accent2); text-decoration: underline; text-underline-offset: 3px; }
 .music-artist { color: var(--text3); font-size: var(--fs-hint); margin-top: 1px; }
+.music-about { display: none; }   /* жанр и дата — только на сцене */
 
 .music-vol-row { display: flex; align-items: center; gap: 6px; margin-top: 5px; cursor: pointer; }
 .music-vol {
@@ -1043,6 +1044,7 @@ body.fox-stage-on .music-bg { transition: none; will-change: opacity, transform;
 .donors.open:not(.wide) ~ .music.stage { display: flex; }
 .music.stage .music-cover { width: 72px; height: 72px; }
 .music.stage .music-title { font-size: var(--fs-title); }
+.music.stage .music-about:not(:empty) { display: block; color: var(--text2); font-size: var(--fs-hint); margin-top: 2px; }
 .music.stage .music-vol-row { max-width: 240px; }
 .music.stage .music-fold { display: none; }
 .music.stage .music-skip {
