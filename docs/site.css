@@ -1085,8 +1085,41 @@ body.fox-stage-on .music-bg { transition: none; will-change: opacity, transform;
   color: var(--text2); font-size: var(--fs-hint); white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
+/* «Ещё»: остальные ручки — панелью над плеером, у правого края */
+.music-more-btn {
+  align-self: center; flex: none; width: 34px; height: 34px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 50%; background: var(--bg3); color: var(--text); cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.music-more-btn::before {
+  content: ""; display: block; width: 14px; height: 14px; background: currentColor;
+  -webkit-mask: var(--ico) center / contain no-repeat; mask: var(--ico) center / contain no-repeat;
+}
+.music-more-btn:hover, .music-more-btn.on { background: var(--accent-soft); color: var(--accent2); }
+.ico-sliders { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 4h7M13 4h1M2 12h1M7 12h7' stroke='black' stroke-width='1.6' stroke-linecap='round'/%3E%3Ccircle cx='11' cy='4' r='2' fill='none' stroke='black' stroke-width='1.6'/%3E%3Ccircle cx='5' cy='12' r='2' fill='none' stroke='black' stroke-width='1.6'/%3E%3C/svg%3E"); }
+.music > .music-more {
+  position: absolute; right: 0; bottom: calc(100% + 10px); z-index: 2;
+  display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end;
+  max-width: min(720px, calc(100vw - 32px)); padding: 14px 16px;
+  background: var(--bg2); border: 1px solid var(--bg3); border-radius: var(--r-card);
+  box-shadow: 0 12px 40px rgba(0,0,0,.6), 0 0 0 1px var(--accent-soft);
+}
+.music > .music-more[hidden] { display: none; }
+.music-more-title {
+  color: var(--text3); font-size: var(--fs-hint); letter-spacing: .06em; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.music-more-row { display: flex; gap: 10px; }
+.music-more-reset {
+  align-self: center; margin-left: auto; padding: 7px 12px;
+  border: 1px solid var(--bg3); border-radius: var(--r-pill); background: none;
+  color: var(--text2); font: inherit; font-size: var(--fs-hint); cursor: pointer;
+}
+.music-more-reset:hover { color: var(--text); border-color: var(--accent); }
 @media (max-width: 600px) {
   .music.stage { gap: 10px; flex-wrap: wrap; }
+  .music > .music-more { left: 0; right: 0; max-width: none; justify-content: center; }
   .music.stage .music-cover { width: 52px; height: 52px; }
   .music.stage .music-knobs { order: 10; width: 100%; justify-content: center; gap: 24px; }
 }

@@ -20,7 +20,8 @@
    того, как вернулся к своему обычному темпу; «Скачать» (событие
    crh:download из thanks-widget.js) тормозит его до нуля. Чем медленнее
    трек, тем больше на нём ревёрба — сам, без настроек; на сцене
-   (fox-stage.js) темп и ревёрб крутятся ручками.
+   (fox-stage.js) темп и ревёрб крутятся ручками, а под «Ещё» — бас и
+   верха, длина и тон ревёрба, эхо и ширина стерео.
 
    Плеер шевелится под музыку по заранее записанным кадрам (music/<имя>.viz,
    tools/music_viz.py), звук на странице не анализируется.
@@ -67,7 +68,7 @@
 
   function save() {
     try {
-      localStorage.setItem(KEY, JSON.stringify({ volume: volume, folded: folded }));
+      localStorage.setItem(KEY, JSON.stringify({ volume: volume, folded: folded, fx: fx }));
     } catch (e) { /* без памяти — тоже можно */ }
   }
 
@@ -518,7 +519,7 @@
      медленнее, или он только трогается на переходе), напор копится, но
      цель — норма; дошёл до неё — дальше уже разгон (см. tick и xfTick). */
   function depthRate() {
-    if (staged) { return tempo; }          /* на сцене темп — с ручки */
+    if (staged) { return fx.tempo; }       /* на сцене темп — с ручки */
     var max = document.documentElement.scrollHeight - window.innerHeight;
     var k = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
     var base = 1 - (1 - BOTTOM_RATE) * k;
@@ -591,23 +592,36 @@
   });
   on('pause', function () { if (!stopping) { resuming = false; } });
 
-  /* ── ревёрб: чем медленнее, тем гулче ──
+  /* ── звук через Web Audio: ревёрб, а на сцене — ручки ──
      Каждая дека идёт в Web Audio двумя путями: сухой — как есть, мокрый —
-     через свёртку с искусственным залом (шум с затуханием, REVERB_S секунд).
-     Мокрого тем больше, чем медленнее дека играет сейчас: на нормальной
-     скорости его нет, к VERB_FULL — до WET_MAX. Поэтому гудит и низ
-     страницы, и уходящий трек на переходе, и кассета, остановленная
-     «Скачать». Разгон ревёрба не добавляет. На сцене ручка «Ревёрб»
-     перехватывает это значение, пока её не сбросят двойным щелчком.
-     Нет Web Audio — трек играет как раньше, без ревёрба. */
-  var REVERB_S = 3.2, VERB_FULL = 0.5, WET_MAX = 0.75;
-  var actx = null, wired = false;
-  var verbHand = null;     /* значение ручки на сцене, 0…1; null — авто */
-  var tempo = 1;           /* темп с ручки на сцене */
+     через свёртку с искусственным залом (шум с затуханием). Мокрого тем
+     больше, чем медленнее дека играет сейчас: на нормальной скорости его
+     нет, к VERB_FULL — до WET_MAX. Поэтому гудит и низ страницы, и уходящий
+     трек на переходе, и кассета, остановленная «Скачать». Разгон ревёрба не
+     добавляет. Нет Web Audio — трек играет как раньше, без ревёрба.
+
+     Дальше общая шина: эхо (задержка с обратной связью) → бас и верха
+     (полочные фильтры) → ширина стерео (середина и бока) → ограничитель →
+     колонки. Всё это — только на сцене, по ручкам (fx); на обычной странице
+     эквалайзер ровный, эха нет, ширина как есть, ограничитель не жмёт.
+     Ручки сцены запоминаются у посетителя вместе с громкостью. */
+  var VERB_FULL = 0.5, WET_MAX = 0.75;
+  var FX_DEF = { tempo: 1, verb: null, bass: 0, treble: 0, length: 3.2, tone: 20000,
+                 echo: 0, echoTime: 0.35, width: 1 };
+  var fx = {};
+  Object.keys(FX_DEF).forEach(function (k) {
+    var v = saved.fx && saved.fx[k];
+    fx[k] = typeof v === 'number' ? v : FX_DEF[k];
+  });
+  var actx = null, wired = false, nodes = null;
   var knobs = null;
 
-  function impulse(c) {
-    var n = Math.floor(c.sampleRate * REVERB_S), pre = Math.floor(c.sampleRate * 0.02);
+  /* зал: стерео-шум, затухающий за len секунд; по разу на длину */
+  var irCache = {};
+  function impulse(c, len) {
+    var key = len.toFixed(1);
+    if (irCache[key]) { return irCache[key]; }
+    var n = Math.floor(c.sampleRate * len), pre = Math.floor(c.sampleRate * 0.02);
     var buf = c.createBuffer(2, n, c.sampleRate);
     for (var ch = 0; ch < 2; ch++) {
       var d = buf.getChannelData(ch);
@@ -616,6 +630,7 @@
         d[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, 3.2);
       }
     }
+    irCache[key] = buf;
     return buf;
   }
 
@@ -626,19 +641,77 @@
     if (!AC) { return; }
     try {
       actx = new AC();
-      var verb = actx.createConvolver();
-      verb.buffer = impulse(actx);
-      verb.connect(actx.destination);
+      var c = actx, n = {};
+      n.bus = c.createGain();
+      n.verb = c.createConvolver();
+      n.verbLen = 3.2;
+      n.verb.buffer = impulse(c, n.verbLen);
+      n.tone = c.createBiquadFilter();             /* тон ревёрба: срез верхов хвоста */
+      n.tone.type = 'lowpass';
+      n.verb.connect(n.tone); n.tone.connect(n.bus);
       decks.forEach(function (d) {
-        var src = actx.createMediaElementSource(d);
-        d.dry = actx.createGain();
-        d.wet = actx.createGain();
+        var src = c.createMediaElementSource(d);
+        d.dry = c.createGain();
+        d.wet = c.createGain();
         d.wet.gain.value = 0;
-        src.connect(d.dry); d.dry.connect(actx.destination);
-        src.connect(d.wet); d.wet.connect(verb);
+        src.connect(d.dry); d.dry.connect(n.bus);
+        src.connect(d.wet); d.wet.connect(n.verb);
       });
+      n.bass = c.createBiquadFilter(); n.bass.type = 'lowshelf'; n.bass.frequency.value = 150;
+      n.treble = c.createBiquadFilter(); n.treble.type = 'highshelf'; n.treble.frequency.value = 3500;
+      /* эхо: из шины в задержку, задержка сама в себя и дальше в эквалайзер */
+      n.send = c.createGain(); n.send.gain.value = 0;
+      n.delay = c.createDelay(2);
+      n.fb = c.createGain(); n.fb.gain.value = 0;
+      n.bus.connect(n.bass);
+      n.bus.connect(n.send); n.send.connect(n.delay);
+      n.delay.connect(n.fb); n.fb.connect(n.delay);
+      n.delay.connect(n.bass);
+      n.bass.connect(n.treble);
+      /* ширина: моно поднимается до стерео до разделителя, иначе правый канал пуст */
+      n.up = c.createGain();
+      n.up.channelCount = 2; n.up.channelCountMode = 'explicit'; n.up.channelInterpretation = 'speakers';
+      n.split = c.createChannelSplitter(2);
+      n.merge = c.createChannelMerger(2);
+      n.ll = c.createGain(); n.rl = c.createGain(); n.rr = c.createGain(); n.lr = c.createGain();
+      n.treble.connect(n.up); n.up.connect(n.split);
+      n.split.connect(n.ll, 0); n.ll.connect(n.merge, 0, 0);
+      n.split.connect(n.rl, 1); n.rl.connect(n.merge, 0, 0);
+      n.split.connect(n.rr, 1); n.rr.connect(n.merge, 0, 1);
+      n.split.connect(n.lr, 0); n.lr.connect(n.merge, 0, 1);
+      /* ограничитель: подъём баса и широкое стерео не должны хрипеть */
+      n.limit = c.createDynamicsCompressor();
+      n.limit.knee.value = 0; n.limit.attack.value = 0.003; n.limit.release.value = 0.25;
+      n.merge.connect(n.limit); n.limit.connect(c.destination);
+      nodes = n;
+      applyFx();
       syncVerb();
-    } catch (e) { actx = null; }
+    } catch (e) { actx = null; nodes = null; }
+  }
+
+  /* ручки сцены → узлы; вне сцены всё ровно */
+  var irTimer = 0;
+  function applyFx() {
+    if (!nodes) { return; }
+    var n = nodes, t = actx.currentTime, on = staged;
+    function to(p, v) { p.setTargetAtTime(v, t, 0.05); }
+    to(n.bass.gain, on ? fx.bass : 0);
+    to(n.treble.gain, on ? fx.treble : 0);
+    to(n.tone.frequency, Math.min(on ? fx.tone : 20000, actx.sampleRate / 2 - 100));
+    var e = on ? fx.echo : 0;
+    to(n.send.gain, e * 0.9);
+    to(n.fb.gain, e > 0 ? 0.15 + e * 0.6 : 0);
+    to(n.delay.delayTime, on ? fx.echoTime : FX_DEF.echoTime);
+    var w = on ? fx.width : 1, a = (1 + w) / 2, b = (1 - w) / 2;
+    to(n.ll.gain, a); to(n.rr.gain, a); to(n.rl.gain, b); to(n.lr.gain, b);
+    to(n.limit.threshold, on ? -3 : 0);
+    to(n.limit.ratio, on ? 20 : 1);
+    /* новый зал — не на каждый шаг ручки, а когда её отпустили */
+    var len = on ? fx.length : FX_DEF.length;
+    if (Math.abs(len - n.verbLen) > 0.05) {
+      clearTimeout(irTimer);
+      irTimer = setTimeout(function () { n.verbLen = len; n.verb.buffer = impulse(actx, len); }, 200);
+    }
   }
 
   /* сколько ревёрба положено при такой скорости, 0…1 */
@@ -646,7 +719,8 @@
     var k = Math.min(1, Math.max(0, (1 - r) / (1 - VERB_FULL)));
     return Math.pow(k, 0.8);
   }
-  function verbOf(d) { return staged && verbHand !== null ? verbHand : autoVerb(d.playbackRate); }
+  /* 0…2: 1 — столько, сколько авто даёт на самом медленном; выше — гуще */
+  function verbOf(d) { return staged && fx.verb !== null ? fx.verb : autoVerb(d.playbackRate); }
   function syncVerb() {
     if (knobs && staged) { knobs.paint(); }
     if (!actx) { return; }
@@ -654,9 +728,9 @@
     decks.forEach(function (d) {
       if (!d.wet) { return; }
       var w = verbOf(d);
-      /* мокрое прибавляется, сухое чуть уступает — на слух громкость та же */
+      /* мокрое прибавляется, сухое уступает — на слух громкость та же */
       d.wet.gain.setTargetAtTime(w * WET_MAX, t, 0.06);
-      d.dry.gain.setTargetAtTime(1 - w * 0.35, t, 0.06);
+      d.dry.gain.setTargetAtTime(Math.max(0.15, 1 - Math.min(w, 1) * 0.35 - Math.max(0, w - 1) * 0.4), t, 0.06);
     });
   }
 
@@ -922,9 +996,8 @@
      старый обрывается, новый трогается с разгона, как по «играть». */
   var staged = false;
 
-  /* ручки на сцене: темп и ревёрб. Тянуть вверх-вниз, колесо, стрелки;
-     двойной щелчок — на место (темп ×1, ревёрб — снова сам по темпу) */
-  var TEMPO_MIN = 0.5, TEMPO_MAX = 1.5;
+  /* ручки на сцене. Тянуть вверх-вниз, колесо, стрелки; двойной щелчок —
+     на место. Темп и ревёрб — на самой панели, остальное — под «Ещё» */
   function knob(label, get, set, text, reset) {
     var w = el('div', 'music-knob');
     var dial = el('div', 'music-knob-dial');
@@ -977,25 +1050,99 @@
       }
     };
   }
-  function verbNow() { return verbHand !== null ? verbHand : autoVerb(audio.playbackRate); }
-  var tempoKnob = knob('Темп',
-    function () { return (tempo - TEMPO_MIN) / (TEMPO_MAX - TEMPO_MIN); },
-    function (v) { tempo = TEMPO_MIN + v * (TEMPO_MAX - TEMPO_MIN); onTempo(); },
-    function () { return '×' + tempo.toFixed(2); },
-    function () { tempo = 1; onTempo(); });
-  var verbKnob = knob('Ревёрб', verbNow,
-    function (v) { verbHand = v; syncVerb(); },
-    function (v) { return Math.round(v * 100) + '%' + (verbHand === null ? ' · авто' : ''); },
-    function () { verbHand = null; syncVerb(); });
-  function onTempo() {
-    if (!stopping) { glide(depthRate()); }
+
+  /* шкалы ручек: положение 0…1 ↔ значение. mid — значение в середине хода
+     (×1 у темпа, 0 дБ у эквалайзера), чтобы «как было» стояло по центру */
+  function scale(lo, mid, hi, log) {
+    function f(a, b, k) { return log ? a * Math.pow(b / a, k) : a + (b - a) * k; }
+    function g(a, b, x) { return log ? Math.log(x / a) / Math.log(b / a) : (x - a) / (b - a); }
+    return {
+      v: function (x) { return x <= mid ? g(lo, mid, x) / 2 : 0.5 + g(mid, hi, x) / 2; },
+      x: function (v) { return v <= 0.5 ? f(lo, mid, v * 2) : f(mid, hi, (v - 0.5) * 2); }
+    };
+  }
+  function db(x) { return (x > 0 ? '+' : '') + Math.round(x) + ' дБ'; }
+  function sec(x) { return x < 1 ? Math.round(x * 1000) + ' мс' : x.toFixed(1) + ' с'; }
+  function pct(x) { return Math.round(x * 100) + '%'; }
+  var PARAMS = {
+    tempo:    { label: 'Темп',    s: scale(0.25, 1, 2, true),   fmt: function (x) { return '×' + x.toFixed(2); } },
+    bass:     { label: 'Бас',     s: scale(-24, 0, 24),         fmt: db },
+    treble:   { label: 'Верха',   s: scale(-24, 0, 24),         fmt: db },
+    length:   { label: 'Длина',   s: scale(0.3, 3.2, 12, true), fmt: sec },
+    tone:     { label: 'Тон',     s: scale(400, 4000, 20000, true),
+                fmt: function (x) { return x >= 19500 ? 'открыт' : x < 1000 ? Math.round(x) + ' Гц' : (x / 1000).toFixed(1) + ' кГц'; } },
+    echo:     { label: 'Сила',    s: scale(0, 0.5, 1),          fmt: pct },
+    echoTime: { label: 'Время',   s: scale(0.04, 0.35, 1.5, true), fmt: sec },
+    width:    { label: 'Ширина',  s: scale(0, 1, 3),            fmt: function (x) { return x < 0.02 ? 'моно' : pct(x); } }
+  };
+  function fxChanged() {
+    applyFx();
+    save();
     knobs.paint();
   }
-  knobs = { paint: function () { tempoKnob.paint(); verbKnob.paint(); } };
+  function param(key) {
+    var p = PARAMS[key];
+    return knob(p.label,
+      function () { return p.s.v(fx[key]); },
+      function (v) { fx[key] = p.s.x(v); if (key === 'tempo') { onTempo(); } fxChanged(); },
+      function () { return p.fmt(fx[key]); },
+      function () { fx[key] = FX_DEF[key]; if (key === 'tempo') { onTempo(); } fxChanged(); });
+  }
+  function onTempo() { if (!stopping) { glide(depthRate()); } }
+
+  /* ревёрб: 0…200 %; 100 % — сколько авто даёт на самом медленном. Пока ручку
+     не трогали — «авто», ревёрб сам идёт за темпом */
+  function verbNow() { return fx.verb !== null ? fx.verb : autoVerb(audio.playbackRate); }
+  var verbKnob = knob('Ревёрб',
+    function () { return verbNow() / 2; },
+    function (v) { fx.verb = v * 2; syncVerb(); save(); },
+    function () { return pct(verbNow()) + (fx.verb === null ? ' · авто' : ''); },
+    function () { fx.verb = null; syncVerb(); save(); });
+
+  var all = [param('tempo'), verbKnob];
   var knobBox = el('div', 'music-knobs');
-  knobBox.appendChild(tempoKnob.node);
-  knobBox.appendChild(verbKnob.node);
+  all.forEach(function (k) { knobBox.appendChild(k.node); });
+
+  /* «Ещё»: панель над плеером с остальными ручками */
+  var moreBtn = button('music-more-btn ico-sliders', 'Ещё настройки звука', null);
+  moreBtn.setAttribute('aria-expanded', 'false');
+  knobBox.appendChild(moreBtn);
+  var more = el('div', 'music-more');
+  more.hidden = true;
+  [['Эквалайзер', ['bass', 'treble']], ['Ревёрб', ['length', 'tone']],
+   ['Эхо', ['echo', 'echoTime']], ['Стерео', ['width']]].forEach(function (g) {
+    var grp = el('div', 'music-more-group');
+    grp.appendChild(el('div', 'music-more-title', g[0]));
+    var row = el('div', 'music-more-row');
+    g[1].forEach(function (key) { var k = param(key); all.push(k); row.appendChild(k.node); });
+    grp.appendChild(row);
+    more.appendChild(grp);
+  });
+  var resetAll = button('music-more-reset', 'Вернуть все ручки на место', 'Сбросить всё');
+  resetAll.addEventListener('click', function () {
+    Object.keys(FX_DEF).forEach(function (k) { fx[k] = FX_DEF[k]; });
+    onTempo();
+    syncVerb();
+    fxChanged();
+  });
+  more.appendChild(resetAll);
+  function openMore(on) {
+    more.hidden = !on;
+    moreBtn.classList.toggle('on', on);
+    moreBtn.setAttribute('aria-expanded', on ? 'true' : 'false');
+  }
+  moreBtn.addEventListener('click', function () { openMore(more.hidden); });
+  /* щелчок мимо панели и Esc закрывают её; Esc при открытой панели сцену не гасит */
+  document.addEventListener('pointerdown', function (e) {
+    if (!more.hidden && !more.contains(e.target) && !moreBtn.contains(e.target)) { openMore(false); }
+  });
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !more.hidden) { e.stopPropagation(); e.preventDefault(); openMore(false); }
+  }, true);
+
+  knobs = { paint: function () { all.forEach(function (k) { k.paint(); }); } };
   box.insertBefore(knobBox, prev);
+  box.appendChild(more);
   knobs.paint();
 
   function skip(dir) {
@@ -1015,6 +1162,8 @@
       staged = !!on; box.classList.toggle('stage', staged); vizScan = 0; apply(); panTo();
       /* вошли — темп с ручки, ушли — снова по месту на странице */
       if (!stopping) { glide(depthRate()); }
+      if (!staged) { openMore(false); }
+      applyFx();
       syncVerb();
     },
     skip: skip,
