@@ -1057,11 +1057,41 @@ body.fox-stage-on .music-bg { transition: none; will-change: opacity, transform;
 .music.stage .music-skip:hover { background: var(--accent-soft); color: var(--accent2); }
 .ico-prev { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 3h2v10H3zM14 3v10L6 8z'/%3E%3C/svg%3E"); }
 .ico-next { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M11 3h2v10h-2zM2 3v10l8-5z'/%3E%3C/svg%3E"); }
+/* ручки темпа и ревёрба — только на сцене (music-widget.js); дуга —
+   conic-gradient на 270°, риска на колпачке поворачивается на --knob */
+.music-knobs { display: none; }
+.music.stage .music-knobs { display: flex; gap: 14px; flex: none; align-items: flex-start; }
+.music-knob { display: flex; flex-direction: column; align-items: center; width: 64px; }
+.music-knob-dial {
+  position: relative; width: 44px; height: 44px; border-radius: 50%;
+  cursor: ns-resize; touch-action: none; outline: none;
+  background: conic-gradient(from 225deg,
+    var(--accent2) 0 var(--knob-fill, 0%), var(--bg3) var(--knob-fill, 0%) 75%, transparent 75%);
+}
+.music-knob-dial:focus-visible { box-shadow: 0 0 0 2px var(--accent-soft); }
+.music-knob-cap {
+  position: absolute; inset: 5px; border-radius: 50%;
+  background: var(--bg2); box-shadow: inset 0 0 0 1px var(--bg3);
+  transform: rotate(var(--knob, -135deg));
+  transition: transform .08s linear;
+}
+.music-knob-cap::after {
+  content: ""; position: absolute; left: 50%; top: 4px;
+  width: 2px; height: 10px; margin-left: -1px; border-radius: 1px; background: var(--text);
+}
+.music-knob-dial:hover .music-knob-cap, .music-knob-dial.drag .music-knob-cap { background: var(--bg3); }
+.music-knob-name { color: var(--text2); font-size: var(--fs-hint); margin-top: 4px; }
+.music-knob-val {
+  color: var(--text2); font-size: var(--fs-hint); white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
 @media (max-width: 600px) {
-  .music.stage { gap: 10px; }
+  .music.stage { gap: 10px; flex-wrap: wrap; }
   .music.stage .music-cover { width: 52px; height: 52px; }
+  .music.stage .music-knobs { order: 10; width: 100%; justify-content: center; gap: 24px; }
 }
 .fx-still .music.stage { animation: none; }
+.fx-still .music-knob-cap { transition: none; }
 
 /* ── слова песни на сцене (fox-lyrics.js) ──────────────────────────────────
    По бокам лисёнка две колонки; новое слово встаёт наверх своей колонки,

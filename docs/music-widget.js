@@ -18,7 +18,9 @@
    Чем ниже по странице, тем медленнее идёт трек, а если наверху крутят
    дальше вверх — разгоняется (crh:top-push из top-egg.js), но только после
    того, как вернулся к своему обычному темпу; «Скачать» (событие
-   crh:download из thanks-widget.js) тормозит его до нуля.
+   crh:download из thanks-widget.js) тормозит его до нуля. Чем медленнее
+   трек, тем больше на нём ревёрба — сам, без настроек; на сцене
+   (fox-stage.js) темп и ревёрб крутятся ручками.
 
    Плеер шевелится под музыку по заранее записанным кадрам (music/<имя>.viz,
    tools/music_viz.py), звук на странице не анализируется.
@@ -90,6 +92,9 @@
     /* высоту тона не сохраняем: замедление звучит как притормозившая
        пластинка, а не как растянутый голос */
     a.preservesPitch = a.mozPreservesPitch = a.webkitPreservesPitch = false;
+    /* звук идёт через Web Audio (ревёрб), а чужой поток без CORS там молчит;
+       GitHub Pages и cdn1.suno.ai отдают Access-Control-Allow-Origin: * */
+    a.crossOrigin = 'anonymous';
     return a;
   }
   var decks = [deck(), deck()];
@@ -361,6 +366,7 @@
   }
 
   function go() {
+    wire();                                /* по нажатию: иначе браузер не даст звук */
     if (!audio.src) { pick(cur); }
     if (audio.currentTime < 0.3 && !resuming) { rampIn(false); }   /* с начала — с разгона */
     fadeIn();
@@ -485,6 +491,7 @@
   function applyRate() {
     audio.playbackRate = Math.max(MIN_RATE, rate * mult);
     if (xf) { xf.from.playbackRate = Math.max(MIN_RATE, rate * xf.mult); }
+    syncVerb();
   }
   function setRate(v) { rate = mid = v; applyRate(); }
   function tick(now) {
@@ -511,6 +518,7 @@
      медленнее, или он только трогается на переходе), напор копится, но
      цель — норма; дошёл до неё — дальше уже разгон (см. tick и xfTick). */
   function depthRate() {
+    if (staged) { return tempo; }          /* на сцене темп — с ручки */
     var max = document.documentElement.scrollHeight - window.innerHeight;
     var k = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
     var base = 1 - (1 - BOTTOM_RATE) * k;
@@ -553,6 +561,7 @@
       var e = k * k;                          /* сначала медленно, потом обрыв */
       audio.playbackRate = Math.max(MIN_RATE, from - (from - MIN_RATE) * e);
       audio.volume = v0 * (1 - Math.max(0, (k - 0.6) / 0.4));
+      syncVerb();
       if (k < 1) { requestAnimationFrame(step); return; }
       audio.pause();
       target = depthRate();
@@ -581,6 +590,75 @@
     go();
   });
   on('pause', function () { if (!stopping) { resuming = false; } });
+
+  /* ── ревёрб: чем медленнее, тем гулче ──
+     Каждая дека идёт в Web Audio двумя путями: сухой — как есть, мокрый —
+     через свёртку с искусственным залом (шум с затуханием, REVERB_S секунд).
+     Мокрого тем больше, чем медленнее дека играет сейчас: на нормальной
+     скорости его нет, к VERB_FULL — до WET_MAX. Поэтому гудит и низ
+     страницы, и уходящий трек на переходе, и кассета, остановленная
+     «Скачать». Разгон ревёрба не добавляет. На сцене ручка «Ревёрб»
+     перехватывает это значение, пока её не сбросят двойным щелчком.
+     Нет Web Audio — трек играет как раньше, без ревёрба. */
+  var REVERB_S = 3.2, VERB_FULL = 0.5, WET_MAX = 0.75;
+  var actx = null, wired = false;
+  var verbHand = null;     /* значение ручки на сцене, 0…1; null — авто */
+  var tempo = 1;           /* темп с ручки на сцене */
+  var knobs = null;
+
+  function impulse(c) {
+    var n = Math.floor(c.sampleRate * REVERB_S), pre = Math.floor(c.sampleRate * 0.02);
+    var buf = c.createBuffer(2, n, c.sampleRate);
+    for (var ch = 0; ch < 2; ch++) {
+      var d = buf.getChannelData(ch);
+      for (var i = pre; i < n; i++) {
+        var t = (i - pre) / (n - pre);
+        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, 3.2);
+      }
+    }
+    return buf;
+  }
+
+  function wire() {
+    if (wired) { if (actx && actx.state === 'suspended') { actx.resume(); } return; }
+    wired = true;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) { return; }
+    try {
+      actx = new AC();
+      var verb = actx.createConvolver();
+      verb.buffer = impulse(actx);
+      verb.connect(actx.destination);
+      decks.forEach(function (d) {
+        var src = actx.createMediaElementSource(d);
+        d.dry = actx.createGain();
+        d.wet = actx.createGain();
+        d.wet.gain.value = 0;
+        src.connect(d.dry); d.dry.connect(actx.destination);
+        src.connect(d.wet); d.wet.connect(verb);
+      });
+      syncVerb();
+    } catch (e) { actx = null; }
+  }
+
+  /* сколько ревёрба положено при такой скорости, 0…1 */
+  function autoVerb(r) {
+    var k = Math.min(1, Math.max(0, (1 - r) / (1 - VERB_FULL)));
+    return Math.pow(k, 0.8);
+  }
+  function verbOf(d) { return staged && verbHand !== null ? verbHand : autoVerb(d.playbackRate); }
+  function syncVerb() {
+    if (knobs && staged) { knobs.paint(); }
+    if (!actx) { return; }
+    var t = actx.currentTime;
+    decks.forEach(function (d) {
+      if (!d.wet) { return; }
+      var w = verbOf(d);
+      /* мокрое прибавляется, сухое чуть уступает — на слух громкость та же */
+      d.wet.gain.setTargetAtTime(w * WET_MAX, t, 0.06);
+      d.dry.gain.setTargetAtTime(1 - w * 0.35, t, 0.06);
+    });
+  }
 
   vol.addEventListener('input', function () {
     volume = vol.value / 100;
@@ -843,6 +921,83 @@
      Там он всегда развёрнут, а «назад» и «вперёд» переключают трек сразу:
      старый обрывается, новый трогается с разгона, как по «играть». */
   var staged = false;
+
+  /* ручки на сцене: темп и ревёрб. Тянуть вверх-вниз, колесо, стрелки;
+     двойной щелчок — на место (темп ×1, ревёрб — снова сам по темпу) */
+  var TEMPO_MIN = 0.5, TEMPO_MAX = 1.5;
+  function knob(label, get, set, text, reset) {
+    var w = el('div', 'music-knob');
+    var dial = el('div', 'music-knob-dial');
+    dial.tabIndex = 0;
+    dial.setAttribute('role', 'slider');
+    dial.setAttribute('aria-label', label);
+    dial.setAttribute('aria-valuemin', '0');
+    dial.setAttribute('aria-valuemax', '100');
+    dial.title = label + ': тянуть вверх-вниз или колесом, двойной щелчок — сброс';
+    dial.appendChild(el('div', 'music-knob-cap'));
+    var val = el('div', 'music-knob-val');
+    w.appendChild(dial);
+    w.appendChild(el('div', 'music-knob-name', label));
+    w.appendChild(val);
+    function to(v) { set(Math.min(1, Math.max(0, v))); }
+    var y0 = null, v0 = 0;
+    dial.addEventListener('pointerdown', function (e) {
+      y0 = e.clientY; v0 = get();
+      dial.setPointerCapture(e.pointerId);
+      dial.classList.add('drag');
+      e.preventDefault();
+    });
+    dial.addEventListener('pointermove', function (e) {
+      if (y0 !== null) { to(v0 + (y0 - e.clientY) / 160); }
+    });
+    function up() { y0 = null; dial.classList.remove('drag'); }
+    dial.addEventListener('pointerup', up);
+    dial.addEventListener('pointercancel', up);
+    dial.addEventListener('wheel', function (e) {
+      e.preventDefault();
+      to(get() + (e.deltaY < 0 ? 0.03 : -0.03));
+    }, { passive: false });
+    dial.addEventListener('keydown', function (e) {
+      var k = { ArrowUp: 0.02, ArrowRight: 0.02, ArrowDown: -0.02, ArrowLeft: -0.02 }[e.key];
+      if (!k) { return; }
+      e.preventDefault();
+      e.stopPropagation();                 /* стрелки на сцене иначе листают треки */
+      to(get() + k);
+    });
+    dial.addEventListener('dblclick', reset);
+    return {
+      node: w,
+      paint: function () {
+        var v = get();
+        dial.style.setProperty('--knob', (-135 + 270 * v).toFixed(1) + 'deg');
+        dial.style.setProperty('--knob-fill', (v * 75).toFixed(1) + '%');
+        dial.setAttribute('aria-valuenow', String(Math.round(v * 100)));
+        val.textContent = text(v);
+        dial.setAttribute('aria-valuetext', val.textContent);
+      }
+    };
+  }
+  function verbNow() { return verbHand !== null ? verbHand : autoVerb(audio.playbackRate); }
+  var tempoKnob = knob('Темп',
+    function () { return (tempo - TEMPO_MIN) / (TEMPO_MAX - TEMPO_MIN); },
+    function (v) { tempo = TEMPO_MIN + v * (TEMPO_MAX - TEMPO_MIN); onTempo(); },
+    function () { return '×' + tempo.toFixed(2); },
+    function () { tempo = 1; onTempo(); });
+  var verbKnob = knob('Ревёрб', verbNow,
+    function (v) { verbHand = v; syncVerb(); },
+    function (v) { return Math.round(v * 100) + '%' + (verbHand === null ? ' · авто' : ''); },
+    function () { verbHand = null; syncVerb(); });
+  function onTempo() {
+    if (!stopping) { glide(depthRate()); }
+    knobs.paint();
+  }
+  knobs = { paint: function () { tempoKnob.paint(); verbKnob.paint(); } };
+  var knobBox = el('div', 'music-knobs');
+  knobBox.appendChild(tempoKnob.node);
+  knobBox.appendChild(verbKnob.node);
+  box.insertBefore(knobBox, prev);
+  knobs.paint();
+
   function skip(dir) {
     if (stopping) { return; }
     stoppedByDownload = false;
@@ -856,7 +1011,12 @@
   box.addEventListener('transitionend', function (e) { if (e.target === box) { sizeViz(); } });
 
   window.CRH_PLAYER = {
-    stage: function (on) { staged = !!on; box.classList.toggle('stage', staged); vizScan = 0; apply(); panTo(); },
+    stage: function (on) {
+      staged = !!on; box.classList.toggle('stage', staged); vizScan = 0; apply(); panTo();
+      /* вошли — темп с ручки, ушли — снова по месту на странице */
+      if (!stopping) { glide(depthRate()); }
+      syncVerb();
+    },
     skip: skip,
     playing: function () { return !audio.paused; },
     /* сила сейчас и сколько дропов уже прошло — огоньки на сцене (fox-stage.js) */
