@@ -39,6 +39,15 @@ window.CRH_VT = {
    "McAfeeD": "ti!8C4EC879B51C"
   }
  },
+ "kemopop": {
+  "sha256": "6413981e9579ce4ea1a9b512f5f04cca89cb1193580286b82fd209619ce045b2",
+  "link": "https://www.virustotal.com/gui/file/6413981e9579ce4ea1a9b512f5f04cca89cb1193580286b82fd209619ce045b2",
+  "date": "10.10.2026",
+  "malicious": 0,
+  "suspicious": 0,
+  "engines": 64,
+  "flagged": {}
+ },
  "lucidcats": {
   "sha256": "ff2692e1ca5c543ce32c0a9d8528264d58ed638630fcab7aa6a6f71e3e4c2d5c",
   "link": "https://www.virustotal.com/gui/file/ff2692e1ca5c543ce32c0a9d8528264d58ed638630fcab7aa6a6f71e3e4c2d5c",
