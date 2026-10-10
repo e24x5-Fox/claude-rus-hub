@@ -90,6 +90,17 @@ window.CRH_DOWNLOADS = {
    "oddremedy": 29,
    "atlyss": 17,
    "lucidcats": 17
+  },
+  "2026-10-10": {
+   "dragnwash": 229,
+   "protogen": 22,
+   "protogen2": 50,
+   "amorous": 13,
+   "bodycam": 1057,
+   "oddremedy": 29,
+   "atlyss": 25,
+   "lucidcats": 24,
+   "kemopop": 0
   }
  }
 };
