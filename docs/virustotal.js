@@ -57,6 +57,24 @@ window.CRH_VT = {
   "engines": 51,
   "flagged": {}
  },
+ "meetcute": {
+  "sha256": "028e3d4d5f09d2100bbedae14f67cbd711d4c5536427ca824f5e3436b1bcd7e8",
+  "link": "https://www.virustotal.com/gui/file/028e3d4d5f09d2100bbedae14f67cbd711d4c5536427ca824f5e3436b1bcd7e8",
+  "date": "11.10.2026",
+  "malicious": 0,
+  "suspicious": 0,
+  "engines": 65,
+  "flagged": {}
+ },
+ "meetcute2": {
+  "sha256": "212dc9442c46620afca648e21f811a05931cbf6e6106b25eb8478b5ce35d97ea",
+  "link": "https://www.virustotal.com/gui/file/212dc9442c46620afca648e21f811a05931cbf6e6106b25eb8478b5ce35d97ea",
+  "date": "11.10.2026",
+  "malicious": 0,
+  "suspicious": 0,
+  "engines": 65,
+  "flagged": {}
+ },
  "oddremedy": {
   "sha256": "d8b3741ff01dd293fe77944ec32c0f375db02c2b77073caae0d0d1b30145e9c3",
   "link": "https://www.virustotal.com/gui/file/d8b3741ff01dd293fe77944ec32c0f375db02c2b77073caae0d0d1b30145e9c3",

@@ -281,6 +281,60 @@ window.CATALOG = {
         "guide": ""
       },
       "note": "Собрано под версию игры 2.3.0. Перевод дописывается в архив игры, оригинальные данные не меняются, удаление возвращает архив байт в байт. Если игра обновится и установщик откажется ставить перевод — дождитесь новой версии русификатора. Включая дополнения Boys in Hawaii! и Lucky Odyssey!."
+    },
+    {
+      "slug": "meetcute",
+      "engine": "Ren'Py",
+      "lines": 871,
+      "words": 6000,
+      "title": "Meet Cute: Cafe",
+      "aliases": ["Мит кьют кафе", "Мит Кьют: Кафе", "Милая встреча кафе"],
+      "banner": "assets/meetcute.png",
+      "status": "released",
+      "version": "1.0",
+      "adult": true,
+      "tags": ["Ren'Py", "Windows", "18+"],
+      "summary": "Полный перевод короткой новеллы от авторов My Furry Protogen: герой падает в лужу по дороге на встречу, и отстирать костюм ему помогает официантка Элис. Все диалоги и интерфейс, ~6 тыс. слов.",
+      "scope": [
+        { "label": "Диалоги", "value": "514 реплик" },
+        { "label": "Интерфейс", "value": "357 строк" },
+        { "label": "Объём", "value": "~6 тыс. слов" }
+      ],
+      "install_size": "68 МБ",
+      "release": { "tag_prefix": "meetcute-", "asset": "MeetCuteCafe-RU-Setup.exe" },
+      "links": {
+        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
+        "steam": "https://store.steampowered.com/app/1879190/",
+        "guide": ""
+      },
+      "note": "Оригинальные файлы игры не изменяются: перевод лежит отдельными файлами, удаление стирает только их. Обновление игры в Steam перевод не ломает."
+    },
+    {
+      "slug": "meetcute2",
+      "engine": "Ren'Py",
+      "lines": 944,
+      "words": 8000,
+      "title": "Meet Cute: Delivery",
+      "aliases": ["Мит кьют деливери", "Мит Кьют: Доставка", "Милая встреча доставка"],
+      "banner": "assets/meetcute2.png",
+      "status": "released",
+      "version": "1.0",
+      "adult": true,
+      "tags": ["Ren'Py", "Windows", "18+"],
+      "summary": "Полный перевод второй новеллы серии Meet Cute: курьерша Лиллиан привозит герою телевизор и падает в обморок у его двери. Все диалоги и интерфейс, ~8 тыс. слов.",
+      "scope": [
+        { "label": "Диалоги", "value": "587 реплик" },
+        { "label": "Интерфейс", "value": "357 строк" },
+        { "label": "Объём", "value": "~8 тыс. слов" }
+      ],
+      "install_size": "68 МБ",
+      "release": { "tag_prefix": "meetcute2-", "asset": "MeetCuteDelivery-RU-Setup.exe" },
+      "links": {
+        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
+        "steam": "https://store.steampowered.com/app/1897960/",
+        "guide": ""
+      },
+      "note": "Оригинальные файлы игры не изменяются: перевод лежит отдельными файлами, удаление стирает только их. Обновление игры в Steam перевод не ломает."
     }
   ]
 }
