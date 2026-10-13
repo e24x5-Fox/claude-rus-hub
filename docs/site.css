@@ -474,14 +474,13 @@ a:hover { text-decoration: underline; }
 /* Широкий экран: каталог ровно по центру, боковые колонки — от стенок окна
    до каталога. Слева панель донатов и плеер (они fixed, donors-widget.js и
    music-widget.js) — под них в сетке пустая колонка той же ширины, что
-   статистика справа. Порог тот же, что WIDE в обоих виджетах, — 1760px. */
+   статистика справа. Класс trio ставит layout.js шире 1760px (тот же порог,
+   что WIDE в обоих виджетах) — не @media, чтобы смена раскладки шла плавно. */
 :root { --cat: 860px; --side-w: calc(50% - var(--cat) / 2 - 32px - 16px); }
-@media (min-width: 1760px) {
-  .wrap { max-width: none; }
-  .layout { grid-template-columns: 1fr minmax(0, var(--cat)) 1fr; }
-  .main-col { grid-column: 2; }
-  .side { grid-column: 3; }
-}
+.trio .wrap { max-width: none; }
+.trio .layout { grid-template-columns: 1fr minmax(0, var(--cat)) 1fr; }
+.trio .main-col { grid-column: 2; }
+.trio .side { grid-column: 3; }
 
 .side-block {
   background: var(--bg2);
