@@ -17,6 +17,7 @@
 
 (function () {
   var DONATE = 'https://dalink.to/e24x5';
+  var STICKERS = 'https://t.me/addstickers/foxkisser_rpc';
   var SHOW = 10;          /* строк сразу, остальные — по «ещё» */
   var STEP_MS = 140;      /* пауза между появлением строк */
   var WIDE = window.matchMedia('(min-width: 1760px)');
@@ -96,6 +97,30 @@
   var rulesBtn = el('button', 'donors-rules-btn', 'Правила донатов');
   rulesBtn.type = 'button';
   panel.appendChild(rulesBtn);
+
+  /* Стикерпак с лисёнком: веер из пяти стикеров торчит из коробки, как на
+     обложке набора. Вся плашка — ссылка на добавление в Telegram. */
+  var pack = el('a', 'stickers');
+  pack.href = STICKERS;
+  pack.rel = 'noopener';
+  pack.target = '_blank';
+  pack.title = 'Добавить стикеры в Telegram';
+  var fan = el('div', 'stickers-fan');
+  ['delight', 'cute', 'happy', 'wow', 'joy'].forEach(function (s, k) {
+    var st = el('img');
+    st.src = 'assets/stickers/' + s + '.png';
+    st.alt = '';
+    st.loading = 'lazy';
+    st.style.setProperty('--i', k - 2);
+    st.style.zIndex = 3 - Math.abs(k - 2);
+    fan.appendChild(st);
+  });
+  pack.appendChild(fan);
+  var crate = el('div', 'stickers-box');
+  crate.appendChild(el('span', 'stickers-name', 'Стикеры с лисёнком'));
+  crate.appendChild(el('span', 'stickers-get', 'Добавить в Telegram →'));
+  pack.appendChild(crate);
+  panel.appendChild(pack);
 
   box.appendChild(toggle);
   box.appendChild(panel);
