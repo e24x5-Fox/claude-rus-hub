@@ -8,10 +8,10 @@
    переключаем класс (виджеты в это же время сворачивают панель донатов и
    плеер своими обработчиками), измеряем новое место и ведём каждый блок от
    старого места к новому (FLIP). Каталог и статистика только едут — текст не
-   растягивается. Панель донатов и плеер меняют ещё и размер; их ничто не
-   раздувает больше натуральной величины: прежний вид (копия) сжимается к
-   новому месту и тает, а новый либо вырастает из маленького, либо
-   проявляется на месте.
+   растягивается. Панель донатов меняет ещё и размер, и её ничто не раздувает
+   больше натуральной величины: прежний вид (копия) сжимается к новому месту
+   и тает, а новый либо вырастает из маленького, либо проявляется на месте.
+   Плеер копии не получает — он просто съезжает на новое место и проявляется.
 
    Анимация — свойствами translate и scale, а не transform: transform колонки
    статистики занят параллаксом (side.js). Подключается в <head> сразу после
@@ -32,7 +32,7 @@
     { sel: '.main-col' },
     { sel: '.side' },
     { sel: '.donors', resize: true },
-    { sel: '.music', resize: true }
+    { sel: '.music', slide: true }
   ];
 
   function rect(el) {
@@ -85,6 +85,18 @@
         if (!from || !to) { if (b.g) { b.g.remove(); } return; }
         var dx = from.left - to.left, dy = from.top - to.top;
 
+        if (b.p.slide) {
+          /* плеер: без копии — две версии плеера рядом читаются как
+             раздвоение. Он сам съезжает от прежнего места (по нижнему краю:
+             к низу он и прижат) и проявляется */
+          b.el.style.transformOrigin = '0 100%';
+          anims.push(b.el.animate([
+            { translate: dx + 'px ' + (from.bottom - to.bottom) + 'px', scale: '.92', opacity: 0 },
+            { translate: '0px 0px', scale: '1', opacity: 1 }
+          ], { duration: MS, easing: EASE }));
+          return;
+        }
+
         if (!b.p.resize) {
           if (!dx && !dy) { return; }
           anims.push(b.el.animate([{ translate: dx + 'px ' + dy + 'px' }, { translate: '0px 0px' }],
@@ -126,7 +138,7 @@
       function done() {
         root.style.overflowX = '';
         ghosts.forEach(function (g) { g.remove(); });
-        before.forEach(function (b) { if (b.p.resize) { b.el.style.transformOrigin = ''; } });
+        before.forEach(function (b) { if (b.p.resize || b.p.slide) { b.el.style.transformOrigin = ''; } });
       }
     });
   }
