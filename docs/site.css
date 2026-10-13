@@ -471,6 +471,17 @@ a:hover { text-decoration: underline; }
   }
 }
 
+/* Три колонки одной группой по центру: слева панель донатов и плеер (они
+   fixed, donors-widget.js и music-widget.js), дальше каталог и статистика.
+   Под панель в сетке оставлено место (260 + 32), а сама панель встаёт по
+   левому краю группы: половина ширины группы от центра экрана. Порог тот же,
+   что WIDE в обоих виджетах, — 1760px. */
+:root { --trio: 1474px; }             /* 260 + 32 + 860 + 32 + 290 */
+@media (min-width: 1760px) {
+  .wrap { max-width: calc(var(--trio) + 32px); }
+  .layout { padding-left: 292px; }
+}
+
 .side-block {
   background: var(--bg2);
   border: 1px solid var(--bg3);
@@ -547,7 +558,7 @@ a:hover { text-decoration: underline; }
   z-index: 20;
   font-size: var(--fs-note);
 }
-.donors.wide { top: 47px; bottom: auto; }   /* вровень с шапкой: 3px рамка + 44px */
+.donors.wide { top: 47px; bottom: auto; left: max(16px, calc(50% - var(--trio) / 2)); }   /* вровень с шапкой: 3px рамка + 44px */
 
 .donors-pill {
   display: inline-flex;
@@ -572,13 +583,15 @@ a:hover { text-decoration: underline; }
   width: min(260px, calc(100vw - 32px));
   max-height: calc(100vh - 32px);
   overflow-y: auto;
+  overflow-x: hidden;              /* веер стикеров при наведении шире панели */
   background: var(--bg2);
   border: 1px solid var(--bg3);
   border-radius: var(--r-card);
   padding: 14px 16px;
   box-shadow: 0 8px 28px rgba(0,0,0,.5);
 }
-.donors.wide .donors-panel { box-shadow: none; max-height: calc(100vh - 63px); }
+/* снизу — место под плеер (.music.wide): панель до него не доходит */
+.donors.wide .donors-panel { box-shadow: none; max-height: calc(100vh - 47px - 16px - 88px - 16px); }
 .donors.open .donors-panel { display: block; }
 
 .donors-head { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
@@ -790,7 +803,7 @@ a:hover { text-decoration: underline; }
   box-shadow: 0 8px 28px rgba(0,0,0,.5);
   font-size: var(--fs-note);
 }
-.music.wide { bottom: 16px; box-shadow: none; }
+.music.wide { bottom: 16px; left: max(16px, calc(50% - var(--trio) / 2)); box-shadow: none; }
 
 /* фон страницы — обложка текущего трека, тёмная и размытая почти до пятна.
    Слой лежит под содержимым (z-index -1 над фоном холста); два слоя — чтобы
