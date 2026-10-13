@@ -99,13 +99,15 @@
   panel.appendChild(rulesBtn);
 
   /* Стикерпак с лисёнком: веер из пяти стикеров торчит из коробки, как на
-     обложке набора. Вся плашка — ссылка на добавление в Telegram. */
-  var pack = el('a', 'stickers');
-  pack.href = STICKERS;
-  pack.rel = 'noopener';
-  pack.target = '_blank';
-  pack.title = 'Добавить стикеры в Telegram';
-  var fan = el('div', 'stickers-fan');
+     обложке набора. На коробке — своя кнопка «Добавить в Telegram»; веер ведёт
+     туда же, но мимо него проходит Tab: ссылка для клавиатуры одна — кнопка. */
+  var pack = el('div', 'stickers');
+  var fan = el('a', 'stickers-fan');
+  fan.href = STICKERS;
+  fan.rel = 'noopener';
+  fan.target = '_blank';
+  fan.tabIndex = -1;
+  fan.setAttribute('aria-hidden', 'true');
   ['delight', 'cute', 'happy', 'wow', 'joy'].forEach(function (s, k) {
     var st = el('img');
     st.src = 'assets/stickers/' + s + '.png';
@@ -118,7 +120,11 @@
   pack.appendChild(fan);
   var crate = el('div', 'stickers-box');
   crate.appendChild(el('span', 'stickers-name', 'Стикеры с лисёнком'));
-  crate.appendChild(el('span', 'stickers-get', 'Добавить в Telegram →'));
+  var get = el('a', 'stickers-get', 'Добавить в Telegram');
+  get.href = STICKERS;
+  get.rel = 'noopener';
+  get.target = '_blank';
+  crate.appendChild(get);
   pack.appendChild(crate);
   panel.appendChild(pack);
 

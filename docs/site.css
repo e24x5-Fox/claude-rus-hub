@@ -649,14 +649,11 @@ a:hover { text-decoration: underline; }
    сторону на свой номер (--i от -2 до 2) и наклонён вокруг низа — как карты
    в руке; середина сверху, края чуть меньше и ниже. */
 .stickers {
-  display: block;
   margin-top: 14px;
   padding-top: 12px;
   border-top: 1px solid var(--bg3);
-  color: inherit;
-  text-decoration: none;
 }
-.stickers-fan { position: relative; height: 82px; }
+.stickers-fan { display: block; position: relative; height: 82px; }
 .stickers-fan img {
   position: absolute;
   left: 50%;
@@ -670,7 +667,7 @@ a:hover { text-decoration: underline; }
   transition: transform var(--t-slow);
 }
 .stickers:hover .stickers-fan img,
-.stickers:focus-visible .stickers-fan img {
+.stickers:focus-within .stickers-fan img {
   transform: translateX(calc(-50% + var(--i) * 39px)) translateY(calc(abs(var(--i)) * 5px - 8px))
              rotate(calc(var(--i) * 16deg)) scale(calc(1 - abs(var(--i)) * .07));
 }
@@ -680,8 +677,8 @@ a:hover { text-decoration: underline; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 10px 12px 9px;
+  gap: 8px;
+  padding: 10px 12px 12px;
   border-radius: 6px 6px var(--r-field) var(--r-field);
   background: linear-gradient(180deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 70%, #000) 100%);
   box-shadow: inset 0 2px 0 rgba(255,255,255,.18), 0 6px 16px rgba(0,0,0,.35);
@@ -698,8 +695,20 @@ a:hover { text-decoration: underline; }
   background: color-mix(in srgb, var(--accent) 80%, #fff);
 }
 .stickers-name { font-weight: 600; }
-.stickers-get { font-size: var(--fs-hint); opacity: .85; }
-.stickers:hover .stickers-get { opacity: 1; text-decoration: underline; text-underline-offset: 3px; }
+.stickers-get {
+  align-self: stretch;
+  padding: 6px 10px;
+  border-radius: var(--r-btn);
+  background: #fff;
+  color: color-mix(in srgb, var(--accent) 65%, #000);
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--accent) 45%, #000);
+  transition: transform var(--t-fast), box-shadow var(--t-fast), background var(--t-fast);
+}
+.stickers-get:hover { background: color-mix(in srgb, var(--accent) 12%, #fff); }
+.stickers-get:active { transform: translateY(2px); box-shadow: none; }
+.stickers-get:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .fx-still .stickers-fan img { transition: none; }
 
 /* «Эффекты: Авто / Все / Без» (fx.js). На узком — кружок рядом с пилюлей,
