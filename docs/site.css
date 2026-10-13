@@ -223,6 +223,11 @@ a:hover { text-decoration: underline; }
 }
 .foot .links { flex: 1 1 auto; display: flex; flex-wrap: wrap; gap: 16px; }
 .foot .mascot { width: 62px; }
+/* Узкий экран: пилюля донатов и плеер висят в углу поверх страницы — подвал
+   оставляет под собой их высоту (--dock-h считает layout.js), чтобы ссылки
+   не уходили под них. Широкий: подвал — под каталогом, а не под колонками. */
+.foot { padding-bottom: max(40px, var(--dock-h, 0px)); }
+.trio .foot { max-width: var(--cat); margin-left: auto; margin-right: auto; }
 
 /* ── Пустое состояние и ошибка загрузки каталога ────────────────────────── */
 
@@ -240,8 +245,6 @@ a:hover { text-decoration: underline; }
   .mascot { width: 84px; }
   .head h1 { font-size: 22px; }
   .stat { flex-basis: 45%; }
-  /* плеер и донатеры висят внизу поверх страницы — подвал не должен уходить под них */
-  body.has-music .foot { padding-bottom: 130px; }
 }
 
 /* ── Панель: поиск, метки, вид ──────────────────────────────────────────── */

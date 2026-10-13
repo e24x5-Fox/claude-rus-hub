@@ -158,6 +158,7 @@
     if (m.classList.contains('wide') || m.classList.contains('stage')) {
       m.style.bottom = '';
       root.style.removeProperty('--music-h');
+      root.style.removeProperty('--dock-h');
       return;
     }
     root.style.setProperty('--music-h', m.offsetHeight + 'px');
@@ -165,6 +166,14 @@
     var pick = d.querySelector('.fx-dock.open .fx-pick');
     if (pick) { top = Math.min(top, pick.getBoundingClientRect().top); }
     m.style.bottom = Math.max(16, Math.round(window.innerHeight - top + 8)) + 'px';
+    /* сколько низа экрана занимает угол в спокойном виде (пилюля и плеер) —
+       столько места оставляет под собой подвал, чтобы его ссылки не уходили
+       под угол. Пока открыта панель или «Эффекты», не пересчитываем: страница
+       не должна прыгать от того, что открыли окошко */
+    if (!pick && !d.classList.contains('open')) {
+      var mt = m.getBoundingClientRect().top;
+      root.style.setProperty('--dock-h', Math.round(window.innerHeight - Math.min(top - m.offsetHeight - 8, mt) + 12) + 'px');
+    }
   }
   function soon() { if (!queued) { queued = true; requestAnimationFrame(dock); } }
 
