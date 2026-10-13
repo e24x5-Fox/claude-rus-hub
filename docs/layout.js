@@ -78,6 +78,7 @@
        после этого; мерить новое место надо, когда отработают все, а до
        отрисовки кадра остаются только колбэки requestAnimationFrame */
     requestAnimationFrame(function () {
+      dock();                       /* плеер — на место по новой раскладке до замера */
       var anims = [], ghosts = [];
       before.forEach(function (b) {
         var to = rect(b.el), from = b.r;
@@ -142,6 +143,49 @@
       }
     });
   }
+
+  /* ── узкий экран: угол с пилюлей донатов, «Эффектами» и плеером ──
+     Плеер стоит над тем, что открыто в углу: над пилюлей, над раскрытой
+     панелью донатов или над карточкой «Эффектов» — иначе они ложатся на
+     него. Панель донатов, со своей стороны, ниже на высоту плеера
+     (--music-h в site.css), чтобы обоим хватало экрана. */
+  var queued = false;
+  function dock() {
+    queued = false;
+    var d = document.querySelector('.donors:not([aria-hidden])');
+    var m = document.querySelector('.music:not([aria-hidden])');
+    if (!d || !m) { return; }
+    if (m.classList.contains('wide') || m.classList.contains('stage')) {
+      m.style.bottom = '';
+      root.style.removeProperty('--music-h');
+      return;
+    }
+    root.style.setProperty('--music-h', m.offsetHeight + 'px');
+    var top = d.getBoundingClientRect().top;
+    var pick = d.querySelector('.fx-dock.open .fx-pick');
+    if (pick) { top = Math.min(top, pick.getBoundingClientRect().top); }
+    m.style.bottom = Math.max(16, Math.round(window.innerHeight - top + 8)) + 'px';
+  }
+  function soon() { if (!queued) { queued = true; requestAnimationFrame(dock); } }
+
+  function watch() {
+    var d = document.querySelector('.donors'), m = document.querySelector('.music');
+    if (!d || !m) { return; }
+    if (window.ResizeObserver) {
+      var ro = new ResizeObserver(soon);
+      ro.observe(d); ro.observe(m);
+      var pick = d.querySelector('.fx-pick');
+      if (pick) { ro.observe(pick); }
+    }
+    var mo = new MutationObserver(soon);
+    mo.observe(d, { attributes: true, attributeFilter: ['class'], subtree: true });
+    mo.observe(m, { attributes: true, attributeFilter: ['class'] });
+    window.addEventListener('resize', soon);
+    dock();
+  }
+  /* виджеты строятся скриптами в конце <body> */
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', watch); }
+  else { watch(); }
 
   if (WIDE.addEventListener) { WIDE.addEventListener('change', change); }
   else if (WIDE.addListener) { WIDE.addListener(change); }

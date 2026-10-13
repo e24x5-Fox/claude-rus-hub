@@ -581,7 +581,7 @@ a:hover { text-decoration: underline; }
 .donors-panel {
   display: none;
   width: min(260px, calc(100vw - 32px));
-  max-height: calc(100vh - 32px);
+  max-height: calc(100vh - 32px - var(--music-h, 0px) - 8px);   /* над панелью — плеер, layout.js */
   overflow-y: auto;
   overflow-x: hidden;              /* веер стикеров при наведении шире панели */
   background: var(--bg2);
@@ -805,6 +805,8 @@ a:hover { text-decoration: underline; }
   box-shadow: 0 8px 28px rgba(0,0,0,.5);
   font-size: var(--fs-note);
 }
+.music:not(.wide):not(.stage) { transition: bottom var(--t-slow); }   /* поднимается над открытым в углу (layout.js) */
+.fx-still .music { transition: none; }
 .music.wide { bottom: 16px; width: var(--side-w); box-shadow: none; }
 
 /* фон страницы — обложка текущего трека, тёмная и размытая почти до пятна.
@@ -848,8 +850,8 @@ body.music-playing .music-bg-layer.css-blur { filter: blur(24px) saturate(1.3) b
 .music-bg-layer.css-blur:not(.on) { transition: opacity 3.5s ease, filter 2.5s ease, visibility 0s 3.5s; }
 /* на широком экране плеер занимает низ колонки — панель донатеров уступает */
 body.has-music .donors.wide .donors-panel { max-height: calc(100vh - 63px - 90px); }
-/* на узком открытая панель донатеров выше плеера — прячем его, чтобы не налезал */
-.donors.open:not(.wide) ~ .music { display: none; }
+/* на узком плеер не прячется под открытой панелью донатеров — layout.js ставит
+   его над ней, а панель на его высоту ниже (--music-h) */
 
 .music.folded { width: auto; gap: 8px; padding: 6px; border-radius: var(--r-pill); }
 .music.folded .music-info, .music.folded .music-fold { display: none; }
