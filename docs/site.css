@@ -787,6 +787,30 @@ a:hover { text-decoration: underline; }
 /* без движения — см. fx.js */
 .fx-still .donors-row { transition: none; transform: none; }
 
+/* ── Угол на узком экране: пилюля донатов, «Эффекты», плеер ──────────────
+   Они висят поверх страницы теми же цветами, что карточки, и на мелком
+   масштабе сливались с ней. Поэтому — обводка акцентом и мягкое свечение,
+   которое медленно дышит, по очереди у каждого значка. Без движения
+   (fx-still) свечение просто стоит. */
+.donors-pill, .fx-gear, .music:not(.wide):not(.stage) {
+  --dock-shadow: 0 4px 18px rgba(0,0,0,.45);
+  border-color: color-mix(in srgb, var(--accent) 65%, transparent);
+  box-shadow: var(--dock-shadow), 0 0 12px color-mix(in srgb, var(--accent) 30%, transparent);
+  animation: dock-glow 3.6s ease-in-out infinite;
+}
+.music:not(.wide):not(.stage) { --dock-shadow: 0 8px 28px rgba(0,0,0,.5); animation-delay: -1.2s; }
+.fx-gear { animation-delay: -2.4s; }
+.donors-pill { color: var(--text); }
+.donors-pill:hover, .fx-gear:hover, .fx-dock.open .fx-gear, .music:not(.wide):not(.stage):hover {
+  border-color: var(--accent);
+}
+@keyframes dock-glow {
+  0%, 100% { box-shadow: var(--dock-shadow), 0 0 6px color-mix(in srgb, var(--accent) 20%, transparent); }
+  50%      { box-shadow: var(--dock-shadow), 0 0 24px 3px color-mix(in srgb, var(--accent) 70%, transparent),
+                         0 0 0 2px color-mix(in srgb, var(--accent) 55%, transparent); }
+}
+.fx-still .donors-pill, .fx-still .fx-gear, .fx-still .music { animation: none; }
+
 /* ── Музыка автора: плеер под донатерами (music-widget.js) ─────────────────
    Одна строка: обложка · название и громкость · «играть». Свёрнутый — только
    обложка и «играть». Иконки — масками из SVG, цветом текста: так они не
