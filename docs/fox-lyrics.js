@@ -13,6 +13,10 @@
    их собирает tools/music_lyrics.py из Suno; у трека без .lyr слов нет.
 
    Места по бокам мало (телефон, узкое окно) — колонки встают над лисёнком.
+
+   Пять нажатий на лисёнка на сцене — слова по-русски (music/<имя>.ru.lyr,
+   tools/lyrics_ru.json), ещё пять — снова как поют. Выбор помнится в браузере.
+   У песни без перевода слова остаются как были.
    ───────────────────────────────────────────────────────────────────────── */
 
 (function () {
@@ -20,11 +24,16 @@
   var FADE_AFTER = 6;      /* секунд записи после конца слова — и оно гаснет само */
   var MAX_SLOTS = 7;       /* сколько строк в колонке, не больше */
   var GONE_MS = 700;       /* сколько гаснет убранное слово (как в site.css) */
+  var RU_NEED = 5;         /* нажатий на лисёнка, чтобы переключить язык слов */
+  var RU_GAP_MS = 1500;    /* перерыв, после которого счёт начинается заново */
+  var RU_KEY = 'crh-lyrics-ru';
 
   var lyrics = {};         /* файл → {w: […]} | null (нет слов) | 'wait' */
   var box = null, cols = null, raf = 0;
   var file = null, idx = 0, lastT = -1, side = 0;
   var live = [];           /* слова на экране: {el, col, slot, end} */
+  var ru = false, ruCount = 0, ruTimer = 0, hint = null, hintTimer = 0;
+  try { ru = localStorage.getItem(RU_KEY) === '1'; } catch (e) { /* без хранилища — по умолчанию */ }
 
   function player() { return window.CRH_PLAYER; }
   function still() { return (window.CRH_FX || {}).still; }
@@ -79,7 +88,27 @@
     cols = [el('div', 'fox-lyrics-col left'), el('div', 'fox-lyrics-col right')];
     box.appendChild(cols[0]);
     box.appendChild(cols[1]);
+    hint = el('div', 'fox-lyrics-hint');
+    box.appendChild(hint);
   }
+
+  /* ── язык: пять нажатий на лисёнка на сцене ── */
+  function toggleRu() {
+    ru = !ru;
+    try { localStorage.setItem(RU_KEY, ru ? '1' : '0'); } catch (e) { /* не запомнится — не беда */ }
+    hint.textContent = ru ? 'слова — по-русски' : 'слова — как поют';
+    hint.classList.add('on');
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(function () { hint.classList.remove('on'); }, 1800);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (!box || !e.target.closest || !e.target.closest('.fox-stage.on .fox-stage-img')) { return; }
+    ruCount++;
+    clearTimeout(ruTimer);
+    if (ruCount >= RU_NEED) { ruCount = 0; toggleRu(); return; }
+    ruTimer = setTimeout(function () { ruCount = 0; }, RU_GAP_MS);
+  });
 
   /* ── слова ── */
   function place(w) {
@@ -136,9 +165,14 @@
 
     var now = player().now();
     var d = now.file ? get(now.file) : null;
-    if (now.file !== file) {                    /* сменился трек */
+    if (ru && d && d !== 'wait') {              /* перевод есть — он, нет — оригинал */
+      var tr = get(now.file + '.ru');
+      if (tr && tr !== 'wait') { d = tr; }
+    }
+    var key = now.file && d && d !== 'wait' ? now.file + (d === lyrics[now.file] ? '' : '.ru') : now.file;
+    if (key !== file) {                         /* сменился трек или язык */
       clear();
-      file = now.file;
+      file = key;
       lastT = -1;
     }
     if (!d || d === 'wait') { return; }

@@ -1164,3 +1164,16 @@ body.fox-stage-on .music-bg { transition: none; will-change: opacity, transform;
   from { opacity: 0; filter: blur(10px); transform: translateY(-.5em) scale(1.25); }
 }
 .fx-still .fox-lyric, .fx-still .fox-lyric-in { transition: none; animation: none; }
+/* пять нажатий на лисёнка — слова по-русски; сам лисёнок ловит нажатия, а
+   на миг сверху всплывает, на каком языке теперь слова */
+.fox-stage.on .fox-stage-img { pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.fox-lyrics-hint {
+  position: absolute; left: 50%; top: calc(24px + env(safe-area-inset-top, 0px));
+  transform: translate(-50%, -6px);
+  padding: 6px 14px; border-radius: 999px;
+  background: var(--bg2); border: 1px solid var(--accent); color: var(--text);
+  font-size: 14px; white-space: nowrap;
+  opacity: 0; transition: opacity .3s ease, transform .3s ease;
+}
+.fox-lyrics-hint.on { opacity: 1; transform: translate(-50%, 0); }
+.fx-still .fox-lyrics-hint { transition: none; }

@@ -6,6 +6,7 @@
 
     python tools/music_lyrics.py --fetch    взять тайминг у Suno (нужен вход)
     python tools/music_lyrics.py            из кеша — в docs/music/*.lyr
+    python tools/music_lyrics.py --ru       только русские *.ru.lyr (tools/lyrics_ru.json)
 
 Тайминг (api/gen/<id>/aligned_lyrics/v2/) Suno отдаёт только вошедшему, а
 токен у страницы suno.com спрятан внутри её кода. Поэтому --fetch не берёт
@@ -199,6 +200,85 @@ def build(cache):
         print("%-24s %3d слов → %s" % (name, len(words), path.name))
 
 
+# ── русские слова: <имя>.ru.lyr ──────────────────────────────────────────────
+# Пять нажатий на лисёнка на сцене (fox-lyrics.js) переключают слова на русский.
+# Перевод — построчно в tools/lyrics_ru.json, ключ — строка оригинала, как она
+# в .lyr; одна и та же строка в разных песнях переводится один раз. Слова
+# перевода раскладываются по времени исходной строки: доля строки по буквам
+# переводится во время через исходные слова, так что паузы внутри строки
+# остаются на своих местах.
+
+RU = Path(__file__).resolve().parent / "lyrics_ru.json"
+
+
+def lines_of(words):
+    out, cur = [], []
+    for w in words:
+        cur.append(w)
+        if w[3]:
+            out.append(cur)
+            cur = []
+    if cur:
+        out.append(cur)
+    return out
+
+
+def spread(src, text):
+    """Слова строки src (с временем) → слова перевода text на том же времени."""
+    weights = [max(1, len(w[2])) for w in src]
+    total = float(sum(weights))
+    marks, acc = [], 0
+    for w, k in zip(src, weights):
+        marks.append((acc / total, (acc + k) / total, w[0], w[1]))
+        acc += k
+
+    def at(f):
+        for a, b, t0, t1 in marks:
+            if f <= b:
+                return t0 + (t1 - t0) * (f - a) / max(1e-9, b - a)
+        return marks[-1][3]
+
+    tr = []
+    for w in text.split():             # «—» без букв — часть соседнего слова, как в clean()
+        if tr and not re.search(r"\w", w):
+            tr[-1] += " " + w
+        else:
+            tr.append(w)
+    k = [len(w) + 1 for w in tr]
+    n, acc, res = float(sum(k)), 0, []
+    for w, c in zip(tr, k):
+        res.append([round(at(acc / n), 3), round(at((acc + c - 1) / n), 3), w, 0])
+        acc += c
+    res[-1][3] = src[-1][3]
+    return res
+
+
+def build_ru():
+    ru = json.loads(RU.read_text(encoding="utf-8"))
+    for name, _ in tracks():
+        src, dst = MUSIC / (name + ".lyr"), MUSIC / (name + ".ru.lyr")
+        words = json.loads(src.read_text(encoding="utf-8"))["w"] if src.exists() else []
+        out, hit, miss = [], 0, []
+        for line in lines_of(words):
+            text = " ".join(w[2] for w in line)
+            if text in ru:
+                out += spread(line, ru[text])
+                hit += 1
+            else:
+                out += line
+                if re.search(r"[^\W\dа-яё]", text.lower().replace("_", "")):
+                    miss.append(text)
+        if not hit:
+            if dst.exists():
+                dst.unlink()
+            continue
+        dst.write_text(json.dumps({"w": out}, ensure_ascii=False, separators=(",", ":")),
+                       encoding="utf-8")
+        print("%-24s %3d строк по-русски → %s" % (name, hit, dst.name))
+        for m in miss:
+            print("    без перевода:", m)
+
+
 def main():
     cache = load_cache()
     if "--fetch" in sys.argv:
@@ -210,7 +290,9 @@ def main():
             if not want:
                 break
         CACHE.write_text(json.dumps(cache, ensure_ascii=False, indent=1), encoding="utf-8")
-    build(cache)
+    if "--ru" not in sys.argv:
+        build(cache)
+    build_ru()
 
 
 if __name__ == "__main__":
