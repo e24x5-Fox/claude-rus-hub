@@ -471,15 +471,16 @@ a:hover { text-decoration: underline; }
   }
 }
 
-/* Три колонки одной группой по центру: слева панель донатов и плеер (они
-   fixed, donors-widget.js и music-widget.js), дальше каталог и статистика.
-   Под панель в сетке оставлено место (260 + 32), а сама панель встаёт по
-   левому краю группы: половина ширины группы от центра экрана. Порог тот же,
-   что WIDE в обоих виджетах, — 1760px. */
-:root { --trio: 1474px; }             /* 260 + 32 + 860 + 32 + 290 */
+/* Широкий экран: каталог ровно по центру, боковые колонки — от стенок окна
+   до каталога. Слева панель донатов и плеер (они fixed, donors-widget.js и
+   music-widget.js) — под них в сетке пустая колонка той же ширины, что
+   статистика справа. Порог тот же, что WIDE в обоих виджетах, — 1760px. */
+:root { --cat: 860px; --side-w: calc(50% - var(--cat) / 2 - 32px - 16px); }
 @media (min-width: 1760px) {
-  .wrap { max-width: calc(var(--trio) + 32px); }
-  .layout { padding-left: 292px; }
+  .wrap { max-width: none; }
+  .layout { grid-template-columns: 1fr minmax(0, var(--cat)) 1fr; }
+  .main-col { grid-column: 2; }
+  .side { grid-column: 3; }
 }
 
 .side-block {
@@ -558,7 +559,7 @@ a:hover { text-decoration: underline; }
   z-index: 20;
   font-size: var(--fs-note);
 }
-.donors.wide { top: 47px; bottom: auto; left: max(16px, calc(50% - var(--trio) / 2)); }   /* вровень с шапкой: 3px рамка + 44px */
+.donors.wide { top: 47px; bottom: auto; width: var(--side-w); }   /* вровень с шапкой: 3px рамка + 44px */
 
 .donors-pill {
   display: inline-flex;
@@ -591,7 +592,7 @@ a:hover { text-decoration: underline; }
   box-shadow: 0 8px 28px rgba(0,0,0,.5);
 }
 /* снизу — место под плеер (.music.wide): панель до него не доходит */
-.donors.wide .donors-panel { box-shadow: none; max-height: calc(100vh - 47px - 16px - 88px - 16px); }
+.donors.wide .donors-panel { width: auto; box-shadow: none; max-height: calc(100vh - 47px - 16px - 88px - 16px); }
 .donors.open .donors-panel { display: block; }
 
 .donors-head { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
@@ -666,6 +667,8 @@ a:hover { text-decoration: underline; }
   padding-top: 12px;
   border-top: 1px solid var(--bg3);
 }
+/* в широкой панели коробка не растягивается во всю ширину */
+.stickers-fan, .stickers-box { max-width: 300px; margin-left: auto; margin-right: auto; }
 .stickers-fan { display: block; position: relative; height: 82px; }
 .stickers-fan img {
   position: absolute;
@@ -803,7 +806,7 @@ a:hover { text-decoration: underline; }
   box-shadow: 0 8px 28px rgba(0,0,0,.5);
   font-size: var(--fs-note);
 }
-.music.wide { bottom: 16px; left: max(16px, calc(50% - var(--trio) / 2)); box-shadow: none; }
+.music.wide { bottom: 16px; width: var(--side-w); box-shadow: none; }
 
 /* фон страницы — обложка текущего трека, тёмная и размытая почти до пятна.
    Слой лежит под содержимым (z-index -1 над фоном холста); два слоя — чтобы
