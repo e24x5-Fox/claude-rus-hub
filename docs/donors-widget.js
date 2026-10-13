@@ -112,8 +112,8 @@
     var st = el('img');
     st.src = 'assets/stickers/' + s + '.png';
     st.alt = '';
-    st.loading = 'lazy';
     st.style.setProperty('--i', k - 2);
+    st.style.opacity = 0;                 /* до прыжка из коробки их не видно */
     st.style.zIndex = 3 - Math.abs(k - 2);
     fan.appendChild(st);
   });
@@ -127,6 +127,28 @@
   crate.appendChild(get);
   pack.appendChild(crate);
   panel.appendChild(pack);
+
+  /* Лисята выпрыгивают из коробки: из крошечных, снизу, из-за её борта
+     (коробка лежит поверх них), с отскоком; середина первой, края следом.
+     Свойствами translate и scale — transform занят веером. */
+  function pop() {
+    [].forEach.call(fan.children, function (st) {
+      var still = window.CRH_FX && CRH_FX.still;
+      var go = function () {
+        if (still || !st.animate) { st.style.opacity = ''; return; }
+        var a = st.animate([
+          { translate: '0 46px', scale: '.15', opacity: 0, easing: 'cubic-bezier(.2, .7, .3, 1)' },
+          { translate: '0 -12px', scale: '1.08', opacity: 1, offset: .55, easing: 'ease-in-out' },
+          { translate: '0 4px', scale: '.96', opacity: 1, offset: .78, easing: 'ease-out' },
+          { translate: '0 0', scale: '1', opacity: 1 }
+        ], { duration: 700, delay: 150 + Math.abs(+st.style.getPropertyValue('--i')) * 110, fill: 'backwards' });
+        st.style.opacity = '';
+        a.finished.catch(function () {});
+      };
+      if (st.complete && st.naturalWidth) { go(); }
+      else { st.addEventListener('load', go, { once: true }); st.addEventListener('error', go, { once: true }); }
+    });
+  }
 
   box.appendChild(toggle);
   box.appendChild(panel);
@@ -241,7 +263,7 @@
   function open(on) {
     box.classList.toggle('open', on);
     toggle.setAttribute('aria-expanded', on ? 'true' : 'false');
-    if (on && !shown) { shown = true; reveal(0, SHOW); }
+    if (on && !shown) { shown = true; reveal(0, SHOW); pop(); }
   }
 
   toggle.addEventListener('click', function () { open(true); });
