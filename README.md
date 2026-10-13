@@ -124,4 +124,9 @@ README.md          этот файл
 Переводы бесплатные и такими останутся. Если захочется сказать спасибо не
 только звёздочкой — можно [закинуть донат](https://dalink.to/e24x5).
 
-<div align="center"><img src="docs/assets/mascot-calm.png" width="120" alt=""></div>
+## Стикеры
+
+Лисёнок, который встречает на сайте и в окне установщика, — из стикерпака
+в Telegram: [foxkisser_rpc](https://t.me/addstickers/foxkisser_rpc).
+
+<div align="center"><a href="https://t.me/addstickers/foxkisser_rpc"><img src="docs/assets/mascot-calm.png" width="120" alt="Стикеры в Telegram"></a></div>
