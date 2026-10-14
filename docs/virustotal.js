@@ -101,5 +101,14 @@ window.CRH_VT = {
   "suspicious": 0,
   "engines": 65,
   "flagged": {}
+ },
+ "tailsandpines": {
+  "sha256": "3b8e127afc2bf0552b0622ec9937946def3e786cfecb0b204f0111222a552bff",
+  "link": "https://www.virustotal.com/gui/file/3b8e127afc2bf0552b0622ec9937946def3e786cfecb0b204f0111222a552bff",
+  "date": "14.10.2026",
+  "malicious": 0,
+  "suspicious": 0,
+  "engines": 65,
+  "flagged": {}
  }
 };

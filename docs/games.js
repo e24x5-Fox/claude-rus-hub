@@ -335,6 +335,33 @@ window.CATALOG = {
         "guide": ""
       },
       "note": "Оригинальные файлы игры не изменяются: перевод лежит отдельными файлами, удаление стирает только их. Обновление игры в Steam перевод не ломает."
+    },
+    {
+      "slug": "tailsandpines",
+      "engine": "Ren'Py",
+      "lines": 932,
+      "words": 8600,
+      "title": "Tails and Pines",
+      "aliases": ["Тейлз энд Пайнс", "Хвосты и сосны", "Tails & Pines"],
+      "banner": "assets/tailsandpines.png",
+      "status": "released",
+      "version": "1.0",
+      "adult": true,
+      "tags": ["Ren'Py", "Windows", "18+"],
+      "summary": "Полный перевод новеллы о двух школьных подругах: официантка Эйприл бросает работу, а на пороге появляется Стейси — теперь знаменитая модель. Все диалоги и интерфейс, ~8,6 тыс. слов.",
+      "scope": [
+        { "label": "Диалоги", "value": "575 реплик" },
+        { "label": "Интерфейс", "value": "357 строк" },
+        { "label": "Объём", "value": "~8,6 тыс. слов" }
+      ],
+      "install_size": "68 МБ",
+      "release": { "tag_prefix": "tailsandpines-", "asset": "TailsAndPines-RU-Setup.exe" },
+      "links": {
+        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
+        "steam": "https://store.steampowered.com/app/1772810/",
+        "guide": ""
+      },
+      "note": "Оригинальные файлы игры не изменяются: перевод лежит отдельными файлами, удаление стирает только их. В шрифте игры нет буквы «ё», поэтому в тексте везде «е»."
     }
   ]
 }
