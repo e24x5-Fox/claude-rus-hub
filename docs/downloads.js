@@ -140,6 +140,19 @@ window.CRH_DOWNLOADS = {
    "kemopop": 7,
    "meetcute": 0,
    "meetcute2": 12
+  },
+  "2026-10-14": {
+   "dragnwash": 236,
+   "protogen": 34,
+   "protogen2": 62,
+   "amorous": 14,
+   "bodycam": 1598,
+   "oddremedy": 29,
+   "atlyss": 57,
+   "lucidcats": 29,
+   "kemopop": 7,
+   "meetcute": 0,
+   "meetcute2": 14
   }
  }
 };
