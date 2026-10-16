@@ -110,5 +110,14 @@ window.CRH_VT = {
   "suspicious": 0,
   "engines": 65,
   "flagged": {}
+ },
+ "webfishing": {
+  "sha256": "c5a8a7e2172f4078710fcb87e35b289171e6b99f2ad1b23bc18f36581345b16c",
+  "link": "https://www.virustotal.com/gui/file/c5a8a7e2172f4078710fcb87e35b289171e6b99f2ad1b23bc18f36581345b16c",
+  "date": "16.10.2026",
+  "malicious": 0,
+  "suspicious": 0,
+  "engines": 67,
+  "flagged": {}
  }
 };
