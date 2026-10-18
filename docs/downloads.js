@@ -197,6 +197,22 @@ window.CRH_DOWNLOADS = {
    "tailsandpines": 10,
    "webfishing": 2,
    "feedthecups": 0
+  },
+  "2026-10-18": {
+   "dragnwash": 245,
+   "protogen": 45,
+   "protogen2": 73,
+   "amorous": 15,
+   "bodycam": 2010,
+   "oddremedy": 29,
+   "atlyss": 80,
+   "lucidcats": 40,
+   "kemopop": 8,
+   "meetcute": 0,
+   "meetcute2": 15,
+   "tailsandpines": 10,
+   "webfishing": 4,
+   "feedthecups": 2
   }
  }
 };
