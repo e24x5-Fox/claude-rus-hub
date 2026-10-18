@@ -57,6 +57,15 @@ window.CRH_VT = {
   "engines": 64,
   "flagged": {}
  },
+ "lockdown": {
+  "sha256": "34cd51a10293bd12dbd6f04ce35967158a31dae2303120802833e4e7fdf3979d",
+  "link": "https://www.virustotal.com/gui/file/34cd51a10293bd12dbd6f04ce35967158a31dae2303120802833e4e7fdf3979d",
+  "date": "19.10.2026",
+  "malicious": 0,
+  "suspicious": 0,
+  "engines": 67,
+  "flagged": {}
+ },
  "lucidcats": {
   "sha256": "ff2692e1ca5c543ce32c0a9d8528264d58ed638630fcab7aa6a6f71e3e4c2d5c",
   "link": "https://www.virustotal.com/gui/file/ff2692e1ca5c543ce32c0a9d8528264d58ed638630fcab7aa6a6f71e3e4c2d5c",
