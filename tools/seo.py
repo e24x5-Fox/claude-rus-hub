@@ -63,7 +63,7 @@ def jsonld(games):
             "image": SITE + g["banner"] if g.get("banner") else None,
             "softwareVersion": g.get("version"),
             "fileSize": g.get("install_size"),
-            "downloadUrl": f"{REPO}/releases",
+            "downloadUrl": (g.get("links") or {}).get("mod") or f"{REPO}/releases",
             "isAccessibleForFree": True,
             "offers": {"@type": "Offer", "price": "0", "priceCurrency": "RUB"},
             "about": {
@@ -142,7 +142,9 @@ def list_block(games):
         if also:
             out.append(f"        <p>Ещё называют: {e(also)}.</p>")
         out.append(f'        <p>{e(g.get("summary", ""))}</p>')
-        links = [f'<a href="{REPO}/releases">Скачать русификатор {e(g["title"])}</a>']
+        mod = (g.get("links") or {}).get("mod")
+        links = [f'<a href="{e(mod)}" rel="noopener">Мод {e(g["title"])} на Thunderstore</a>' if mod
+                 else f'<a href="{REPO}/releases">Скачать русификатор {e(g["title"])}</a>']
         if steam:
             links.append(f'<a href="{e(steam)}" rel="noopener">{e(g["title"])} в Steam</a>')
         out.append("        <p>" + " · ".join(links) + "</p></li>")
