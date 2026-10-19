@@ -1335,6 +1335,7 @@
       var b = el('button', on ? 'on' : '', k.title);
       b.type = 'button';
       b.setAttribute('role', 'tab');
+      b.setAttribute('data-kind', k.key);
       b.setAttribute('aria-selected', on ? 'true' : 'false');
       b.appendChild(el('span', 'n', String(n)));
       b.addEventListener('click', function () { setKind(k.key); });
