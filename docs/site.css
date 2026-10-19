@@ -356,6 +356,23 @@ a:hover { text-decoration: underline; }
 }
 .more-btn:hover { color: var(--text); }
 
+/* Вкладки «Русификаторы / Фуривизаторы» — над поиском, подчёркиванием */
+.kinds {
+  display: flex; gap: 4px; flex-wrap: wrap;
+  margin: 0 0 var(--gap-lg); border-bottom: 1px solid var(--bg3);
+}
+.kinds button {
+  font-family: inherit; font-size: var(--fs-title); font-weight: 600;
+  color: var(--text2); background: none; border: none;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  padding: 10px 14px; cursor: pointer;
+  transition: color var(--t-fast), border-color var(--t-fast);
+}
+.kinds button:hover { color: var(--text); }
+.kinds button.on { color: var(--accent2); border-bottom-color: var(--accent); }
+.kinds button:focus-visible { outline: 2px solid var(--accent2); outline-offset: 2px; }
+.kinds .n { font-size: var(--fs-micro); color: var(--text3); margin-left: 7px; font-weight: 400; }
+
 .views { display: flex; gap: 4px; flex: 0 0 auto; }
 .views button {
   font-family: inherit;

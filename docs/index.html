@@ -601,6 +601,8 @@
     <div class="mascot" data-viz><img src="assets/mascot-wave.png" alt="Лисёнок-маскот каталога русификаторов машет лапой"></div>
   </header>
 
+  <nav class="kinds" id="kinds" role="tablist" aria-label="Что показывать"></nav>
+
   <div class="finder">
     <label for="q" class="finder-label">Найти перевод своей игры</label>
     <div class="finder-box">
@@ -852,7 +854,7 @@
     var dl = null, size = null;
     var vt = virustotal(game);
     if (links.download) {
-      dl = link(links.download, 'btn btn-primary', 'Скачать русификатор');
+      dl = link(links.download, 'btn btn-primary', game.kind === 'furry' ? 'Скачать фуривизатор' : 'Скачать русификатор');
       /* плашка «спасибо» — thanks-widget.js; «пожалуйста» считается раз на игру и версию */
       dl.setAttribute('data-download', (game.slug || '') + '@' + (game.version || ''));
       actions.appendChild(dl);
@@ -1064,16 +1066,33 @@
 
   var VIEW_KEY = 'crh-view';
   var VIEWS = ['cards', 'grid', 'list'];
-  var state = { q: '', tags: [], view: 'cards', shown: 1 };
+  var state = { q: '', tags: [], view: 'cards', shown: 1, kind: 'ru' };
+
+  /* Вкладки: обычные русификаторы и фуривизаторы — шуточные переделки текста.
+     Вид игры — поле kind в games.js, без него — русификатор. */
+  var KIND_KEY = 'crh-kind';
+  var KINDS = [
+    { key: 'ru', title: 'Русификаторы' },
+    { key: 'furry', title: 'Фуривизаторы' }
+  ];
+  function kindOf(g) { return g.kind || 'ru'; }
+  function inKind(g) { return kindOf(g) === state.kind; }
+  function kindTitle(key) {
+    return KINDS.filter(function (k) { return k.key === key; })[0].title;
+  }
 
   try {
     var saved = localStorage.getItem(VIEW_KEY);
     if (VIEWS.indexOf(saved) >= 0) { state.view = saved; }
+    var savedKind = localStorage.getItem(KIND_KEY);
+    if (KINDS.some(function (k) { return k.key === savedKind; })) { state.kind = savedKind; }
   } catch (e) { /* приватный режим — останется вид по умолчанию */ }
+  /* ссылка вида …/#furry открывает сразу нужную вкладку */
+  if (location.hash === '#furry') { state.kind = 'furry'; }
 
   function allTags() {
     var seen = {}, out = [];
-    data.games.forEach(function (g) {
+    data.games.filter(inKind).forEach(function (g) {
       (g.tags || []).forEach(function (t) {
         if (!seen[t]) { seen[t] = 1; out.push(t); }
       });
@@ -1177,6 +1196,7 @@
   }
 
   function matches(game) {
+    if (!inKind(game)) { return 0; }
     for (var i = 0; i < state.tags.length; i++) {
       if ((game.tags || []).indexOf(state.tags[i]) < 0) { return 0; }
     }
@@ -1209,7 +1229,7 @@
     var latest = days.length ? hist[days[days.length - 1]] : {};
 
     var rows = data.games.filter(function (g) {
-      return g.status === 'released' && g.release && g.release.tag_prefix;
+      return inKind(g) && g.status === 'released' && g.release && g.release.tag_prefix;
     }).map(function (g, i) {
       var total = releasesCache ? downloadsFor(releasesCache, g.release.tag_prefix)
                                 : (latest[g.slug] || 0);
@@ -1255,6 +1275,34 @@
     }
   }
 
+  function renderKinds() {
+    var nav = document.getElementById('kinds');
+    nav.innerHTML = '';
+    KINDS.forEach(function (k) {
+      var n = data.games.filter(function (g) { return kindOf(g) === k.key; }).length;
+      if (!n) { return; }
+      var on = k.key === state.kind;
+      var b = el('button', on ? 'on' : '', k.title);
+      b.type = 'button';
+      b.setAttribute('role', 'tab');
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+      b.appendChild(el('span', 'n', String(n)));
+      b.addEventListener('click', function () { setKind(k.key); });
+      nav.appendChild(b);
+    });
+  }
+
+  function setKind(key) {
+    if (key === state.kind) { return; }
+    state.kind = key;
+    state.tags = [];        /* метки у вкладок свои */
+    state.shown = 1;
+    try { localStorage.setItem(KIND_KEY, key); } catch (e) { /* ничего страшного */ }
+    renderKinds();
+    renderTagbar();
+    render();
+  }
+
   function renderViews() {
     var box = document.getElementById('views');
     Array.prototype.forEach.call(box.querySelectorAll('button'), function (b) {
@@ -1269,6 +1317,25 @@
   function nothingFound() {
     var q = state.q.trim();
     var box = el('div', 'card nothing');
+
+    /* в другой вкладке нашлось - туда и отправить, а не просить игру */
+    if (q) {
+      var other = KINDS.filter(function (k) {
+        return k.key !== state.kind && data.games.some(function (g) {
+          return kindOf(g) === k.key && score(g, q) > 0;
+        });
+      })[0];
+      if (other) {
+        box.appendChild(el('h2', null, 'Нашлось во вкладке «' + other.title + '»'));
+        var go = el('button', 'btn btn-primary', 'Открыть «' + other.title + '»');
+        go.type = 'button';
+        go.addEventListener('click', function () { setKind(other.key); });
+        var row = el('div', 'actions');
+        row.appendChild(go);
+        box.appendChild(row);
+        return box;
+      }
+    }
 
     box.appendChild(el('h2', null, q ? 'Перевода для «' + q + '» у нас нет'
                                      : 'Под эти метки ничего не подошло'));
@@ -1316,7 +1383,7 @@
     if (!pop.top) { return false; }
 
     var order = pop.rows.map(function (r) { return r.game; });
-    data.games.forEach(function (g) { if (order.indexOf(g) < 0) { order.push(g); } });
+    data.games.filter(inKind).forEach(function (g) { if (order.indexOf(g) < 0) { order.push(g); } });
     var upto = Math.min(state.shown, order.length);
 
     var sec = el('section', 'section');
@@ -1429,6 +1496,7 @@
     render();
   });
 
+  renderKinds();
   renderTagbar();
   renderViews();
   render();
