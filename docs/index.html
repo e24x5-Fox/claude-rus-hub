@@ -917,6 +917,18 @@
       size = el('span', 'size', game.install_size);
       actions.appendChild(size);
     }
+    /* Мод Thunderstore: скачивания и лайки - из снимка downloads.js (раз в сутки,
+       tools/downloads_snapshot.py). Живьём не спросить: у Thunderstore нет CORS. */
+    if (links.mod && size) {
+      var snap = window.CRH_DOWNLOADS || {};
+      var sdays = Object.keys(snap.days || {}).sort();
+      var got = sdays.length ? (snap.days[sdays[sdays.length - 1]][game.slug] || 0) : 0;
+      var ts = (snap.thunderstore || {})[game.slug] || {};
+      var bits = [game.install_size];
+      if (got) { bits.push(got + ' ' + plural(got, 'скачивание', 'скачивания', 'скачиваний')); }
+      if (ts.rating) { bits.push('👍 ' + ts.rating); }
+      size.textContent = bits.join(' · ');
+    }
     if (actions.childNodes.length) { body.appendChild(actions); }
 
     if (vt && vt.note) { body.appendChild(vt.note); }
@@ -1279,10 +1291,12 @@
     var latest = days.length ? hist[days[days.length - 1]] : {};
 
     var rows = data.games.filter(function (g) {
-      return inKind(g) && g.status === 'released' && g.release && g.release.tag_prefix;
+      return inKind(g) && g.status === 'released' &&
+             ((g.release && g.release.tag_prefix) || (g.links && g.links.mod));
     }).map(function (g, i) {
-      var total = releasesCache ? downloadsFor(releasesCache, g.release.tag_prefix)
-                                : (latest[g.slug] || 0);
+      /* у мода Thunderstore релизов на GitHub нет - счёт только из снимка */
+      var total = (releasesCache && g.release) ? downloadsFor(releasesCache, g.release.tag_prefix)
+                                               : (latest[g.slug] || 0);
       var gain = base ? Math.max(0, total - (hist[base][g.slug] || 0)) : total;
       return { game: g, gain: gain, total: total, order: i };
     });

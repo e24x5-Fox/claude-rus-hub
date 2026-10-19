@@ -219,7 +219,7 @@ window.CRH_DOWNLOADS = {
    "protogen": 46,
    "protogen2": 76,
    "amorous": 16,
-   "bodycam": 2116,
+   "bodycam": 2135,
    "oddremedy": 29,
    "atlyss": 84,
    "lucidcats": 45,
@@ -229,7 +229,14 @@ window.CRH_DOWNLOADS = {
    "tailsandpines": 10,
    "webfishing": 5,
    "feedthecups": 2,
-   "lockdown": 0
+   "lockdown": 0,
+   "lethalcompany": 1
+  }
+ },
+ "thunderstore": {
+  "lethalcompany": {
+   "rating": 0,
+   "version": "1.0.3"
   }
  }
 };
