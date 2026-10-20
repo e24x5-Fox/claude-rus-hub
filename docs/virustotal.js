@@ -39,6 +39,15 @@ window.CRH_VT = {
    "McAfeeD": "ti!8C4EC879B51C"
   }
  },
+ "easydelivery": {
+  "sha256": "b82ba58adfd88be8e681a9b264ff09c44b112c226ac3cda6b6776a31a7482ed1",
+  "link": "https://www.virustotal.com/gui/file/b82ba58adfd88be8e681a9b264ff09c44b112c226ac3cda6b6776a31a7482ed1",
+  "date": "20.10.2026",
+  "malicious": 0,
+  "suspicious": 0,
+  "engines": 67,
+  "flagged": {}
+ },
  "feedthecups": {
   "sha256": "7ef901bce01bb1b7192eccb28a1d6adf5f54e0d70968a00f18193e79c1807be2",
   "link": "https://www.virustotal.com/gui/file/7ef901bce01bb1b7192eccb28a1d6adf5f54e0d70968a00f18193e79c1807be2",
@@ -55,6 +64,15 @@ window.CRH_VT = {
   "malicious": 0,
   "suspicious": 0,
   "engines": 64,
+  "flagged": {}
+ },
+ "lethalcompany": {
+  "sha256": "ae2a5195d7a3864f846a24666ca0ee7053657d817a0be4dd20465a8279441f87",
+  "link": "https://www.virustotal.com/gui/file/ae2a5195d7a3864f846a24666ca0ee7053657d817a0be4dd20465a8279441f87",
+  "date": "20.10.2026",
+  "malicious": 0,
+  "suspicious": 0,
+  "engines": 67,
   "flagged": {}
  },
  "lockdown": {

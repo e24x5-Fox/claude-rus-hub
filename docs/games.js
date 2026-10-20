@@ -452,6 +452,36 @@ window.CATALOG = {
       "note": "Мод-архив кладётся в Paks\\~mods, слово «Русский» в списке языков заменяется на «Фуриный» прямо в архиве игры (с проверкой, той же длины); удаление возвращает всё. Перевод виден только вам. Игра предупреждает, что моды вне мод-лобби могут привести к бану — решайте сами."
     },
     {
+      "slug": "easydelivery",
+      "kind": "furry",
+      "engine": "Unity",
+      "lines": 803,
+      "words": 8600,
+      "title": "Easy Delivery Co. — Фуриный",
+      "aliases": ["Изи деливери", "Easy Delivery", "Доставка", "фуривизатор", "фуриный", "фурри"],
+      "banner": "assets/easydelivery.png",
+      "status": "released",
+      "version": "1.0.0",
+      "adult": false,
+      "tags": ["Unity", "Thunderstore", "BepInEx", "Шуточный"],
+      "summary": "Не перевод, а фуривизатор: официальный русский уютной игры про доставку переписан ласково — посылочки, грузовичок, бензинчик, «Поиграться» и «Настроечки» в меню, в списке языков — «Фуриный». Тёплые и грустные моменты остались собой.",
+      "scope": [
+        { "label": "Строки", "value": "725 из 803" },
+        { "label": "Язык в меню", "value": "«Фуриный»" },
+        { "label": "Основа", "value": "официальный русский" },
+        { "label": "Тон", "value": "ласково, но понятно" }
+      ],
+      "install_size": "72 МБ",
+      "release": { "tag_prefix": "easydelivery-", "asset": "EasyDelivery-Furry-Setup.exe" },
+      "links": {
+        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
+        "mod": "https://thunderstore.io/c/easy-delivery-co/p/ClaudeRusHub/EasyDeliveryFurryRU/",
+        "steam": "https://store.steampowered.com/app/3293010/",
+        "guide": ""
+      },
+      "note": "Два пути на выбор: мод на Thunderstore (r2modman или Thunderstore Mod Manager) или установщик — он поставит BepInEx и мод, а заодно сделает фуриной страницу игры в библиотеке Steam. В игре выберите язык «Фуриный». Файлы игры не меняются."
+    },
+    {
       "slug": "repo",
       "kind": "furry",
       "engine": "Unity",
@@ -501,13 +531,15 @@ window.CATALOG = {
         { "label": "Терминал", "value": "русские команды" },
         { "label": "Версия игры", "value": "v81" }
       ],
-      "install_size": "30 МБ",
+      "install_size": "96 МБ",
+      "release": { "tag_prefix": "lethalcompany-", "asset": "LethalCompany-Furry-Setup.exe" },
       "links": {
+        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "mod": "https://thunderstore.io/c/lethal-company/p/ClaudeRusHub/LethalFurryRU/",
         "steam": "https://store.steampowered.com/app/1966720/",
         "guide": ""
       },
-      "note": "Совместим с версией игры v81. Ставится через r2modman или Thunderstore Mod Manager, кнопкой «Install with Mod Manager» на странице мода. Мод клиентский: перевод видите только вы. С RTLC и другими русификаторами не совместим — обычный русский ведёт RTLC Team. Названия товаров и лун остаются английскими: их вводят в терминал."
+      "note": "Совместим с версией игры v81. Ставится через r2modman или Thunderstore Mod Manager, кнопкой «Install with Mod Manager» на странице мода. Мод клиентский: перевод видите только вы. С RTLC и другими русификаторами не совместим — обычный русский ведёт RTLC Team. Названия товаров и лун остаются английскими: их вводят в терминал. Без менеджера модов — установщик: он поставит BepInEx и мод, а заодно сделает фуриной страницу игры в библиотеке Steam (фон, обложка); прежние картинки вернутся при удалении."
     }
   ]
 }
