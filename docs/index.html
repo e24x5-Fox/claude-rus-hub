@@ -1105,8 +1105,21 @@
        владельца браузер отдавал вчерашние числа даже после Ctrl+Shift+R.
        no-store — мимо кэша браузера, метка времени в адресе — мимо любого
        кэша по дороге. */
-    fetch(API + '&_=' + Date.now(), { cache: 'no-store', headers: { 'Accept': 'application/vnd.github+json' } })
-      .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+    /* Повисший запрос держал «Спрашиваем у GitHub…» бесконечно (20.10.2026):
+       на ответ вместе с телом — 15 секунд, потом ещё попытка, потом запасной текст. */
+    function ask(tries) {
+      var ctl = window.AbortController ? new AbortController() : null;
+      var timer = ctl ? setTimeout(function () { ctl.abort(); }, 15000) : 0;
+      return fetch(API + '&_=' + Date.now(), { cache: 'no-store', signal: ctl ? ctl.signal : undefined,
+                                               headers: { 'Accept': 'application/vnd.github+json' } })
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+        .then(function (j) { clearTimeout(timer); return j; },
+              function (e) {
+                clearTimeout(timer);
+                return tries > 1 && e && e.name === 'AbortError' ? ask(tries - 1) : Promise.reject(e);
+              });
+    }
+    ask(2)
       .then(function (fresh) {
         if (!Array.isArray(fresh)) { return; }
         releasesCache = fresh;
