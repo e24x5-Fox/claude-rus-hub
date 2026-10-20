@@ -447,7 +447,7 @@ window.CATALOG = {
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/2780980/",
-        "guide": ""
+        "guide": "https://steamcommunity.com/sharedfiles/filedetails/?id=3822669522"
       },
       "note": "Мод-архив кладётся в Paks\\~mods, слово «Русский» в списке языков заменяется на «Фуриный» прямо в архиве игры (с проверкой, той же длины); удаление возвращает всё. Перевод виден только вам. Игра предупреждает, что моды вне мод-лобби могут привести к бану — решайте сами."
     },
@@ -477,7 +477,7 @@ window.CATALOG = {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "mod": "https://thunderstore.io/c/easy-delivery-co/p/ClaudeRusHub/EasyDeliveryFurryRU/",
         "steam": "https://store.steampowered.com/app/3293010/",
-        "guide": ""
+        "guide": "https://steamcommunity.com/sharedfiles/filedetails/?id=3823299664"
       },
       "note": "Два пути на выбор: мод на Thunderstore (r2modman или Thunderstore Mod Manager) или установщик — он поставит BepInEx и мод, а заодно сделает фуриной страницу игры в библиотеке Steam. В игре выберите язык «Фуриный». Файлы игры не меняются."
     },
@@ -507,7 +507,7 @@ window.CATALOG = {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "mod": "https://thunderstore.io/c/repo/p/ClaudeRusHub/REPOFurryRU/",
         "steam": "https://store.steampowered.com/app/3241660/",
-        "guide": ""
+        "guide": "https://steamcommunity.com/sharedfiles/filedetails/?id=3823269294"
       },
       "note": "Два пути на выбор: мод на Thunderstore (r2modman или Thunderstore Mod Manager, кнопка «Install with Mod Manager») или установщик — он сам найдёт игру, поставит BepInEx и мод, а кнопкой «Удалить» снимет всё. Перевод виден при английском языке игры. Мод клиентский: остальным игрокам ставить не нужно."
     },
@@ -537,7 +537,7 @@ window.CATALOG = {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "mod": "https://thunderstore.io/c/lethal-company/p/ClaudeRusHub/LethalFurryRU/",
         "steam": "https://store.steampowered.com/app/1966720/",
-        "guide": ""
+        "guide": "https://steamcommunity.com/sharedfiles/filedetails/?id=3822868767"
       },
       "note": "Совместим с версией игры v81. Ставится через r2modman или Thunderstore Mod Manager, кнопкой «Install with Mod Manager» на странице мода. Мод клиентский: перевод видите только вы. С RTLC и другими русификаторами не совместим — обычный русский ведёт RTLC Team. Названия товаров и лун остаются английскими: их вводят в терминал. Без менеджера модов — установщик: он поставит BepInEx и мод, а заодно сделает фуриной страницу игры в библиотеке Steam (фон, обложка); прежние картинки вернутся при удалении."
     }
