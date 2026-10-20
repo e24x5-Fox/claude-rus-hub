@@ -231,12 +231,40 @@ window.CRH_DOWNLOADS = {
    "feedthecups": 2,
    "lockdown": 0,
    "lethalcompany": 1
+  },
+  "2026-10-20": {
+   "dragnwash": 248,
+   "protogen": 46,
+   "protogen2": 77,
+   "amorous": 17,
+   "bodycam": 2203,
+   "oddremedy": 29,
+   "atlyss": 84,
+   "lucidcats": 46,
+   "kemopop": 9,
+   "meetcute": 0,
+   "meetcute2": 15,
+   "tailsandpines": 10,
+   "webfishing": 6,
+   "feedthecups": 3,
+   "lockdown": 1,
+   "easydelivery": 6,
+   "repo": 17,
+   "lethalcompany": 64
   }
  },
  "thunderstore": {
+  "easydelivery": {
+   "rating": 0,
+   "version": "1.0.1"
+  },
+  "repo": {
+   "rating": 0,
+   "version": "1.0.2"
+  },
   "lethalcompany": {
    "rating": 0,
-   "version": "1.0.3"
+   "version": "1.0.4"
   }
  }
 };
