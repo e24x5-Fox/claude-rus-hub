@@ -905,7 +905,8 @@
     /* Мод на Thunderstore вместо установщика (Lethal Company): главная кнопка ведёт на
        страницу мода, ставит его менеджер модов; релиза на GitHub у такой игры нет. */
     if (links.mod) {
-      var mod = link(links.mod, 'btn btn-primary', 'Мод на Thunderstore');
+      /* есть и установщик (R.E.P.O.) - мод второй кнопкой, главная одна */
+      var mod = link(links.mod, links.download ? 'btn btn-mini' : 'btn btn-primary', 'Мод на Thunderstore');
       mod.setAttribute('data-download', (game.slug || '') + '@' + (game.version || ''));
       actions.appendChild(mod);
     }

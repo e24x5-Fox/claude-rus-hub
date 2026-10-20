@@ -452,6 +452,36 @@ window.CATALOG = {
       "note": "Мод-архив кладётся в Paks\\~mods, слово «Русский» в списке языков заменяется на «Фуриный» прямо в архиве игры (с проверкой, той же длины); удаление возвращает всё. Перевод виден только вам. Игра предупреждает, что моды вне мод-лобби могут привести к бану — решайте сами."
     },
     {
+      "slug": "repo",
+      "kind": "furry",
+      "engine": "Unity",
+      "lines": 1094,
+      "words": 2600,
+      "title": "R.E.P.O. — Фуриный",
+      "aliases": ["Репо", "REPO", "R.E.P.O", "фуривизатор", "фуриный", "фурри"],
+      "banner": "assets/repo.png",
+      "status": "released",
+      "version": "1.0",
+      "adult": false,
+      "tags": ["Unity", "Thunderstore", "BepInEx", "Мультиплеер", "Шуточный"],
+      "summary": "Не перевод, а фуривизатор: у R.E.P.O. русского нет вовсе, и весь интерфейс сразу переведён ласковым фуриным диалектом. Роботы — пушистики, ценности — блестяшечки, сохранение — сохраняшка, «Стереть сохраняшку? Дя! / Неть...». Реплики роботов в чат тоже по-фуриному, а кириллицу в узком шрифте дорисовывает Oswald.",
+      "scope": [
+        { "label": "Интерфейс", "value": "603 строки" },
+        { "label": "Наряды и надписи", "value": "491" },
+        { "label": "Чат роботов", "value": "по-фуриному" },
+        { "label": "Шрифт", "value": "Oswald под Teko" }
+      ],
+      "install_size": "72 МБ",
+      "release": { "tag_prefix": "repo-", "asset": "REPO-Furry-Setup.exe" },
+      "links": {
+        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
+        "mod": "https://thunderstore.io/c/repo/p/ClaudeRusHub/REPOFurryRU/",
+        "steam": "https://store.steampowered.com/app/3241660/",
+        "guide": ""
+      },
+      "note": "Два пути на выбор: мод на Thunderstore (r2modman или Thunderstore Mod Manager, кнопка «Install with Mod Manager») или установщик — он сам найдёт игру, поставит BepInEx и мод, а кнопкой «Удалить» снимет всё. Перевод виден при английском языке игры. Мод клиентский: остальным игрокам ставить не нужно."
+    },
+    {
       "slug": "lethalcompany",
       "kind": "furry",
       "engine": "Unity",
