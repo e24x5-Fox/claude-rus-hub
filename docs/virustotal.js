@@ -67,12 +67,12 @@ window.CRH_VT = {
   "flagged": {}
  },
  "lethalcompany": {
-  "sha256": "ae2a5195d7a3864f846a24666ca0ee7053657d817a0be4dd20465a8279441f87",
-  "link": "https://www.virustotal.com/gui/file/ae2a5195d7a3864f846a24666ca0ee7053657d817a0be4dd20465a8279441f87",
-  "date": "20.10.2026",
+  "sha256": "ef5f399ce5c6d84d2be8f9833455f508f5d3eb57351a7e31ec85b30958ad5451",
+  "link": "https://www.virustotal.com/gui/file/ef5f399ce5c6d84d2be8f9833455f508f5d3eb57351a7e31ec85b30958ad5451",
+  "date": "21.10.2026",
   "malicious": 0,
   "suspicious": 0,
-  "engines": 67,
+  "engines": 66,
   "flagged": {}
  },
  "lockdown": {
