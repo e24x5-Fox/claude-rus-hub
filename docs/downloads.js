@@ -291,6 +291,26 @@ window.CRH_DOWNLOADS = {
    "easydelivery": 34,
    "repo": 126,
    "lethalcompany": 163
+  },
+  "2026-10-23": {
+   "dragnwash": 250,
+   "protogen": 49,
+   "protogen2": 81,
+   "amorous": 17,
+   "bodycam": 2389,
+   "oddremedy": 29,
+   "atlyss": 87,
+   "lucidcats": 49,
+   "kemopop": 10,
+   "meetcute": 0,
+   "meetcute2": 15,
+   "tailsandpines": 10,
+   "webfishing": 6,
+   "feedthecups": 4,
+   "lockdown": 1,
+   "easydelivery": 40,
+   "repo": 171,
+   "lethalcompany": 184
   }
  },
  "thunderstore": {
