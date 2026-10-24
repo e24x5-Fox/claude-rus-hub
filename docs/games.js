@@ -568,6 +568,33 @@ window.CATALOG = {
         "guide": "https://steamcommunity.com/sharedfiles/filedetails/?id=3822868767"
       },
       "note": "Совместим с версией игры v81. Ставится через r2modman или Thunderstore Mod Manager, кнопкой «Install with Mod Manager» на странице мода. Мод клиентский: перевод видите только вы. С RTLC и другими русификаторами не совместим — обычный русский ведёт RTLC Team. Названия товаров и лун остаются английскими: их вводят в терминал. Без менеджера модов — установщик: он поставит BepInEx и мод, а заодно сделает фуриной страницу игры в библиотеке Steam (фон, обложка); прежние картинки вернутся при удалении."
+    },
+    {
+      "slug": "lucidcheats",
+      "kind": "mod",
+      "engine": "Unity",
+      "title": "Lucid Cats — Noclip и телепорт",
+      "aliases": ["Люсид кэтс читы", "Лусид кетс ноклип", "Lucid Cats cheats", "читы", "ноклип", "полёт сквозь стены", "бессмертие"],
+      "banner": "assets/lucidcats.png",
+      "status": "released",
+      "version": "1.0.0",
+      "adult": false,
+      "tags": ["Unity", "BepInEx", "Мультиплеер", "Читы"],
+      "summary": "Мод для прогулок по снам без правил: полёт сквозь стены, бессмертие и телепорт — в точку под прицелом, в сохранённое место или к другу. Всё включается клавишами F1–F7, состояние видно на маленькой панели в углу экрана.",
+      "scope": [
+        { "label": "Noclip", "value": "F2" },
+        { "label": "Бессмертие", "value": "F3" },
+        { "label": "Телепорт", "value": "F4–F7" },
+        { "label": "Загрузчик", "value": "BepInEx 5" }
+      ],
+      "install_size": "0,6 МБ",
+      "release": { "tag_prefix": "lucidcheats-", "asset": "LucidCats-Cheats.zip" },
+      "links": {
+        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
+        "steam": "https://store.steampowered.com/app/4778540/",
+        "guide": ""
+      },
+      "note": "Архив распаковывается прямо в папку игры, BepInEx уже внутри. Бессмертие работает только в одиночной игре или у хоста лобби — здоровье считает сервер. Noclip и телепорт работают у всех, но другие игроки видят, как вы летаете: играйте так с друзьями, а не в чужих лобби. С русификатором Lucid Cats из этого каталога совместим. Удаление — стереть winhttp.dll и папку BepInEx."
     }
   ]
 }

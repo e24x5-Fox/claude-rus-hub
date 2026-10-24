@@ -38,10 +38,23 @@ def released(catalog):
     return [g for g in catalog["games"] if g.get("status") == "released"]
 
 
+def is_mod(game):
+    """Вкладка «Модификации»: мод меняет игру, а не текст — и называется иначе."""
+    return game.get("kind") == "mod"
+
+
+def what(game):
+    return "Мод" if is_mod(game) else "Русификатор"
+
+
 def phrases(game):
     """Как ищут перевод люди: «русификатор X», «X на русском» и т. п."""
     names = [game["title"]] + list(game.get("aliases") or [])
     out = []
+    if is_mod(game):
+        for n in names[:3]:
+            out += [f"{n} мод", f"{n} читы", f"{n} noclip"]
+        return out
     for n in names[:3]:
         out += [f"русификатор {n}", f"{n} на русском", f"{n} русский язык"]
     out += [f"{game['title']} перевод", f"{game['title']} russian"]
@@ -53,8 +66,8 @@ def jsonld(games):
     for i, g in enumerate(games, 1):
         app = {
             "@type": "SoftwareApplication",
-            "name": f"Русификатор {g['title']}",
-            "alternateName": [f"{a} русификатор" for a in g.get("aliases") or []],
+            "name": f"{what(g)} {g['title']}",
+            "alternateName": [f"{a} {what(g).lower()}" for a in g.get("aliases") or []],
             "description": g.get("summary", ""),
             "applicationCategory": "GameApplication",
             "operatingSystem": "Windows",
@@ -138,13 +151,13 @@ def list_block(games):
     for g in games:
         steam = (g.get("links") or {}).get("steam")
         also = ", ".join(g.get("aliases") or [])
-        out.append(f'      <li id="{e(g["slug"])}"><h2>Русификатор {e(g["title"])}</h2>')
+        out.append(f'      <li id="{e(g["slug"])}"><h2>{what(g)} {e(g["title"])}</h2>')
         if also:
             out.append(f"        <p>Ещё называют: {e(also)}.</p>")
         out.append(f'        <p>{e(g.get("summary", ""))}</p>')
         mod = (g.get("links") or {}).get("mod")
         links = [f'<a href="{e(mod)}" rel="noopener">Мод {e(g["title"])} на Thunderstore</a>' if mod
-                 else f'<a href="{REPO}/releases">Скачать русификатор {e(g["title"])}</a>']
+                 else f'<a href="{REPO}/releases">Скачать {what(g).lower()} {e(g["title"])}</a>']
         if steam:
             links.append(f'<a href="{e(steam)}" rel="noopener">{e(g["title"])} в Steam</a>')
         out.append("        <p>" + " · ".join(links) + "</p></li>")

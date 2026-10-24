@@ -91,7 +91,8 @@
     if (!box || !data || !data.games) { return; }
     box.innerHTML = '';
 
-    var done = data.games.filter(function (g) { return g.status === 'released'; });
+    /* моды (kind: "mod") ничего не переводят — в счёт переводов не идут */
+    var done = data.games.filter(function (g) { return g.status === 'released' && g.kind !== 'mod'; });
     var lines = 0, words = 0, engines = {};
     done.forEach(function (g) {
       lines += g.lines || 0;
