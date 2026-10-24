@@ -157,12 +157,12 @@ window.CRH_VT = {
   "flagged": {}
  },
  "warriorcats": {
-  "sha256": "b5dd53b3215740b81e9df854ec056566107d650fc06871026c191ef46e865b2b",
-  "link": "https://www.virustotal.com/gui/file/b5dd53b3215740b81e9df854ec056566107d650fc06871026c191ef46e865b2b",
+  "sha256": "707aff8545228cd84724d396a0f3baacc602e7fd2162fdc81acb39282d1ffc77",
+  "link": "https://www.virustotal.com/gui/file/707aff8545228cd84724d396a0f3baacc602e7fd2162fdc81acb39282d1ffc77",
   "date": "25.10.2026",
   "malicious": 0,
   "suspicious": 0,
-  "engines": 64,
+  "engines": 67,
   "flagged": {}
  },
  "webfishing": {
