@@ -126,6 +126,8 @@ a:hover { text-decoration: underline; }
   font-size: 19px;
   font-weight: 600;
 }
+.card h2 a { color: inherit; text-decoration: none; }
+.card h2 a:hover { color: var(--accent2); text-decoration: underline; text-underline-offset: 3px; }
 
 .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
 .tag {

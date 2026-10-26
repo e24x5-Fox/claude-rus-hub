@@ -1,5 +1,5 @@
 # После правки games.js пересобирает разметку для поисковиков в index.html
-# и sitemap.xml, метки версий у стилей и скриптов (tools/seo.py), чтобы не
+# и sitemap.xml, страницы игр docs/<слаг>/, метки версий у стилей и скриптов (tools/seo.py), чтобы не
 # забыть запустить его руками.
 name: Разметка для поисковиков
 
@@ -7,6 +7,7 @@ on:
   push:
     paths:
       - docs/games.js
+      - docs/index.html
       - docs/tokens.css
       - docs/site.css
       - docs/side.js
@@ -26,9 +27,9 @@ jobs:
         run: python3 tools/seo.py
       - name: Сохранить
         run: |
-          git diff --quiet docs/index.html docs/sitemap.xml && exit 0
+          git add -A docs
+          git diff --cached --quiet && exit 0
           git config user.name "github-actions[bot]"
           git config user.email "41898208+github-actions[bot]@users.noreply.github.com"
-          git add docs/index.html docs/sitemap.xml
           git commit -m "Разметка для поисковиков"
           git push

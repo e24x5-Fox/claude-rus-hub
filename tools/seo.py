@@ -13,8 +13,13 @@
   самое, что в карточках: прятать от людей текст «только для роботов»
   поисковики считают обманом и за это понижают, поэтому так не делаем.
 
-Запускать после правки games.js (это делает и workflow «Разметка для
-поисковиков»):  python tools/seo.py
+Ещё у каждой готовой игры своя страница docs/<слаг>/index.html: копия главной
+с <base href="../">, своими заголовком, описанием, картинкой превью и
+window.CRH_FOCUS — скрипт страницы ставит её карточку первой. Руками их не
+править: переписываются при каждом запуске.
+
+Запускать после правки games.js или index.html (это делает и workflow
+«Разметка для поисковиков»):  python tools/seo.py
 """
 
 import html
@@ -47,6 +52,15 @@ def what(game):
     return "Мод" if is_mod(game) else "Русификатор"
 
 
+def word(game):
+    """Как назвать в заголовке страницы игры."""
+    return {"mod": "Мод", "furry": "Фуривизатор"}.get(game.get("kind"), "Русификатор")
+
+
+def page_url(game):
+    return f"{SITE}{game['slug']}/"
+
+
 def phrases(game):
     """Как ищут перевод люди: «русификатор X», «X на русском» и т. п."""
     names = [game["title"]] + list(game.get("aliases") or [])
@@ -61,35 +75,38 @@ def phrases(game):
     return out
 
 
+def app_ld(g):
+    app = {
+        "@type": "SoftwareApplication",
+        "name": f"{what(g)} {g['title']}",
+        "alternateName": [f"{a} {what(g).lower()}" for a in g.get("aliases") or []],
+        "description": g.get("summary", ""),
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Windows",
+        "inLanguage": "ru",
+        "url": page_url(g),
+        "image": SITE + g["banner"] if g.get("banner") else None,
+        "softwareVersion": g.get("version"),
+        "fileSize": g.get("install_size"),
+        "downloadUrl": (g.get("links") or {}).get("mod") or f"{REPO}/releases",
+        "isAccessibleForFree": True,
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "RUB"},
+        "about": {
+            "@type": "VideoGame",
+            "name": g["title"],
+            "gamePlatform": "PC",
+            "sameAs": (g.get("links") or {}).get("steam") or None,
+        },
+        "keywords": ", ".join(phrases(g)),
+    }
+    if g.get("adult"):
+        app["contentRating"] = "18+"
+    return clean(app)
+
+
 def jsonld(games):
-    items = []
-    for i, g in enumerate(games, 1):
-        app = {
-            "@type": "SoftwareApplication",
-            "name": f"{what(g)} {g['title']}",
-            "alternateName": [f"{a} {what(g).lower()}" for a in g.get("aliases") or []],
-            "description": g.get("summary", ""),
-            "applicationCategory": "GameApplication",
-            "operatingSystem": "Windows",
-            "inLanguage": "ru",
-            "url": f"{SITE}#{g['slug']}",
-            "image": SITE + g["banner"] if g.get("banner") else None,
-            "softwareVersion": g.get("version"),
-            "fileSize": g.get("install_size"),
-            "downloadUrl": (g.get("links") or {}).get("mod") or f"{REPO}/releases",
-            "isAccessibleForFree": True,
-            "offers": {"@type": "Offer", "price": "0", "priceCurrency": "RUB"},
-            "about": {
-                "@type": "VideoGame",
-                "name": g["title"],
-                "gamePlatform": "PC",
-                "sameAs": (g.get("links") or {}).get("steam") or None,
-            },
-            "keywords": ", ".join(phrases(g)),
-        }
-        if g.get("adult"):
-            app["contentRating"] = "18+"
-        items.append({"@type": "ListItem", "position": i, "item": clean(app)})
+    items = [{"@type": "ListItem", "position": i, "item": app_ld(g)}
+             for i, g in enumerate(games, 1)]
     return [
         {
             "@context": "https://schema.org",
@@ -160,6 +177,7 @@ def list_block(games):
                  else f'<a href="{REPO}/releases">Скачать {what(g).lower()} {e(g["title"])}</a>']
         if steam:
             links.append(f'<a href="{e(steam)}" rel="noopener">{e(g["title"])} в Steam</a>')
+        links.insert(0, f'<a href="{e(g["slug"])}/">{word(g)} {e(g["title"])}: страница перевода</a>')
         out.append("        <p>" + " · ".join(links) + "</p></li>")
     out += ["    </ul>", "    <!-- /seo:list -->"]
     return "\n".join(out)
@@ -195,13 +213,65 @@ def stamp(text):
     return text
 
 
-def sitemap(catalog):
+def sitemap(catalog, games):
     day = catalog.get("updated") or date.today().isoformat()
+    urls = [SITE] + [page_url(g) for g in games]
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-            f"  <url><loc>{SITE}</loc><lastmod>{day}</lastmod>"
-            "<changefreq>weekly</changefreq></url>\n"
-            "</urlset>\n")
+            + "".join(f"  <url><loc>{u}</loc><lastmod>{day}</lastmod>"
+                      "<changefreq>weekly</changefreq></url>\n" for u in urls)
+            + "</urlset>\n")
+
+
+INTRO = ('<p>Из каталога <a href="./">«Русификаторы с Клодом»</a>: переводы игр, собранные '
+         'вместе с нейросетью Claude. Установщик сам находит игру, делает резервные копии '
+         'и умеет вернуть всё как было.</p>')
+
+
+def game_page(text, g):
+    """Страница игры из готовой главной: подменяются шапка, разметка и заголовок."""
+    e = html.escape
+    # «Фуривизатор R.E.P.O. — Фуриный» - дважды одно и то же
+    title = f"{word(g)} {g['title'].removesuffix(' — Фуриный')}"
+    desc = g.get("summary", "")
+    short = desc if len(desc) <= 160 else desc[:157].rsplit(" ", 1)[0] + "…"
+    image = SITE + g["banner"] if g.get("banner") else f"{SITE}assets/mascot-wave.png"
+    ld = json.dumps({"@context": "https://schema.org", **app_ld(g)}, ensure_ascii=False, indent=1)
+    head = "\n".join([
+        "<!-- seo:head — пишет tools/seo.py из games.js, руками не править -->",
+        f'<meta name="keywords" content="{e(", ".join(phrases(g)))}">',
+        '<meta name="robots" content="index, follow">',
+        "<script>document.documentElement.className += ' js';</script>",
+        f'<link rel="canonical" href="{page_url(g)}">',
+        f'<meta property="og:url" content="{page_url(g)}">',
+        f'<meta property="og:image" content="{image}">',
+        '<meta property="og:locale" content="ru_RU">',
+        '<meta name="twitter:card" content="summary_large_image">',
+        f'<meta name="twitter:title" content="{e(title)}">',
+        '<script type="application/ld+json">',
+        ld.replace("</", "<\\/"),
+        "</script>",
+        "<!-- /seo:head -->",
+    ])
+    text = replace(text, "seo:head", head, "")
+    text = replace(text, "seo:list", list_block([g]), "")
+    subs = [
+        (r"<title>.*?</title>", f"<title>{e(title)} — скачать | Русификаторы с Клодом</title>"),
+        (r'<meta name="description" content="[^"]*">', f'<meta name="description" content="{e(short)}">'),
+        (r'<meta property="og:title" content="[^"]*">', f'<meta property="og:title" content="{e(title)}">'),
+        (r'<meta property="og:description" content="[^"]*">',
+         f'<meta property="og:description" content="{e(short)}">'),
+        (r'<meta charset="utf-8">', '<meta charset="utf-8">\n<base href="../">'),
+        (r'<h1>.*?</h1>\s*<p>.*?</p>', f'<h1>{e(title)}</h1>\n      {INTRO}'),
+        (r'\n<script>\n/\* Страница строится',
+         f"\n<script>window.CRH_FOCUS = {json.dumps(g['slug'])};</script>"
+         "\n<script>\n/* Страница строится"),
+    ]
+    for pat, rep in subs:
+        text, n = re.subn(pat, lambda m, rep=rep: rep, text, count=1, flags=re.S)
+        if n != 1:
+            raise SystemExit(f"страница {g['slug']}: не нашёл {pat!r}")
+    return text
 
 
 def main():
@@ -215,8 +285,12 @@ def main():
                    '    <p class="empty">Каталог загружается…</p>')
     text = stamp(text)
     page.write_text(text, encoding="utf-8", newline="\n")
-    (DOCS / "sitemap.xml").write_text(sitemap(catalog), encoding="utf-8", newline="\n")
-    print(f"seo: {len(games)} игр в разметке")
+    for g in games:
+        out = DOCS / g["slug"]
+        out.mkdir(exist_ok=True)
+        (out / "index.html").write_text(game_page(text, g), encoding="utf-8", newline="\n")
+    (DOCS / "sitemap.xml").write_text(sitemap(catalog, games), encoding="utf-8", newline="\n")
+    print(f"seo: {len(games)} игр в разметке, у каждой своя страница")
 
 
 if __name__ == "__main__":
