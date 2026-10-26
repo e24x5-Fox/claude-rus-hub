@@ -578,6 +578,8 @@ a:hover { text-decoration: underline; }
 .side-stat .k { display: block; color: var(--text2); font-size: var(--fs-note); }
 .side-stat[title] { cursor: help; }
 
+.side-discord p { margin: 0 0 12px; color: var(--text2); font-size: var(--fs-note); line-height: 1.5; }
+.side-discord .btn { display: block; text-align: center; }
 .side-foot { margin: 0 0 16px; color: var(--text3); font-size: var(--fs-hint); text-align: center; }
 .side-thanks-link { margin-top: -8px; line-height: 1.5; }
 .side-thanks-link a { color: var(--text2); text-decoration: underline; text-underline-offset: 3px; }
