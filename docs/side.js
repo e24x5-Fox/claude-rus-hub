@@ -18,6 +18,11 @@
    Аккаунтов у посетителей нет, поэтому «разные» — это разные браузеры:
    человек с телефона и с компьютера посчитается дважды. С file:// и с
    локального сервера счётчики только читаются — проверками число не накрутишь.
+
+   На странице игры (…/<слаг>/, window.CRH_FOCUS — пишет tools/seo.py) колонка
+   про эту игру: её скачивания и прирост за неделю, заходы именно на эту
+   страницу (свои ключи views-<слаг>, visitors-<слаг>, pleased-<слаг>; общие
+   при этом тоже растут) и сводка перевода вместо сводки каталога.
    ───────────────────────────────────────────────────────────────────────── */
 
 (function () {
@@ -71,6 +76,13 @@
     return many;
   }
 
+  /* Игра страницы или null на главной */
+  var FOCUS = (function () {
+    var want = window.CRH_FOCUS, data = window.CATALOG;
+    if (!want || !data || !data.games) { return null; }
+    return data.games.filter(function (g) { return g.slug === want; })[0] || null;
+  })();
+
   function thanksFor(m) {
     return THANKS[m] || ('Ещё одно удвоение — ' + num(m) + '. Спасибо, что вы с нами :3');
   }
@@ -86,10 +98,26 @@
 
   /* ── Сводка по каталогу: всё из games.js, сеть не нужна ───────────────── */
 
+  function gameSummary(box, g) {
+    var title = box.parentNode.querySelector('.side-title');
+    if (title) { title.textContent = 'Этот перевод'; }
+    if (g.lines) { stat(box, num(g.lines), plural(g.lines, 'реплика', 'реплики', 'реплик') + ' диалогов'); }
+    if (g.words) {
+      stat(box, '~' + num(Math.max(1, Math.round(g.words / 1000))) + ' тыс.', 'слов оригинала',
+           'Английские слова в переведённых репликах. Интерфейс и надписи не считаются.');
+      var mins = Math.round(g.words / WORDS_PER_MIN);
+      stat(box, mins >= 90 ? '~' + num(Math.round(mins / 60)) + ' ч' : '~' + num(mins) + ' мин',
+           'чтобы прочитать всё вслух', 'Если читать без остановки, по ' + WORDS_PER_MIN + ' слов в минуту.');
+    }
+    if (g.engine) { stat(box, g.engine, 'движок игры'); }
+    if (g.version) { stat(box, 'v' + g.version, 'версия перевода'); }
+  }
+
   function summary(data) {
     var box = $('side-summary');
     if (!box || !data || !data.games) { return; }
     box.innerHTML = '';
+    if (FOCUS) { gameSummary(box, FOCUS); return; }
 
     /* моды (kind: "mod") ничего не переводят — в счёт переводов не идут */
     var done = data.games.filter(function (g) { return g.status === 'released' && g.kind !== 'mod'; });
@@ -120,21 +148,26 @@
     if (!box || !Array.isArray(releases)) { return; }
 
     var total = 0, first = null;
+    var prefix = FOCUS && FOCUS.release && FOCUS.release.tag_prefix;
     releases.forEach(function (r) {
       if (r.draft) { return; }
+      if (FOCUS && !(prefix && r.tag_name && r.tag_name.indexOf(prefix) === 0)) { return; }
       (r.assets || []).forEach(function (a) { total += a.download_count || 0; });
       var when = new Date(r.published_at || r.created_at);
       if (!isNaN(when) && (!first || when < first)) { first = when; }
     });
     /* моды Thunderstore: их скачивания GitHub не видит, они в снимке downloads.js */
     var ts = (window.CRH_DOWNLOADS || {}).thunderstore || {};
-    Object.keys(ts).forEach(function (slug) { total += ts[slug].downloads || 0; });
+    Object.keys(ts).forEach(function (slug) {
+      if (!FOCUS || slug === FOCUS.slug) { total += ts[slug].downloads || 0; }
+    });
 
     box.innerHTML = '';
     var big = el('div', 'side-big');
     big.appendChild(el('span', 'v', num(total)));
     big.appendChild(el('span', 'k', plural(total, 'скачивание', 'скачивания', 'скачиваний')));
     box.appendChild(big);
+    if (FOCUS) { weekGain(box, total); }
 
     /* Взятые рубежи: 2, 4, 8… не больше total */
     var reached = [];
@@ -163,8 +196,21 @@
     var since = $('side-since');
     if (since && first) {
       var days = Math.floor((Date.now() - first) / 86400000);
-      since.textContent = 'Первый релиз — ' + num(days) + ' ' + plural(days, 'день', 'дня', 'дней') + ' назад';
+      since.textContent = (FOCUS ? 'Вышел ' : 'Первый релиз — ') + num(days) + ' '
+        + plural(days, 'день', 'дня', 'дней') + ' назад';
     }
+  }
+
+  /* Прирост за неделю: живой счёт минус снимок недельной давности (downloads.js) */
+  function weekGain(box, total) {
+    var hist = (window.CRH_DOWNLOADS && window.CRH_DOWNLOADS.days) || {};
+    var base = null;
+    Object.keys(hist).sort().forEach(function (d) {
+      if ((Date.now() - Date.parse(d + 'T00:00:00Z')) / 864e5 >= 7) { base = d; }
+    });
+    if (!base || hist[base][FOCUS.slug] == null) { return; }
+    var gain = Math.max(0, total - hist[base][FOCUS.slug]);
+    box.appendChild(el('p', 'side-next', '+' + num(gain) + ' за неделю'));
   }
 
   /* ── Посещения ────────────────────────────────────────────────────────── */
@@ -197,13 +243,21 @@
     var local = isLocal();
     var newView = !local && !flag(sessionStorage, 'crh-counted');
     var newVisitor = !local && !flag(localStorage, 'crh-visitor');
+    var own = FOCUS ? '-' + FOCUS.slug : '';
+    if (FOCUS) {
+      /* общие счётчики растут и со страниц игр, а показываются свои */
+      if (newView) { counter('views', true).catch(function () {}); }
+      if (newVisitor) { counter('visitors', true).catch(function () {}); }
+      newView = !local && !flag(sessionStorage, 'crh-counted' + own);
+      newVisitor = !local && !flag(localStorage, 'crh-visitor' + own);
+    }
 
-    Promise.all([counter('views', newView), counter('visitors', newVisitor),
-                 counter(PLEASE_KEY, false).catch(function () { return null; })])
+    Promise.all([counter('views' + own, newView), counter('visitors' + own, newVisitor),
+                 counter(PLEASE_KEY + own, false).catch(function () { return null; })])
       .then(function (v) {
         box.innerHTML = '';
         pleases = v[2];
-        stat(box, num(v[0]), plural(v[0], 'заход', 'захода', 'заходов') + ' в каталог',
+        stat(box, num(v[0]), plural(v[0], 'заход', 'захода', 'заходов') + (FOCUS ? ' на страницу' : ' в каталог'),
              'Каждое открытие страницы. Перезагрузка вкладки не считается.');
         stat(box, num(v[1]), plural(v[1], 'посетитель', 'посетителя', 'посетителей') + ' без повторов',
              'Разные браузеры: вернувшийся посетитель второй раз не считается. '
@@ -300,7 +354,11 @@
   function please(game) {
     if (isLocal() || !firstPlease(String(game || ''))) { return; }
     if (pleases !== null) { pleases += 1; drawPlease(); }   /* сразу, не дожидаясь сети */
-    counter(PLEASE_KEY, true).then(function (v) { pleases = v; drawPlease(); }, function () {});
+    /* у каждой игры и свой счёт: слаг - до «@версия» */
+    var mine = counter(PLEASE_KEY, true);
+    var slug = String(game || '').split('@')[0];
+    var own = slug ? counter(PLEASE_KEY + '-' + slug, true) : mine;
+    (FOCUS ? own : mine).then(function (v) { pleases = v; drawPlease(); }, function () {});
   }
 
   window.CRH_SIDE = { downloads: downloads, please: please };

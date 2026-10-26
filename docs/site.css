@@ -126,6 +126,8 @@ a:hover { text-decoration: underline; }
   font-size: 19px;
   font-weight: 600;
 }
+/* Страница игры (…/<слаг>/, html.focus): вкладки, поиск и метки не нужны */
+.focus .kinds, .focus .finder, .focus .toolbar { display: none; }
 .card h2 a { color: inherit; text-decoration: none; }
 .card h2 a:hover { color: var(--accent2); text-decoration: underline; text-underline-offset: 3px; }
 

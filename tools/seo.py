@@ -15,7 +15,8 @@
 
 Ещё у каждой готовой игры своя страница docs/<слаг>/index.html: копия главной
 с <base href="../">, своими заголовком, описанием, картинкой превью и
-window.CRH_FOCUS — скрипт страницы ставит её карточку первой. Руками их не
+window.CRH_FOCUS — на странице только карточка игры, а колонка справа считает
+скачивания и посещения этой игры (side.js). Руками их не
 править: переписываются при каждом запуске.
 
 Запускать после правки games.js или index.html (это делает и workflow
@@ -241,7 +242,10 @@ def game_page(text, g):
         "<!-- seo:head — пишет tools/seo.py из games.js, руками не править -->",
         f'<meta name="keywords" content="{e(", ".join(phrases(g)))}">',
         '<meta name="robots" content="index, follow">',
-        "<script>document.documentElement.className += ' js';</script>",
+        # в шапке, до всех скриптов: side.js читает CRH_FOCUS сразу, а поиск и
+        # вкладки прячет CSS по классу focus - не мелькают до отрисовки
+        f"<script>window.CRH_FOCUS = {json.dumps(g['slug'])};"
+        " document.documentElement.className += ' js focus';</script>",
         f'<link rel="canonical" href="{page_url(g)}">',
         f'<meta property="og:url" content="{page_url(g)}">',
         f'<meta property="og:image" content="{image}">',
@@ -263,9 +267,6 @@ def game_page(text, g):
          f'<meta property="og:description" content="{e(short)}">'),
         (r'<meta charset="utf-8">', '<meta charset="utf-8">\n<base href="../">'),
         (r'<h1>.*?</h1>\s*<p>.*?</p>', f'<h1>{e(title)}</h1>\n      {INTRO}'),
-        (r'\n<script>\n/\* Страница строится',
-         f"\n<script>window.CRH_FOCUS = {json.dumps(g['slug'])};</script>"
-         "\n<script>\n/* Страница строится"),
     ]
     for pat, rep in subs:
         text, n = re.subn(pat, lambda m, rep=rep: rep, text, count=1, flags=re.S)

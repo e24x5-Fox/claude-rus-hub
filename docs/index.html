@@ -777,7 +777,7 @@
 <script src="fx.js?v=3d9f41ef"></script>
 <script src="layout.js?v=6470371f"></script>
 <link rel="stylesheet" href="tokens.css?v=e5c898f0">
-<link rel="stylesheet" href="site.css?v=dbdabfba">
+<link rel="stylesheet" href="site.css?v=adb55c0b">
 </head>
 <body>
 
@@ -971,7 +971,7 @@
 <script src="games.js"></script>
 <script src="downloads.js"></script>
 <script src="virustotal.js"></script>
-<script src="side.js?v=50cfd9c9"></script>
+<script src="side.js?v=fe2139f4"></script>
 <script src="donors.js"></script>
 <script src="donors-widget.js?v=b45cc565"></script>
 <script src="thanks-widget.js?v=9157636a"></script>
@@ -1725,15 +1725,19 @@
     root.innerHTML = '';
 
     var idle = !state.q.trim() && !state.tags.length;
-    if (idle && focus) {
+    /* страница игры: только её карточка и дорога в каталог, без поиска и чужих карточек */
+    if (focus) {
       var fsec = el('section', 'section');
       var fbox = el('div', 'cards');
       fbox.appendChild(card(focus));
       fsec.appendChild(fbox);
       var back = el('div', 'more');
-      back.appendChild(link('./', 'more-btn', '← Весь каталог'));
+      back.appendChild(link('./', 'btn more-next', '← Весь каталог'));
+      back.appendChild(el('span', 'more-hint', 'там остальные переводы и поиск'));
       fsec.appendChild(back);
       root.appendChild(fsec);
+      if (releasesCache) { apply(releasesCache); }
+      return;
     }
     if (idle && renderPopular()) {
       if (releasesCache) { apply(releasesCache); }
