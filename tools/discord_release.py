@@ -83,7 +83,7 @@ def message(tag, release, test=False):
             "description": whats_new(release.get("body")) + "\n\n**[Скачать на странице каталога](%s)**" % page,
             "color": 0x8B5CF6,
             "thumbnail": {"url": CATALOG + "assets/%s.png" % PAGES.get(slug, slug)},
-            "footer": {"text": "версия %s · выберите свои игры в меню выше, чтобы получать такие уведомления" % version},
+            "footer": {"text": "версия %s · подписаться на свои игры: «Каналы и роли» вверху списка каналов" % version},
         }],
     }
 
