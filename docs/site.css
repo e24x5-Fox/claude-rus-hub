@@ -590,6 +590,7 @@ a:hover { text-decoration: underline; }
   box-shadow: 0 10px 30px -12px rgba(139,92,246,.6);
   transition: transform .18s ease, box-shadow .18s ease;
 }
+.dcard, .dcard:hover, .dcard *, .dcard:hover * { text-decoration: none; }
 .dcard:hover { transform: translateY(-2px); box-shadow: 0 16px 36px -12px rgba(139,92,246,.8); color: #fff; }
 .dcard-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .dcard-icon { width: 44px; height: 44px; border-radius: 14px; flex: none; background: #2a2140;

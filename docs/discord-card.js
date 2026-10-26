@@ -9,7 +9,7 @@
     if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return few;
     return many;
   }
-  fetch('https://discord.com/api/v9/invites/Hwceaquhbc?with_counts=true')
+  fetch('https://discord.com/api/v9/invites/wUsBpMdM2n?with_counts=true')
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (d) {
       if (!d || !d.guild) return;
