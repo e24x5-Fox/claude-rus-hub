@@ -1,5 +1,6 @@
 # Раз в сутки записывает счёт скачиваний каждой игры в docs/downloads.js:
 # у GitHub нет истории скачиваний, а каталогу нужно «популярное за неделю».
+# Там же — текущая сборка игр в Steam в docs/builds.js (плашка версии игры).
 name: Снимок скачиваний
 
 on:
@@ -19,11 +20,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 tools/downloads_snapshot.py
+      - name: Сборки игр в Steam
+        run: python3 tools/builds_snapshot.py
       - name: Сохранить
         run: |
-          git diff --quiet docs/downloads.js && exit 0
+          git diff --quiet docs/downloads.js docs/builds.js && exit 0
           git config user.name "github-actions[bot]"
           git config user.email "41898208+github-actions[bot]@users.noreply.github.com"
-          git add docs/downloads.js
+          git add docs/downloads.js docs/builds.js
           git commit -m "Снимок скачиваний $(date -u +%F)"
           git push

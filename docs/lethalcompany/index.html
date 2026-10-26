@@ -179,6 +179,8 @@
 
 <script src="games.js"></script>
 <script src="downloads.js"></script>
+<script src="builds.js"></script>
+<script src="verified.js"></script>
 <script src="virustotal.js"></script>
 <script src="side.js?v=fe2139f4"></script>
 <script src="donors.js"></script>
@@ -259,6 +261,10 @@
       verPill = el('span', 'tag', 'v' + game.version);
       tags.appendChild(verPill);
     }
+    var buildPill = el('span', 'tag');
+    buildPill.hidden = true;
+    tags.appendChild(buildPill);
+    showBuild(buildPill, game, null);
     (game.tags || []).forEach(function (t) {
       tags.appendChild(el('span', 'tag' + (t === '18+' ? ' adult' : ''), t));
     });
@@ -323,7 +329,7 @@
     /* Ссылка из games.js — запасная: она ведёт на список релизов и работает
        всегда. Если API ответит, её подменит прямая ссылка на свежий файл. */
     if (dl && game.release && game.release.tag_prefix) {
-      pending.push({ game: game, dl: dl, size: size, ver: verPill, vt: vt });
+      pending.push({ game: game, dl: dl, size: size, ver: verPill, vt: vt, build: buildPill });
     }
 
     if (game.note) { body.appendChild(el('p', 'note', game.note)); }
@@ -404,6 +410,42 @@
     return d.getDate() + ' ' + m[d.getMonth()] + ' ' + d.getFullYear();
   }
 
+  /* ── Плашка версии игры ───────────────────────────────────────────────
+     builds.js — какая сборка игры сейчас в Steam (Actions, раз в сутки),
+     verified.js — на какой сборке перевод проверен (пишет трекер, когда после
+     обновления игры файлы с текстом не изменились) и где он сломан (broken).
+     Без отметки перевод считается проверенным, если сборка в Steam старше
+     релиза: его собирали уже на ней. */
+  function buildStatus(game, rel) {
+    if (game.status !== 'released') { return null; }
+    var b = ((window.CRH_BUILDS || {}).games || {})[game.slug];
+    if (!b || !b.build) { return null; }
+    var v = (window.CRH_VERIFIED || {})[game.slug] || {};
+    var tip = 'Сборка игры в Steam: ' + b.build + (v.build ? ' · перевод проверен на ' + v.build : '');
+    if (v.build === b.build && v.broken) {
+      return { cls: 'adult', text: 'нужно обновление перевода', tip: tip };
+    }
+    var released = rel ? Date.parse(rel.published_at || rel.created_at) : 0;
+    if (v.build === b.build || (released && b.updated * 1000 < released)) {
+      return { cls: 'ready', text: '✓ работает с текущей версией игры', tip: tip };
+    }
+    if (!rel) { return null; }   /* без ответа GitHub дату релиза не узнать — молчим */
+    var d = new Date(b.updated * 1000);
+    var day = ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2);
+    return { cls: 'wip', text: 'игра обновилась ' + day + ' — проверяем', tip: tip
+             + ' · после выхода перевода игра обновилась; ставить можно, но на свой страх' };
+  }
+
+  function showBuild(pill, game, rel) {
+    var st = pill && buildStatus(game, rel);
+    if (!pill || (!st && rel === null)) { return; }
+    pill.hidden = !st;
+    if (!st) { return; }
+    pill.className = 'tag ' + st.cls;
+    pill.textContent = st.text;
+    pill.title = st.tip;
+  }
+
   function latestFor(releases, prefix) {
     var mine = releases.filter(function (r) {
       return !r.draft && r.tag_name && r.tag_name.indexOf(prefix) === 0;
@@ -462,6 +504,7 @@
       if (!rel) { return; }
       resolved++;
 
+      showBuild(item.build, item.game, rel);
       var asset = assetOf(rel, item.game.release.asset);
       if (asset) { item.dl.href = asset.browser_download_url; }
       if (item.vt && asset && asset.digest) {
