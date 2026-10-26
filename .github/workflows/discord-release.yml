@@ -1,0 +1,38 @@
+# Опубликован релиз — объявление в Discord, #новые-переводы, с упоминанием роли игры
+# и «Все обновления» (tools/discord_release.py). Адрес вебхука — секрет
+# DISCORD_RELEASES_WEBHOOK. Запуск руками: тег релиза и, для проверки, test —
+# сообщение без упоминаний, которое через 20 секунд удаляется.
+name: Объявление в Discord
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Тег релиза (warriorcats-v1.0.1)
+        required: true
+      test:
+        description: Проверка — без упоминаний, сообщение удалится
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  announce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Релиз
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: gh release view "$TAG" --json name,body > release.json
+      - name: Объявление
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_RELEASES_WEBHOOK }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+          TEST: ${{ inputs.test && '--test' || '' }}
+        run: python3 tools/discord_release.py "$TAG" release.json $TEST
