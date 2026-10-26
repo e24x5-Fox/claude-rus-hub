@@ -173,5 +173,14 @@ window.CRH_VT = {
   "suspicious": 0,
   "engines": 67,
   "flagged": {}
+ },
+ "lucidcheats": {
+  "sha256": "990fa7e59ccfb3c5677123fc6b71e1ef854771ef518ed9d5f31799cd2e7109d7",
+  "link": "https://www.virustotal.com/gui/file/990fa7e59ccfb3c5677123fc6b71e1ef854771ef518ed9d5f31799cd2e7109d7",
+  "date": "27.10.2026",
+  "malicious": 0,
+  "suspicious": 0,
+  "engines": 64,
+  "flagged": {}
  }
 };

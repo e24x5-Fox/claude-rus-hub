@@ -37,7 +37,7 @@
 
 | Игра | Мод | Что делает | Скачать |
 |---|---|---|---|
-| **Lucid Cats** <br><sub>Unity · BepInEx 5</sub> | Noclip и телепорт, v1.0.0 | полёт сквозь стены, бессмертие (у хоста), телепорт под прицел / в сохранённую точку / к игроку | [архив](https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/lucidcheats-v1.0.0) |
+| **Lucid Cats** <br><sub>Unity · BepInEx 5</sub> | Noclip и телепорт, v1.0.1 | полёт сквозь стены, бессмертие (у хоста), телепорт под прицел / в сохранённую точку / к игроку | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/lucidcheats-v1.0.1) |
 
 Список на сайте строится из [`docs/games.js`](docs/games.js) — новая игра
 добавляется одной записью, разметку страницы править не нужно.

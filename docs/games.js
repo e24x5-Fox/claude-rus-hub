@@ -572,12 +572,13 @@ window.CATALOG = {
     {
       "slug": "lucidcheats",
       "kind": "mod",
+      "for": "lucidcats",
       "engine": "Unity",
       "title": "Lucid Cats — Noclip и телепорт",
       "aliases": ["Люсид кэтс читы", "Лусид кетс ноклип", "Lucid Cats cheats", "читы", "ноклип", "полёт сквозь стены", "бессмертие"],
-      "banner": "assets/lucidcats.png",
+      "banner": "assets/lucidcheats.png",
       "status": "released",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "adult": false,
       "tags": ["Unity", "BepInEx", "Мультиплеер", "Читы"],
       "summary": "Мод для прогулок по снам без правил: полёт сквозь стены, бессмертие и телепорт — в точку под прицелом, в сохранённое место или к другу. Всё включается клавишами F1–F7, состояние видно на маленькой панели в углу экрана.",
@@ -587,14 +588,14 @@ window.CATALOG = {
         { "label": "Телепорт", "value": "F4–F7" },
         { "label": "Загрузчик", "value": "BepInEx 5" }
       ],
-      "install_size": "0,6 МБ",
-      "release": { "tag_prefix": "lucidcheats-", "asset": "LucidCats-Cheats.zip" },
+      "install_size": "65 МБ",
+      "release": { "tag_prefix": "lucidcheats-", "asset": "LucidCats-Cheats-Setup.exe" },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/4778540/",
         "guide": ""
       },
-      "note": "Архив распаковывается прямо в папку игры, BepInEx уже внутри. Бессмертие работает только в одиночной игре или у хоста лобби — здоровье считает сервер. Noclip и телепорт работают у всех, но другие игроки видят, как вы летаете: играйте так с друзьями, а не в чужих лобби. С русификатором Lucid Cats из этого каталога совместим. Удаление — стереть winhttp.dll и папку BepInEx."
+      "note": "Установщик сам находит игру и ставит BepInEx, если его ещё нет; кнопка «Удалить» возвращает всё как было. Бессмертие работает только в одиночной игре или у хоста лобби — здоровье считает сервер. Noclip и телепорт работают у всех, но другие игроки видят, как вы летаете: играйте так с друзьями, а не в чужих лобби. С русификатором Lucid Cats из этого каталога совместим."
     }
   ]
 }
