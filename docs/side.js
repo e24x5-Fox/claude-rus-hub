@@ -126,6 +126,9 @@
       var when = new Date(r.published_at || r.created_at);
       if (!isNaN(when) && (!first || when < first)) { first = when; }
     });
+    /* моды Thunderstore: их скачивания GitHub не видит, они в снимке downloads.js */
+    var ts = (window.CRH_DOWNLOADS || {}).thunderstore || {};
+    Object.keys(ts).forEach(function (slug) { total += ts[slug].downloads || 0; });
 
     box.innerHTML = '';
     var big = el('div', 'side-big');

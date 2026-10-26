@@ -971,7 +971,7 @@
 <script src="games.js"></script>
 <script src="downloads.js"></script>
 <script src="virustotal.js"></script>
-<script src="side.js?v=c18f4beb"></script>
+<script src="side.js?v=50cfd9c9"></script>
 <script src="donors.js"></script>
 <script src="donors-widget.js?v=b45cc565"></script>
 <script src="thanks-widget.js?v=9157636a"></script>
@@ -1206,6 +1206,13 @@
     return sum;
   }
 
+  /* Скачивания мода с Thunderstore - из снимка: живьём их не спросить (нет CORS).
+     К счёту GitHub их прибавляют все, кто показывает скачивания игры. */
+  function tsDownloads(slug) {
+    var ts = ((window.CRH_DOWNLOADS || {}).thunderstore || {})[slug];
+    return (ts && ts.downloads) || 0;
+  }
+
   function plural(n, one, few, many) {
     var a = Math.abs(n) % 100, b = a % 10;
     if (a > 10 && a < 20) { return many; }
@@ -1247,8 +1254,10 @@
         else if (item.game.install_size) { parts.push(item.game.install_size); }
         var when = fmtDate(rel.published_at || rel.created_at);
         if (when) { parts.push(when); }
-        var got = downloadsFor(releases, item.game.release.tag_prefix);
+        var got = downloadsFor(releases, item.game.release.tag_prefix) + tsDownloads(item.game.slug);
         if (got) { parts.push(got + ' ' + plural(got, 'скачивание', 'скачивания', 'скачиваний')); }
+        var rating = (((window.CRH_DOWNLOADS || {}).thunderstore || {})[item.game.slug] || {}).rating;
+        if (rating) { parts.push('👍 ' + rating); }
         item.size.textContent = parts.join(' · ');
       }
     });
@@ -1484,8 +1493,9 @@
              ((g.release && g.release.tag_prefix) || (g.links && g.links.mod));
     }).map(function (g, i) {
       /* у мода Thunderstore релизов на GitHub нет - счёт только из снимка */
-      var total = (releasesCache && g.release) ? downloadsFor(releasesCache, g.release.tag_prefix)
-                                               : (latest[g.slug] || 0);
+      var total = (releasesCache && g.release)
+        ? downloadsFor(releasesCache, g.release.tag_prefix) + tsDownloads(g.slug)
+        : (latest[g.slug] || 0);
       var gain = base ? Math.max(0, total - (hist[base][g.slug] || 0)) : total;
       return { game: g, gain: gain, total: total, order: i };
     });

@@ -85,14 +85,17 @@ def main():
         except Exception as e:                       # сбой Thunderstore не роняет снимок GitHub
             print("thunderstore", slug, e)
             continue
-        today[slug] = m.get("downloads", 0)
-        ts[slug] = {"rating": m.get("rating_score", 0), "version": m.get("latest_version", "")}
+        # у таких игр есть и установщик на GitHub: в истории - сумма обоих путей
+        today[slug] = today.get(slug, 0) + m.get("downloads", 0)
+        ts[slug] = {"downloads": m.get("downloads", 0), "rating": m.get("rating_score", 0),
+                    "version": m.get("latest_version", "")}
     days = load()
     day = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
     days[day] = today
     days = dict(sorted(days.items())[-KEEP_DAYS:])
 
-    # thunderstore - лайки и версия мода на сегодня: в истории они не нужны
+    # thunderstore - скачивания, лайки и версия мода на сегодня: страница прибавляет
+    # скачивания к живому счёту GitHub
     body = json.dumps({"days": days, "thunderstore": ts}, ensure_ascii=False, indent=1)
     with open(OUT, "w", encoding="utf-8", newline="\n") as f:
         f.write("/* Счёт скачиваний по дням: пишет tools/downloads_snapshot.py из GitHub\n"
