@@ -578,8 +578,38 @@ a:hover { text-decoration: underline; }
 .side-stat .k { display: block; color: var(--text2); font-size: var(--fs-note); }
 .side-stat[title] { cursor: help; }
 
-.side-discord p { margin: 0 0 12px; color: var(--text2); font-size: var(--fs-note); line-height: 1.5; }
-.side-discord .btn { display: block; text-align: center; }
+/* визитка Discord-сервера: цветы из фона сервера, лис владельца выглядывает справа */
+.dcard {
+  position: relative; display: block; overflow: hidden;
+  margin-bottom: 16px; padding: 16px 16px 16px;
+  border-radius: 14px; color: #fff; text-decoration: none;
+  background:
+    linear-gradient(160deg, rgba(139,92,246,.55), rgba(76,29,149,.85) 70%),
+    url(assets/discord-flowers.jpg) center/cover;
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 10px 30px -12px rgba(139,92,246,.6);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.dcard:hover { transform: translateY(-2px); box-shadow: 0 16px 36px -12px rgba(139,92,246,.8); color: #fff; }
+.dcard-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.dcard-icon { width: 44px; height: 44px; border-radius: 14px; flex: none; background: #2a2140;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.25); }
+.dcard-name { display: flex; flex-direction: column; min-width: 0; }
+.dcard-name b { font-size: 15px; line-height: 1.25; }
+.dcard-stat { font-size: var(--fs-hint); color: rgba(255,255,255,.8); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.dcard-stat .dot { width: 8px; height: 8px; border-radius: 50%; background: #23a55a; display: inline-block; box-shadow: 0 0 6px #23a55a; }
+.dcard-stat .dot.all { background: rgba(255,255,255,.55); box-shadow: none; }
+.dcard-list { display: flex; flex-direction: column; gap: 4px; margin: 0 92px 14px 0;
+  font-size: var(--fs-note); line-height: 1.4; color: rgba(255,255,255,.92); position: relative; z-index: 1; }
+.dcard-btn { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: 9px; background: #fff; color: #5b2fd6;
+  font-size: var(--fs-label); font-weight: 600; }
+.dcard-btn svg { width: 18px; height: 18px; fill: currentColor; }
+.dcard:hover .dcard-btn { background: #f1ebff; }
+.dcard-fox { position: absolute; right: -14px; bottom: -8px; width: 120px; height: auto;
+  filter: drop-shadow(0 6px 10px rgba(30,0,80,.45)); transition: transform .25s ease; transform-origin: 70% 100%; }
+.dcard:hover .dcard-fox { transform: rotate(-4deg) translateY(-3px); }
+@media (prefers-reduced-motion: reduce) { .dcard, .dcard-fox { transition: none; } .dcard:hover, .dcard:hover .dcard-fox { transform: none; } }
 .side-foot { margin: 0 0 16px; color: var(--text3); font-size: var(--fs-hint); text-align: center; }
 .side-thanks-link { margin-top: -8px; line-height: 1.5; }
 .side-thanks-link a { color: var(--text2); text-decoration: underline; text-underline-offset: 3px; }
