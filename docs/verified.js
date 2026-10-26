@@ -8,5 +8,11 @@ window.CRH_VERIFIED = {
   "at": "2026-10-26",
   "by": "трекер",
   "broken": false
+ },
+ "lethalcompany": {
+  "build": "22825947",
+  "at": "2026-10-26",
+  "by": "трекер",
+  "broken": false
  }
 };
