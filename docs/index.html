@@ -1117,6 +1117,19 @@
     if (vt) { actions.appendChild(vt.badge); }
     if (links.guide)    { actions.appendChild(link(links.guide, 'btn btn-mini', 'Руководство в Steam')); }
     if (links.steam)    { actions.appendChild(link(links.steam, 'btn btn-mini', 'Игра в Steam')); }
+    /* Мод и русификатор одной игры ссылаются друг на друга: у мода поле for —
+       слаг перевода (пишет tools/release.py конвейера модов). На карточке
+       перевода — кнопка каждого мода, на карточке мода — перевод. Ведут на
+       страницу карточки: она есть у каждой игры и не зависит от вкладки. */
+    if (game.kind === 'mod' && game['for']) {
+      var base = data.games.filter(function (g) { return g.slug === game['for']; })[0];
+      if (base) { actions.appendChild(link(base.slug + '/', 'btn btn-mini', 'Русификатор для игры')); }
+    }
+    data.games.forEach(function (g) {
+      if (g.kind !== 'mod' || g['for'] !== game.slug || g.status !== 'released') { return; }
+      var name = g.title.indexOf(' — ') > 0 ? g.title.split(' — ').slice(1).join(' — ') : g.title;
+      actions.appendChild(link(g.slug + '/', 'btn btn-mini', 'Мод: ' + name));
+    });
     if (game.install_size && (links.download || links.mod)) {
       size = el('span', 'size', game.install_size);
       actions.appendChild(size);
