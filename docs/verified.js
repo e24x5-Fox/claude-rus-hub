@@ -32,5 +32,11 @@ window.CRH_VERIFIED = {
   "at": "2026-10-27",
   "by": "проверка файлов",
   "broken": true
+ },
+ "feedthecups": {
+  "build": "26179816",
+  "at": "2026-10-27",
+  "by": "проверка файлов",
+  "broken": false
  }
 };
