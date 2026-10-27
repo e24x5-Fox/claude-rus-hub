@@ -94,7 +94,10 @@ h2 { font-size: 15px; margin: 0 0 14px; color: var(--accent2); }
 .stats-line { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--text2); margin-top: 14px; font-size: 12.5px; }
 .stats-line b { color: var(--text); }
 
-.foot { border-top: 1px solid var(--bg3); padding: 22px 0 30px; color: var(--text3); font-size: 12px; }
+/* подвал — сплошной: сквозь прозрачный просвечивала размытая обложка трека;
+   снизу место под плашку беты в углу, чтобы она не ложилась на лисёнка */
+.foot { border-top: 1px solid var(--bg3); padding: 22px 0 64px; color: var(--text3); font-size: 12px;
+        background: var(--bg2); position: relative; }
 .foot .wrap { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
 .foot .sp { flex: 1; }
 
