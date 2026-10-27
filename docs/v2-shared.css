@@ -27,15 +27,20 @@ img { display: block; max-width: 100%; }
 .brand { display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 700; white-space: nowrap; }
 .brand img { width: 34px; height: 34px; }
 .brand b { color: var(--accent2); font-weight: 700; }
-.kinds { display: flex; gap: 4px; }
+/* разделы — кнопки, а не текст: рамка и подложка у каждой, выбранная залита
+   акцентом со свечением; счётчик — плашкой */
+.kinds { display: flex; gap: 6px; }
 .kinds a {
-  padding: 7px 12px; border-radius: var(--r-btn); color: var(--text2); white-space: nowrap;
-  display: flex; align-items: center; gap: 7px;
+  padding: 7px 13px; border-radius: 10px; color: var(--text); white-space: nowrap; font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg2); border: 1px solid var(--bg3);
+  transition: border-color var(--t-fast), background var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
 }
-.kinds a:hover { background: var(--bg2); color: var(--text); }
-.kinds a.on { background: var(--accent-soft); color: var(--text); }
-.kinds .n { font-size: 10.5px; color: var(--text3); }
-.kinds a.on .n { color: var(--accent2); }
+.kinds a:hover { color: var(--text); border-color: var(--accent); transform: translateY(-1px); }
+.kinds a.on { background: var(--accent); border-color: var(--accent2); color: #fff;
+              box-shadow: 0 0 0 3px rgba(139, 92, 246, .22), 0 6px 18px -6px rgba(139, 92, 246, .9); }
+.kinds .n { font-size: 10.5px; padding: 1px 7px; border-radius: var(--r-pill); background: var(--bg3); color: var(--text2); }
+.kinds a.on .n { background: rgba(255, 255, 255, .22); color: #fff; }
 .me { margin-left: auto; display: flex; gap: 6px; align-items: center; }
 .me a {
   display: flex; align-items: center; gap: 7px; padding: 7px 11px; border-radius: var(--r-btn);
@@ -134,6 +139,10 @@ body:not(.radio-on) .music:not(.stage) { display: none; }
   .lift, .lift .lift-fox, .lift .lift-btn { transition: none; }
   .lift:hover, .lift:hover .lift-fox { transform: none; }
 }
+
+/* баннеры проявляются, когда догрузились, а не выпрыгивают кусками */
+img[width="512"][height="192"] { opacity: 0; transition: opacity .3s ease; }
+img[width="512"][height="192"].in { opacity: 1; }
 
 /* пометка, что это макет */
 .mock-tag { text-decoration: none;

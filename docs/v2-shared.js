@@ -56,7 +56,14 @@ function totals() {
 }
 
 function gameUrl(g) { return 'v2-game.html?slug=' + encodeURIComponent(g.slug); }
-function cover(g) { return D + g.banner; }
+/* Баннер игры — лёгкая копия WebP из assets/covers/ (в 12 раз меньше PNG: сетка из
+   20 баннеров весила 2,9 МБ). Нет копии — onerror в coverImg() вернёт исходный PNG. */
+function cover(g) { return D + 'assets/covers/' + g.banner.replace(/^.*\//, '').replace(/\.png$/i, '.webp'); }
+function coverImg(g, eager) {
+  return '<img src="' + cover(g) + '" width="512" height="192" alt="" decoding="async"'
+    + (eager ? ' fetchpriority="high"' : ' loading="lazy"')
+    + ' onload="this.classList.add(\'in\')" onerror="this.onerror=null;this.src=\'' + D + g.banner + '\'">';
+}
 
 /** Шапка: page — 'ru' | 'furry' | 'mod' | 'music' | 'support' | 'about' | null */
 function renderNav(page) {

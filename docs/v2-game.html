@@ -121,7 +121,7 @@
   $('#page').innerHTML =
     '<a class="back" href="v2.html#' + kindOf(g) + '">← все ' + (kindOf(g) === 'ru' ? 'переводы' : kindOf(g) === 'furry' ? 'фуривизаторы' : 'моды') + '</a>'
     + '<section class="top">'
-    + '<div class="banner"><img src="' + cover(g) + '" alt=""></div>'
+    + '<div class="banner">' + coverImg(g, true) + '</div>'
     + '<div><h1>' + esc(g.title) + '</h1>'
     + '<div class="chips"><span class="chip acc" id="ver">v' + esc(g.version) + '</span><span class="chip" id="build" hidden></span>'
     + (g.tags || []).map(function (t) { return '<span class="chip">' + esc(t) + '</span>'; }).join('') + '</div>'
@@ -142,7 +142,7 @@
     + '<a class="btn" href="' + REPO + '/issues/new" target="_blank" rel="noopener">Issue на GitHub</a></div>'
     + '</section>'
     + (others.length ? '<section class="more"><h2>Ещё ' + (kindOf(g) === 'ru' ? 'переводы' : 'из этого раздела') + '</h2><div class="grid">'
-      + others.map(function (o) { return '<a href="' + gameUrl(o) + '"><img src="' + cover(o) + '" alt=""><span>' + esc(o.title) + '</span></a>'; }).join('')
+      + others.map(function (o) { return '<a href="' + gameUrl(o) + '">' + coverImg(o) + '<span>' + esc(o.title) + '</span></a>'; }).join('')
       + '</div></section>' : '');
 
   // те же события, что шлёт thanks-widget.js: плеер тормозит трек, пока висит «спасибо»

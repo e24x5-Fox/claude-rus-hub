@@ -118,10 +118,10 @@
       return kindOf(g) === kind && (!engine || g.engine === engine);
     });
     list.sort(function (a, b) { return DL.of(b.slug) - DL.of(a.slug); });
-    $('#grid').innerHTML = list.map(function (g) {
+    $('#grid').innerHTML = list.map(function (g, n) {
       var v = window.CRH_VERIFIED && CRH_VERIFIED[g.slug];
       var state = v && v.broken ? '<span class="bad">● ждёт исправления</span>' : '<span class="ok">● работает</span>';
-      return '<a class="tile" href="' + gameUrl(g) + '"><div class="img"><img loading="lazy" src="' + cover(g) + '" alt="">'
+      return '<a class="tile" href="' + gameUrl(g) + '"><div class="img">' + coverImg(g, n < 8)
         + (hot.indexOf(g.slug) >= 0 ? '<span class="chip hot">популярно</span>' : '') + '</div>'
         + '<div class="body"><div class="name">' + esc(g.title) + '</div>'
         + '<div class="info">' + state + '<span>v' + esc(g.version) + '</span><span>' + esc(g.engine || '') + '</span>'
