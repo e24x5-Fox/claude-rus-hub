@@ -30,8 +30,8 @@ window.CRH_VERIFIED = {
  "oddremedy": {
   "build": "26071084",
   "at": "2026-10-27",
-  "by": "проверка файлов",
-  "broken": true
+  "by": "перевод 0.2.2",
+  "broken": false
  },
  "feedthecups": {
   "build": "26179816",
