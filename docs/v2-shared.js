@@ -92,7 +92,9 @@ function renderNav(page) {
   tag.target = '_blank';
   tag.rel = 'noopener';
   tag.title = 'Это новая версия каталога. Расскажите в Discord, как она вам';
-  tag.textContent = 'бета · отзыв';
+  tag.classList.add('beta');
+  tag.innerHTML = '<b>бета</b>' + ICON.discord + '<span class="long">Как вам новый каталог? Напишите в Discord</span>'
+    + '<span class="short">Отзыв в Discord</span>';
   document.body.appendChild(tag);
   discordLive();
 }
@@ -300,6 +302,58 @@ var Nav = (function () {
   window.addEventListener('popstate', function () { go(location.href, false); });
   return { go: go };
 })();
+
+/* ── «Правила донатов» перед донатом ─────────────────────────────────────────
+   Как в нынешнем каталоге (donors-widget.js): любая ссылка на донат сначала
+   открывает правила, на DonationAlerts ведёт только «Понятно — к донату» в окне.
+   Текст дословно оттуда, числа — из donors.js (rules). Колёсико и Ctrl/Shift —
+   сразу на донат: кто так открывает вкладку, знает, куда идёт. */
+var donateDialog = null;
+function donateRules() {
+  if (donateDialog && document.body.contains(donateDialog)) { donateDialog.showModal(); return; }
+  var R = (window.CRH_DONORS && CRH_DONORS.rules) || {};
+  var BASE = R.base_days || 7, PER = R.rub_per_day || 10, MSG_MAX = R.msg_max || 200, NAME_MAX = R.name_max || 32;
+  function days(rub) { return Math.round(BASE + rub / PER); }
+  function section(title, items) {
+    return '<h3>' + title + '</h3><ul>' + items.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
+  }
+  donateDialog = document.createElement('dialog');
+  donateDialog.className = 'rules-dlg';
+  donateDialog.setAttribute('aria-label', 'Правила донатов');
+  donateDialog.innerHTML = '<button class="rules-x" type="button" title="Закрыть">×</button><h2>Правила донатов</h2>'
+    + section('Сколько ник висит в списке', [
+        'Ник и сумма появляются здесь в течение шести часов: список обновляется по расписанию.',
+        'Срок зависит от суммы: ' + BASE + ' дней плюс день за каждые ' + PER + ' ₽. '
+          + '100 ₽ — ' + days(100) + ' дней, 500 ₽ — ' + days(500) + ', 1000 ₽ — ' + days(1000) + '.',
+        'Донаты с одного ника складываются: новый донат продлевает срок с конца прежнего, а сумма в строке — общая.',
+        'Выше в списке — бóльшая сумма. До какого дня висит строка, видно, если навести на неё мышь.'])
+    + section('Что можно писать', [
+        'Что угодно: спасибо, пожелание, какую игру перевести следующей.',
+        'Сообщение видят все посетители каталога. Не пишите в нём личного — ни своего, ни чужого.',
+        'Показывается последнее сообщение с ника, до ' + MSG_MAX + ' символов; длиннее — обрезается многоточием.'])
+    + section('Что меняется в сообщении', [
+        'Слова из списка запрещённых DonationAlerts заменяются звёздочками «***» — и в сообщении, и в нике. Донат при этом остаётся.',
+        'Ссылки вырезаются, адрес почты заменяется на «[почта скрыта]».',
+        'Переносы строк и невидимые символы, переворачивающие текст, убираются. Эмодзи остаются.',
+        'Ник длиннее ' + NAME_MAX + ' символов обрезается, донат без ника подписывается «Аноним».'])
+    + section('Когда сообщения не будет', [
+        'Голосовое сообщение: текста у него нет — в списке останутся ник и сумма.',
+        'Если автору придётся скрыть сообщения конкретного ника (за спам или оскорбления), ник и сумма тоже останутся — пропадёт только текст.',
+        'Сам донат из-за содержания сообщения не скрывается никогда.'])
+    + '<a class="btn primary rules-go" href="' + DONATE + '" target="_blank" rel="noopener">Понятно — к донату ♡</a>';
+  donateDialog.querySelector('.rules-x').addEventListener('click', function () { donateDialog.close(); });
+  donateDialog.querySelector('.rules-go').addEventListener('click', function () { donateDialog.close(); });
+  donateDialog.addEventListener('click', function (e) { if (e.target === donateDialog) donateDialog.close(); });
+  document.body.appendChild(donateDialog);
+  donateDialog.showModal();
+}
+document.addEventListener('click', function (e) {
+  var a = e.target.closest && e.target.closest('a[href^="' + DONATE + '"], [data-rules]');
+  if (!a || (donateDialog && donateDialog.contains(a))) return;
+  if (a.tagName === 'A' && (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey)) return;
+  e.preventDefault();
+  donateRules();
+}, true);
 
 /** Лисёнок, который танцует под музыку (и улетает на сцену после десяти нажатий). */
 function mascot(src, cls) {

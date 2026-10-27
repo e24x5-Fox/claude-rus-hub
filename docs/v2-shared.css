@@ -1,14 +1,18 @@
 /* Макет нового каталога: общее для всех страниц. Токены — из настоящего каталога
    (claude-rus-hub/docs/tokens.css), поэтому цвета и шрифт те же. */
 * { box-sizing: border-box; }
-html { background: var(--bg); }
-body {
-  margin: 0; min-height: 100vh; color: var(--text); font-family: var(--mono);
-  font-size: 13.5px; line-height: 1.55;
+/* фон — на html, body прозрачный: иначе он закрывает размытую обложку трека,
+   которую music-widget.js кладёт под страницу (.music-bg, z-index -1) */
+html {
   background:
     radial-gradient(1200px 500px at 15% -10%, rgba(139, 92, 246, .16), transparent 60%),
     radial-gradient(900px 500px at 100% 0%, rgba(139, 92, 246, .08), transparent 60%),
     var(--bg);
+  background-attachment: fixed;
+}
+body {
+  margin: 0; min-height: 100vh; color: var(--text); font-family: var(--mono);
+  font-size: 13.5px; line-height: 1.55; background: transparent;
   overflow-x: hidden;
 }
 body.radio-on { padding-bottom: 76px; }
@@ -144,12 +148,28 @@ body:not(.radio-on) .music:not(.stage) { display: none; }
 img[width="512"][height="192"] { opacity: 0; transition: opacity .3s ease; }
 img[width="512"][height="192"].in { opacity: 1; }
 
+/* окно «Правила донатов» */
+.rules-dlg {
+  max-width: 560px; width: calc(100% - 32px); max-height: calc(100vh - 40px); overflow: auto;
+  padding: 22px 24px; border-radius: var(--r-card); border: 1px solid var(--accent);
+  background: var(--bg2); color: var(--text); font-family: var(--mono); font-size: 13px; line-height: 1.55;
+}
+.rules-dlg::backdrop { background: rgba(0, 0, 0, .65); backdrop-filter: blur(3px); }
+.rules-dlg h2 { margin: 0 0 6px; font-size: 17px; }
+.rules-dlg h3 { margin: 16px 0 6px; color: var(--accent2); font-size: 13.5px; }
+.rules-dlg ul { margin: 0; padding-left: 18px; color: var(--text2); }
+.rules-dlg li + li { margin-top: 4px; }
+.rules-go { margin-top: 20px; width: 100%; }
+.rules-x { position: absolute; top: 10px; right: 12px; width: 30px; height: 30px; border: none; border-radius: 50%;
+           background: transparent; color: var(--text3); font-size: 20px; cursor: pointer; }
+.rules-x:hover { background: var(--bg3); color: var(--text); }
+
 /* пометка, что это макет */
-.mock-tag { text-decoration: none;
+.mock-tag {
   position: fixed; right: 12px; top: 70px; z-index: 40; font-size: 10.5px; padding: 4px 9px;
   border-radius: var(--r-pill); background: var(--yellow); color: #1a1405; font-weight: 700;
 }
-@media (max-width: 900px) { .mock-tag { text-decoration: none; top: auto; bottom: 84px; } }
+@media (max-width: 900px) { .mock-tag { top: auto; bottom: 84px; } }
 
 /* ── подарок со стикерами ─────────────────────────────────────────────────────
    Лисята спрятаны в коробке целиком. Коробка показалась на экране — крышка
@@ -230,3 +250,18 @@ img[width="512"][height="192"].in { opacity: 1; }
   .gift-fan img, .gift-lid { transition: none; animation: none !important; }
   .gift.lid-gone .gift-lid { visibility: hidden; }
 }
+
+.mock-tag.beta {
+  display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; text-decoration: none;
+  background: #5865f2; color: #fff; font-size: 12px; font-weight: 700;
+  box-shadow: 0 6px 20px -6px rgba(88, 101, 242, .9); transition: transform .15s ease, background .15s ease;
+}
+.mock-tag.beta:hover { background: #4752c4; color: #fff; transform: translateY(-1px); }
+.mock-tag.beta b { padding: 2px 8px; border-radius: 999px; background: var(--yellow); color: #1a1405;
+                   font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; }
+.mock-tag.beta svg { width: 16px; height: 16px; flex: none; }
+.mock-tag.beta .short { display: none; }
+@media (max-width: 900px) { .mock-tag.beta .long { display: none; } .mock-tag.beta .short { display: inline; } }
+/* в правом нижнем углу, над полосой плеера: сверху она налезала на лисёнка в шапке страниц */
+.mock-tag.beta { top: auto; bottom: 16px; right: 16px; }
+body.radio-on .mock-tag.beta { bottom: 80px; }
