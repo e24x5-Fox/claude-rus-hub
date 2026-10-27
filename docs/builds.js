@@ -2,7 +2,7 @@
    пишет tools/builds_snapshot.py из GitHub Actions раз в сутки. Руками
    не править. С docs/verified.js даёт плашку версии игры. */
 window.CRH_BUILDS = {
- "checked": "2026-10-26",
+ "checked": "2026-10-27",
  "games": {
   "dragnwash": {
    "build": "25286774",
@@ -75,8 +75,8 @@ window.CRH_BUILDS = {
    "appid": "2336220"
   },
   "warriorcats": {
-   "build": "24847281",
-   "updated": 1787882954,
+   "build": "26184573",
+   "updated": 1793042395,
    "appid": "3960600"
   },
   "lockdown": {
