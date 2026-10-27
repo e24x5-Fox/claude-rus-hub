@@ -795,6 +795,34 @@
     <div class="mascot" data-viz><img src="assets/mascot-wave.png" alt="Лисёнок-маскот каталога русификаторов машет лапой"></div>
   </header>
 
+  <!-- Новый каталог (бета) рядом со старым: v2*.html, собирает work/catalog-mockup/publish.py
+       в мастерской. Со страницы игры (CRH_FOCUS) ведёт сразу на эту игру в новом каталоге. -->
+  <a class="v2-try" id="v2-try" href="v2.html">
+    <span class="v2-try-badge">бета</span>
+    <span class="v2-try-text"><b>Новый каталог</b> — попробуйте и расскажите, как вам</span>
+    <span class="v2-try-go">открыть →</span>
+  </a>
+  <script>
+    if (window.CRH_FOCUS) document.getElementById('v2-try').href = 'v2-game.html?slug=' + encodeURIComponent(window.CRH_FOCUS);
+  </script>
+  <style>
+    .v2-try {
+      display: flex; align-items: center; gap: 12px; margin: 0 0 18px; padding: 12px 16px;
+      border-radius: var(--r-card); border: 1px solid var(--accent); color: var(--text);
+      background: linear-gradient(110deg, var(--accent-soft), var(--bg2) 70%);
+      box-shadow: 0 8px 24px -14px rgba(139,92,246,.9);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .v2-try:hover { text-decoration: none; transform: translateY(-2px); box-shadow: 0 14px 30px -12px rgba(139,92,246,.95); }
+    .v2-try-badge { flex: none; padding: 2px 9px; border-radius: var(--r-pill); background: var(--yellow); color: #1a1405;
+                    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+    .v2-try-text { flex: 1; min-width: 0; font-size: 13.5px; }
+    .v2-try-text b { color: var(--accent2); }
+    .v2-try-go { flex: none; color: var(--accent2); font-weight: 700; font-size: 13px; }
+    @media (max-width: 520px) { .v2-try-go { display: none; } }
+    @media (prefers-reduced-motion: reduce) { .v2-try { transition: none; } .v2-try:hover { transform: none; } }
+  </style>
+
   <nav class="kinds" id="kinds" role="tablist" aria-label="Что показывать"></nav>
 
   <div class="finder">
