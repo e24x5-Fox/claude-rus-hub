@@ -49,6 +49,11 @@ ROLES = {
     "webfishing":    "1564237440904859658",
 }
 
+# свои эмодзи сервера (лис владельца) — боты пишут ими, а не стандартными (28.10.2026);
+# id — из GET /guilds/{id}/emojis, вебхуку сервера они доступны без Nitro
+PARTY = "<:lis_party:1564535633853288478>"
+SQUINT = "<:lis_squint:1564535668602839051>"
+
 # страница игры в каталоге есть не у всех слагов (мод для Lucid Cats живёт на её странице)
 PAGES = {"lucidcheats": "lucidcats"}
 
@@ -73,7 +78,7 @@ def message(tag, release, test=False):
     roles = [r for r in (ROLES.get(slug), ALL_UPDATES) if r]
     mention = " ".join("<@&%s>" % r for r in roles)
     name = release.get("name") or tag
-    head = "🦊 Вышла новая версия!" if not test else "🧪 Проверка объявлений (без упоминаний)"
+    head = PARTY + " Вышла новая версия!" if not test else SQUINT + " Проверка объявлений (без упоминаний)"
     return {
         "content": ("%s %s" % (mention, head)) if not test else head,
         "allowed_mentions": {"parse": [], "roles": [] if test else roles},

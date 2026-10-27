@@ -24,6 +24,7 @@ STATE = os.path.join(ROOT, "tools", "milestones_state.json")
 API = "https://api.github.com/repos/e24x5-Fox/claude-rus-hub/releases?per_page=100&page=%d"
 CATALOG = "https://e24x5-fox.github.io/claude-rus-hub/"
 AVATAR = CATALOG + "assets/lisya-avatar.png"
+PARTY = "<:lis_party:1564535633853288478>"   # своё эмодзи сервера, не стандартное (28.10.2026)
 
 
 def get(url):
@@ -75,7 +76,7 @@ def main():
     if top <= state["announced"]:
         return
     text = phrases().get(top) or "Ещё одно удвоение — %s. Спасибо, что вы с нами :3" % num(top)
-    msg = "🎉 **%s скачиваний переводов!**\n%s\n\n<%s>" % (num(top), text, CATALOG)
+    msg = "%s **%s скачиваний переводов!**\n%s\n\n<%s>" % (PARTY, num(top), text, CATALOG)
     hook = os.environ.get("DISCORD_BAKERY_WEBHOOK")
     if dry or not hook:
         print("--- было бы отправлено%s ---\n%s" % ("" if hook else " (нет DISCORD_BAKERY_WEBHOOK)", msg))
