@@ -196,7 +196,7 @@ function renderFoot() {
   css.href = 'v2-widgets.css';
   document.head.insertBefore(css, document.head.querySelector('link[href="v2-shared.css"]'));
   markPage(document, document.body);
-  var need = ['fx.js', window.CRH_MUSIC ? null : 'music.js', 'music-widget.js', 'top-egg.js',
+  var need = ['fx.js', window.CRH_MUSIC ? null : 'music.js', 'v2-music-widget.js', 'top-egg.js',
               'fox-stage.js', 'fox-lyrics.js', 'fox-stage-bg.js'];
   need.forEach(function (src) {
     if (!src) return;
