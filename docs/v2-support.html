@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Поддержать · новый каталог (бета)</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="v2-shared.css">
+<style>
+  .split { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; margin-top: 28px; align-items: start; }
+  .donate { position: relative; overflow: hidden; padding: 26px; border-color: var(--accent);
+            background: linear-gradient(150deg, #4c2a9c, #2a2140 55%, var(--bg2)); }
+  .donate img { position: absolute; right: -6px; bottom: -8px; width: 150px; }
+  .donate h2 { color: #fff; font-size: 18px; }
+  .donate p { color: rgba(255, 255, 255, .78); max-width: 330px; margin: 0 0 18px; }
+  .donate .btn { background: #fff; color: #3b1f82; border-color: #fff; }
+  /* текст кончается до стикера справа (150px), иначе строка правил уходит под лиса */
+  .donate .rules { display: block; margin-top: 12px; font-size: 11.5px; color: rgba(255, 255, 255, .6);
+                   max-width: calc(100% - 140px); position: relative; z-index: 1; }
+  .donors .row { display: flex; gap: 12px; padding: 10px 0; border-top: 1px solid var(--bg3); }
+  .donors .row:first-of-type { border-top: none; }
+  .donors .who { font-weight: 700; }
+  .donors .sum { margin-left: auto; color: var(--accent2); white-space: nowrap; }
+  .donors .msg { color: var(--text2); font-size: 12px; }
+  .free { margin-top: 36px; }
+  .free .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .free .card { display: flex; flex-direction: column; gap: 8px; }
+  .free .card p { margin: 0; color: var(--text2); font-size: 12.5px; flex: 1; }
+  .gift-card { justify-content: flex-end; padding-top: 6px; }
+  @media (max-width: 860px) { .split, .free .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="wrap page">
+  <h1>Поддержать <em>лисёнка</em></h1>
+  <p class="lead">Все переводы бесплатные и такими останутся. Донат — просто способ сказать спасибо.</p>
+
+  <section class="split">
+    <div class="card donate lift">
+      <h2>Донат</h2>
+      <p>Через DonationAlerts. Ник и сообщение появятся в списке рядом.</p>
+      <a class="btn big lift-btn" href="https://dalink.to/e24x5" target="_blank" rel="noopener">Поддержать ♡</a>
+      <span class="rules">Имя в списке держится от недели и дольше — чем больше сумма, тем дольше.</span>
+      <img class="lift-fox" src="assets/stickers/cute.png" alt="">
+    </div>
+    <div class="card donors">
+      <h2>Уже поддержали</h2>
+      <div id="donors"></div>
+    </div>
+  </section>
+
+  <section class="free">
+    <h2>Без денег — тоже помогает</h2>
+    <div class="grid">
+      <div class="card gift-card" id="gift"></div>
+      <div class="card">
+        <p><b>Оценка руководства в Steam.</b> Лайк и «в избранное» поднимают руководство выше, и перевод находят те, кто ищет.</p>
+        <a class="btn" href="v2.html">Выбрать игру</a>
+      </div>
+      <div class="card">
+        <p><b>Сообщить об ошибке.</b> Непереведённая строка или опечатка со скриншотом — лучший подарок переводу.</p>
+        <a class="btn" id="dc" target="_blank" rel="noopener">Написать в Discord</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="games.js"></script>
+<script src="music.js"></script>
+<script src="donors.js"></script>
+<script src="v2-shared.js"></script>
+<script>
+  renderNav('support');
+  renderFoot();
+  $('#dc').href = 'v2-discord.html';
+  gift($('#gift'));
+  var donors = (window.CRH_DONORS && CRH_DONORS.donors) || [];
+  $('#donors').innerHTML = donors.length ? donors.map(function (d) {
+    return '<div class="row"><div><div class="who">' + esc(d.name) + '</div>'
+      + (d.message ? '<div class="msg">' + esc(d.message) + '</div>' : '') + '</div>'
+      + '<div class="sum">' + num(d.amount) + ' ₽</div></div>';
+  }).join('') : '<p class="muted">Пока никого — можете стать первым :3</p>';
+</script>
+</body>
+</html>

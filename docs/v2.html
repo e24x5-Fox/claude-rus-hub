@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Каталог · новый каталог (бета)</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="v2-shared.css">
+<style>
+  .hero { display: flex; gap: 24px; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; }
+  .hero .side { flex: 1 1 360px; max-width: 460px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+  .hero .side .mascot { width: 110px; margin-right: 20px; cursor: pointer; }
+  .finder { position: relative; width: 100%; }
+  @media (max-width: 700px) { .hero .side { align-items: stretch; } .hero .side .mascot { display: none; } }
+  .finder svg { position: absolute; left: 14px; top: 50%; width: 17px; height: 17px; transform: translateY(-50%); color: var(--text3); }
+  .finder input {
+    width: 100%; padding: 13px 14px 13px 42px; border-radius: 10px; font: inherit; font-size: 14px;
+    background: var(--bg2); color: var(--text); border: 1px solid var(--bg3); outline: none;
+  }
+  .finder input:focus { border-color: var(--accent); }
+  .filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 22px 0 16px; }
+  .filters button {
+    font: inherit; font-size: 11.5px; padding: 5px 11px; border-radius: var(--r-pill); cursor: pointer;
+    background: transparent; color: var(--text2); border: 1px solid var(--bg3);
+  }
+  .filters button.on { background: var(--accent-soft); border-color: var(--accent); color: var(--text); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .tile {
+    display: flex; flex-direction: column; border-radius: var(--r-card); overflow: hidden; color: var(--text);
+    background: var(--bg2); border: 1px solid var(--bg3); transition: transform var(--t-fast), border-color var(--t-fast);
+  }
+  .tile:hover { transform: translateY(-3px); border-color: var(--accent); color: var(--text); }
+  .tile .img { position: relative; aspect-ratio: 512 / 192; background: var(--bg3); }
+  .tile .img img { width: 100%; height: 100%; object-fit: cover; }
+  .tile .img .chip { position: absolute; top: 10px; left: 10px; backdrop-filter: blur(6px); }
+  .tile .body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .tile .name { font-weight: 700; font-size: 14px; }
+  .tile .info { font-size: 11.5px; color: var(--text3); display: flex; gap: 10px; flex-wrap: wrap; }
+  .tile .info .ok { color: #4ade80; }
+  .tile .info .bad { color: #f87171; }
+  .empty { color: var(--text3); padding: 40px 0; text-align: center; }
+
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 44px; }
+  .step { padding: 14px 16px; }
+  .step b { display: block; color: var(--accent2); font-size: 20px; margin-bottom: 4px; }
+  .step p { margin: 0; color: var(--text2); font-size: 12.5px; }
+  details.smart { margin-top: 12px; color: var(--text2); font-size: 12.5px; }
+  details.smart summary { cursor: pointer; color: var(--yellow); }
+  @media (max-width: 900px) { .steps { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .steps { grid-template-columns: 1fr; } h1 { font-size: 22px; } }
+</style>
+</head>
+<body>
+<main class="wrap page">
+  <section class="hero">
+    <div>
+      <h1>Русификаторы <em>с Клодом</em></h1>
+      <p class="lead">Установщик сам находит игру, делает резервную копию и умеет вернуть всё как было.</p>
+      <div class="stats-line" id="stats"></div>
+    </div>
+    <div class="side">
+    <div id="fox"></div>
+    <label class="finder" id="finder"><input id="q" type="search" placeholder="Найти игру — можно по-русски" autocomplete="off"></label>
+    </div>
+  </section>
+
+  <div class="filters" id="filters"></div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" hidden>Такой игры пока нет. <a href="DISCORD" id="ask">Предложите её в Discord</a> — переводим по просьбам.</div>
+
+  <section class="steps">
+    <div class="card step"><b>1</b><p>Закройте игру — установщик правит её файлы.</p></div>
+    <div class="card step"><b>2</b><p>Откройте страницу игры и скачайте <code>.exe</code>.</p></div>
+    <div class="card step"><b>3</b><p>Путь он найдёт сам — нажмите «Установить».</p></div>
+    <div class="card step"><b>4</b><p>Передумали — тот же установщик, кнопка «Удалить».</p></div>
+  </section>
+  <details class="smart">
+    <summary>Windows ругается на установщик?</summary>
+    Установщик не подписан цифровой подписью, поэтому SmartScreen его не знает. «Подробнее» → «Выполнить в любом случае».
+    Каждый файл проверен на VirusTotal — отчёт на странице игры.
+  </details>
+</main>
+
+<script src="games.js"></script>
+<script src="music.js"></script>
+<script src="downloads.js"></script>
+<script src="verified.js"></script>
+<script src="v2-shared.js"></script>
+<script>
+  var kind = (location.hash || '#ru').slice(1);
+  if (!KINDS.some(function (k) { return k.id === kind; })) kind = 'ru';
+  var engine = '';
+
+  renderNav(kind);
+  renderFoot();
+  $('#fox').innerHTML = mascot('mascot-wave.png');
+  $('#finder').insertAdjacentHTML('afterbegin', ICON.search);
+  $('#ask').href = DISCORD;
+
+  var t = totals();
+  $('#stats').innerHTML = '<span><b>' + t.games + '</b> ' + plural(t.games, 'игра', 'игры', 'игр') + '</span>'
+    + '<span><b>' + num(t.lines) + '</b> реплик</span>'
+    + '<span><b>' + num(DL.total) + '</b> скачиваний</span>'
+    + '<a href="v2-about.html">вся статистика →</a>';
+
+  // популярное — три игры с наибольшим числом скачиваний за неделю
+  var hot = GAMES.slice().sort(function (a, b) { return DL.week(b.slug) - DL.week(a.slug); })
+    .slice(0, 3).filter(function (g) { return DL.week(g.slug) > 0; }).map(function (g) { return g.slug; });
+
+  function norm(s) { return String(s).toLowerCase().replace(/ё/g, 'е').replace(/[^a-zа-я0-9]+/g, ''); }
+
+  function draw() {
+    var q = norm($('#q').value);
+    var list = GAMES.filter(function (g) {
+      if (q) return [g.title].concat(g.aliases || []).some(function (s) { return norm(s).indexOf(q) >= 0; });
+      return kindOf(g) === kind && (!engine || g.engine === engine);
+    });
+    list.sort(function (a, b) { return DL.of(b.slug) - DL.of(a.slug); });
+    $('#grid').innerHTML = list.map(function (g) {
+      var v = window.CRH_VERIFIED && CRH_VERIFIED[g.slug];
+      var state = v && v.broken ? '<span class="bad">● ждёт исправления</span>' : '<span class="ok">● работает</span>';
+      return '<a class="tile" href="' + gameUrl(g) + '"><div class="img"><img loading="lazy" src="' + cover(g) + '" alt="">'
+        + (hot.indexOf(g.slug) >= 0 ? '<span class="chip hot">популярно</span>' : '') + '</div>'
+        + '<div class="body"><div class="name">' + esc(g.title) + '</div>'
+        + '<div class="info">' + state + '<span>v' + esc(g.version) + '</span><span>' + esc(g.engine || '') + '</span>'
+        + (g.adult ? '<span>18+</span>' : '') + '</div></div></a>';
+    }).join('');
+    $('#empty').hidden = list.length > 0;
+    // движки — только у текущей вкладки, и прячутся, пока идёт поиск
+    var engines = {};
+    GAMES.forEach(function (g) { if (kindOf(g) === kind && g.engine) engines[g.engine] = 1; });
+    var names = Object.keys(engines);
+    $('#filters').hidden = !!q || names.length < 2;
+    $('#filters').innerHTML = ['<button data-e=""' + (engine ? '' : ' class="on"') + '>Все</button>'].concat(names.map(function (e) {
+      return '<button data-e="' + esc(e) + '"' + (engine === e ? ' class="on"' : '') + '>' + esc(e) + '</button>';
+    })).join('');
+  }
+  $('#filters').addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (b) { engine = b.dataset.e; draw(); }
+  });
+  $('#q').addEventListener('input', draw);
+  window.addEventListener('hashchange', function () {
+    if (!$('#grid')) return;     // уже на другой странице (переход без перезагрузки)
+    kind = location.hash.slice(1) || 'ru'; engine = '';
+    document.querySelectorAll('.kinds a').forEach(function (a) { a.classList.toggle('on', a.hash === '#' + kind); });
+    draw();
+  });
+  draw();
+</script>
+</body>
+</html>

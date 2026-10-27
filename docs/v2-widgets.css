@@ -1,0 +1,521 @@
+/* собрано serve.py из docs/site.css */
+.mascot {
+  flex: 0 0 auto;
+  width: 104px;
+  filter: var(--mascot-shadow);
+}
+.mascot img { display: block; width: 100%; height: auto; }
+/* лисёнок пританцовывает под музыку автора (переменные --viz-… ставит
+   music-widget.js на элементы с data-viz): стоит на лапах, на басу приседает,
+   на долю подпрыгивает, на каждой доле качается в другую сторону. Без музыки
+   переменных нет — стоит смирно. Свой слой (will-change): двигается готовой
+   картинкой, тень не перерисовывается на каждом кадре. */
+.mascot img {
+  transform-origin: 50% 100%;
+  will-change: transform;
+  transform:
+    translateY(calc(var(--viz-beat, 0) * -8px))
+    rotate(calc(var(--viz-sway, 0) * 5deg))
+    scale(calc(1 + var(--viz-bass, 0) * .04), calc(1 - var(--viz-bass, 0) * .035));
+}
+
+/* ── Угол на узком экране: пилюля донатов, «Эффекты», плеер ──────────────
+   Они висят поверх страницы теми же цветами, что карточки, и на мелком
+   масштабе сливались с ней. Поэтому — обводка акцентом и мягкое свечение,
+   которое медленно дышит, по очереди у каждого значка. Без движения
+   (fx-still) свечение просто стоит. */
+.donors-pill, .fx-gear, .music:not(.wide):not(.stage) {
+  --dock-shadow: 0 4px 18px rgba(0,0,0,.45);
+  border-color: color-mix(in srgb, var(--accent) 65%, transparent);
+  box-shadow: var(--dock-shadow), 0 0 12px color-mix(in srgb, var(--accent) 30%, transparent);
+  animation: dock-glow 3.6s ease-in-out infinite;
+}
+.music:not(.wide):not(.stage) { --dock-shadow: 0 8px 28px rgba(0,0,0,.5); animation-delay: -1.2s; }
+.fx-gear { animation-delay: -2.4s; }
+.donors-pill { color: var(--text); }
+.donors-pill:hover, .fx-gear:hover, .fx-dock.open .fx-gear, .music:not(.wide):not(.stage):hover {
+  border-color: var(--accent);
+}
+@keyframes dock-glow {
+  0%, 100% { box-shadow: var(--dock-shadow), 0 0 6px color-mix(in srgb, var(--accent) 20%, transparent); }
+  50%      { box-shadow: var(--dock-shadow), 0 0 24px 3px color-mix(in srgb, var(--accent) 70%, transparent),
+                         0 0 0 2px color-mix(in srgb, var(--accent) 55%, transparent); }
+}
+.fx-still .donors-pill, .fx-still .fx-gear, .fx-still .music { animation: none; }
+
+/* ── Музыка автора: плеер под донатерами (music-widget.js) ─────────────────
+   Одна строка: обложка · название и громкость · «играть». Свёрнутый — только
+   обложка и «играть». Иконки — масками из SVG, цветом текста: так они не
+   превращаются в цветные эмодзи на Windows. */
+.music {
+  position: fixed;
+  left: 16px;
+  bottom: 62px;            /* над пилюлей донатеров */
+  z-index: 21;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(260px, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: 8px 10px 8px 8px;
+  background: var(--bg2);
+  border: 1px solid var(--bg3);
+  border-radius: var(--r-card);
+  box-shadow: 0 8px 28px rgba(0,0,0,.5);
+  font-size: var(--fs-note);
+}
+.music:not(.wide):not(.stage) { transition: bottom var(--t-slow); }   /* поднимается над открытым в углу (layout.js) */
+.fx-still .music { transition: none; }
+.music.wide { bottom: 16px; width: var(--side-w); box-shadow: none; }
+
+/* фон страницы — обложка текущего трека, тёмная и размытая почти до пятна.
+   Слой лежит под содержимым (z-index -1 над фоном холста); два слоя — чтобы
+   старая обложка гасла, пока проявляется новая. Пока музыка играет, фон
+   чуть заметнее и чуть резче.
+
+   Размытие не считается браузером на каждом кадре: music-widget.js один раз
+   рисует обложку на два холста — сильно размытый (.soft, пауза) и слабо
+   (.sharp, играет), — и на плей .sharp проявляется поверх .soft. Меняется
+   только прозрачность, а это для браузера почти бесплатно. Где холст не
+   умеет размывать (старый Safari), слой получает .css-blur и живой фильтр. */
+.music-bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; will-change: opacity; }
+.music-bg-layer {
+  /* квадрат шире экрана: края размытия — за экраном, а по высоте есть запас,
+     по которому music-widget.js ведёт картинку сверху вниз вслед за прокруткой */
+  position: absolute; left: -15%; top: -15vh; width: 130%;
+  aspect-ratio: 1; min-height: 130vh;
+  background: center / cover no-repeat;
+  opacity: 0;
+  transition: opacity 3.5s ease;
+  will-change: opacity, transform;
+}
+.music-bg-layer.on { opacity: .14; }
+body.music-playing .music-bg-layer.on { opacity: .24; }
+.music-bg-layer canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+.music-bg-layer canvas.sharp { opacity: 0; transition: opacity 2.5s ease; }
+body.music-playing .music-bg-layer canvas.sharp { opacity: 1; }
+/* что не видно, то и не рисуется: угасшая обложка и холст под проявившимся
+   .sharp прячутся, когда переход закончился, и возвращаются сразу */
+.music-bg-layer:not(.on) { visibility: hidden; transition: opacity 3.5s ease, visibility 0s 3.5s; }
+body.music-playing .music-bg-layer canvas.soft { visibility: hidden; transition: visibility 0s 2.5s; }
+/* без тяжёлых эффектов (fx.js) фона нет вовсе: music-widget.js его и не рисует */
+.fx-flat .music-bg { display: none; }
+/* запасной путь: размытие фильтром на каждом кадре */
+.music-bg-layer.css-blur { filter: blur(90px) saturate(1.3) brightness(var(--bg-bright, .55)); transition: opacity 3.5s ease, filter 2.5s ease; }
+body.music-playing .music-bg-layer.css-blur { filter: blur(24px) saturate(1.3) brightness(var(--bg-bright, .55)); }
+.music-bg-layer.css-blur:not(.on) { transition: opacity 3.5s ease, filter 2.5s ease, visibility 0s 3.5s; }
+/* на широком экране плеер занимает низ колонки — панель донатеров уступает */
+body.has-music .donors.wide .donors-panel { max-height: calc(100vh - 63px - 90px); }
+/* на узком плеер не прячется под открытой панелью донатеров — layout.js ставит
+   его над ней, а панель на его высоту ниже (--music-h) */
+
+.music.folded { width: auto; gap: 8px; padding: 6px; border-radius: var(--r-pill); }
+.music.folded .music-info, .music.folded .music-fold { display: none; }
+
+/* заранее записанная анимация (music.viz → music-widget.js): столбики спектра
+   по низу плеера, под всем остальным; бас качает обложку (--viz-bass), доля
+   подсвечивает её (--viz-beat). Без движения переменных нет — всё стоит. */
+.music-viz {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  border-radius: inherit; pointer-events: none;
+}
+.music > :not(.music-viz) { position: relative; }
+.music.folded .music-viz { display: none; }
+
+.music-cover-btn {
+  flex: none; padding: 0; border: 0; background: none; border-radius: 8px;
+  cursor: default; line-height: 0;
+  transform: scale(calc(1 + var(--viz-bass, 0) * .07));
+}
+.music.folded .music-cover-btn { cursor: pointer; border-radius: 50%; }
+.music-cover {
+  width: 48px; height: 48px; display: block;
+  border-radius: inherit; object-fit: cover; background: var(--bg3);
+}
+.music.folded .music-cover { width: 38px; height: 38px; }
+.music.playing .music-cover {
+  box-shadow: 0 0 0 2px var(--accent-soft),
+              0 0 calc(var(--viz-beat, 0) * 16px) calc(var(--viz-beat, 0) * 3px) rgba(139,92,246, calc(var(--viz-beat, 0) * .55));
+}
+.music.folded.playing .music-cover { animation: music-spin 12s linear infinite; }
+@keyframes music-spin { to { transform: rotate(360deg); } }
+
+.music-info { min-width: 0; flex: 1; }
+.music-title {
+  display: block;
+  color: var(--text); font-weight: 600; text-decoration: none;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.music-title[href]:hover { color: var(--accent2); text-decoration: underline; text-underline-offset: 3px; }
+.music-artist { color: var(--text3); font-size: var(--fs-hint); margin-top: 1px; }
+.music-about { display: none; }   /* жанр и дата — только на сцене */
+
+.music-vol-row { display: flex; align-items: center; gap: 6px; margin-top: 5px; cursor: pointer; }
+.music-vol {
+  -webkit-appearance: none; appearance: none;
+  flex: 1; min-width: 0; height: 4px; margin: 0; border-radius: 2px;
+  background: var(--bg3); accent-color: var(--accent); cursor: pointer;
+}
+.music-vol::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 11px; height: 11px; border-radius: 50%;
+  background: var(--accent2); border: 0;
+}
+.music-vol::-moz-range-thumb {
+  width: 11px; height: 11px; border-radius: 50%; background: var(--accent2); border: 0;
+}
+
+.music-play {
+  flex: none; width: 34px; height: 34px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 50%;
+  background: var(--accent); color: #fff; cursor: pointer;
+  transition: background var(--t-fast);
+}
+.music-play:hover { background: var(--accent2); }
+.music-play::before, .music-skip::before, .music-vol-ico {
+  content: ""; display: block; flex: none; width: 13px; height: 13px;
+  background: currentColor;
+  -webkit-mask: var(--ico) center / contain no-repeat;
+  mask: var(--ico) center / contain no-repeat;
+}
+.ico-play  { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 2.5v11l9-5.5z'/%3E%3C/svg%3E"); }
+.ico-pause { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z'/%3E%3C/svg%3E"); }
+.music-vol-ico {
+  width: 12px; height: 12px; color: var(--text3);
+  --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 6h3l4-3.5v11L5 10H2z'/%3E%3Cpath d='M11 5.5a3.5 3.5 0 0 1 0 5' fill='none' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E");
+}
+
+.music-fold {
+  align-self: flex-start; flex: none;
+  background: none; border: 0; padding: 0 2px; margin-left: -4px;
+  color: var(--text3); font: inherit; font-size: 16px; line-height: 1; cursor: pointer;
+}
+.music-fold:hover { color: var(--text); }
+
+.fx-still .music.folded.playing .music-cover { animation: none; }
+
+/* ── пасхалка у верхнего края (top-egg.js): выезжает сверху ──────────────── */
+.top-egg {
+  position: fixed; top: 12px; left: 50%; z-index: 40;
+  display: flex; gap: 12px; align-items: center;
+  width: min(420px, calc(100vw - 32px)); box-sizing: border-box;
+  padding: 12px 40px 12px 14px;
+  background: var(--bg2); border: 1px solid var(--accent); border-radius: var(--r-card);
+  box-shadow: 0 12px 40px rgba(0,0,0,.6), 0 0 0 4px var(--accent-soft);
+  transform: translate(-50%, calc(-100% - 24px));
+  visibility: hidden;
+  transition: transform .45s cubic-bezier(.2,1.3,.4,1), visibility 0s .45s;
+}
+.top-egg.show { transform: translate(-50%, 0); visibility: visible; transition: transform .45s cubic-bezier(.2,1.3,.4,1); }
+.top-egg-mascot { width: 64px; height: auto; flex: none; filter: var(--mascot-shadow); }
+.top-egg.show .top-egg-mascot { animation: thanks-wave 1.2s ease-in-out .3s 2; transform-origin: 50% 90%; }
+.top-egg-text { margin: 0; color: var(--text); line-height: 1.5; }
+.top-egg-close { position: absolute; top: 8px; right: 10px; }
+.fx-still .top-egg, .fx-still .top-egg.show { transition: none; }
+.fx-still .top-egg.show .top-egg-mascot { animation: none; }
+
+/* ── «Спасибо, что скачали» (thanks-widget.js) ─────────────────────────── */
+.thanks {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+  background: rgba(0,0,0,.45);
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--t-med), visibility var(--t-med);
+}
+.thanks.show { opacity: 1; visibility: visible; }
+.thanks-card {
+  display: flex; gap: 16px; align-items: center;
+  max-width: 440px; width: 100%; box-sizing: border-box;
+  padding: 20px 22px;
+  background: var(--bg2);
+  border: 1px solid var(--accent);
+  border-radius: var(--r-card);
+  box-shadow: 0 12px 40px rgba(0,0,0,.6), 0 0 0 4px var(--accent-soft);
+  transform: translateY(12px) scale(.97);
+  transition: transform var(--t-med);
+}
+.thanks.show .thanks-card { transform: none; }
+.thanks-mascot { width: 92px; height: auto; flex: none; filter: var(--mascot-shadow); }
+.thanks.show .thanks-mascot { animation: thanks-wave 1.2s ease-in-out 2; transform-origin: 50% 90%; }
+@keyframes thanks-wave { 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
+.thanks-title { color: var(--text); font-weight: 600; font-size: var(--fs-title); line-height: 1.3; }
+.thanks-sub { margin: 6px 0 14px; color: var(--text2); line-height: 1.55; }
+.thanks-ok { border: 0; cursor: pointer; font: inherit; }
+@media (max-width: 560px) {
+  .thanks-card { flex-direction: column; text-align: center; }
+  .thanks-mascot { width: 76px; }
+}
+.fx-still .thanks, .fx-still .thanks-card { transition: none; }
+.fx-still .thanks.show .thanks-mascot { animation: none; }
+
+/* Список переводов обычным HTML (tools/seo.py) — для поисковиков и для тех,
+   у кого не работает JavaScript. Скрипт страницы заменяет его карточками. */
+.seo-list { list-style: none; margin: 0; padding: 0; }
+.seo-list li { margin: 0 0 1.2em; }
+.seo-list h2 { font-size: 1.05em; margin: 0 0 .3em; }
+.seo-list p { margin: 0 0 .3em; }
+.js .seo-list { display: none; }
+
+/* Значок VirusTotal рядом с «Скачать» (virustotal.js): заметный, но не
+   спорит с главной кнопкой — цветная рамка и подложка вместо заливки. */
+.btn-vt {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-weight: 600;
+  border-width: 1.5px;
+}
+.btn-vt svg { width: 18px; height: 18px; flex: none; }
+.btn-vt svg path { fill: currentColor; }
+.btn-vt svg .tick { fill: none; stroke: var(--bg); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.vt-ok   { color: var(--green);  background: rgba(34,197,94,.12); border-color: rgba(34,197,94,.55); }
+.vt-warn { color: var(--yellow); background: rgba(234,179,8,.12); border-color: rgba(234,179,8,.55); }
+.btn-vt:hover { filter: brightness(1.15); }
+.vt-ok:hover   { border-color: var(--green); }
+.vt-warn:hover { border-color: var(--yellow); }
+.vt-note { margin: 10px 0 0; color: var(--text3); font-size: var(--fs-note); }
+
+/* ── сцена (fox-stage.js): лисёнка нажали десять раз ─────────────────────────
+   Лисёнок вылетает в середину экрана, интерфейс гаснет, плеер растягивается
+   на весь низ и получает «назад» и «вперёд». */
+.fox-boop { transition: transform .18s cubic-bezier(.3, 1.8, .5, 1); cursor: pointer; }
+
+.fox-stage-lock, .fox-stage-lock body { overflow: hidden; }
+/* гаснет всё, кроме плеера, фона и самой сцены; анимацией, а не transition,
+   чтобы не перебить собственные переходы у панелей */
+body.fox-stage-on > :not(.music):not(.music-bg):not(.fox-stage) {
+  animation: fox-stage-hide .6s ease forwards; pointer-events: none;
+}
+body.fox-stage-back > :not(.music):not(.music-bg):not(.fox-stage) {
+  animation: fox-stage-show .6s ease .3s backwards;
+}
+@keyframes fox-stage-hide { to { opacity: 0; visibility: hidden; } }
+@keyframes fox-stage-show { from { opacity: 0; } }
+/* на сцене обложка на фоне — как свет на сцене: ярче */
+body.fox-stage-on .music-bg-layer.on { opacity: .5; }
+/* обложку на сцене трясёт fox-stage-bg.js (transform); уходя со сцены — отпускает плавно */
+.music-bg { transition: transform .8s ease; }
+body.fox-stage-on .music-bg { transition: none; will-change: opacity, transform; }
+
+.fox-stage { position: fixed; inset: 0; z-index: 20; pointer-events: none; }
+.fox-stage-fly {
+  /* место лисёнка на сцене: по центру, над плеером; ширину даёт aspect-ratio
+     картинки (fox-stage.js) — тогда полёт считается ещё до её загрузки */
+  position: absolute; left: 0; right: 0; margin: 0 auto;
+  bottom: calc(150px + env(safe-area-inset-bottom, 0px));
+  height: min(calc(100vh - 230px), 80vw);
+  transform-origin: 0 0;
+  transition: transform .9s cubic-bezier(.34, 1.25, .5, 1);
+}
+.fox-stage-img {
+  display: block; width: 100%; height: 100%;
+  filter: var(--mascot-shadow);
+  transform-origin: 50% 100%;
+  will-change: transform;
+  transform:
+    translateY(calc(var(--viz-beat, 0) * -3%))
+    rotate(calc(var(--viz-sway, 0) * 4deg))
+    scale(calc(1 + var(--viz-bass, 0) * .035), calc(1 - var(--viz-bass, 0) * .03));
+}
+.fox-stage-close {
+  position: absolute; right: 16px; top: calc(16px + env(safe-area-inset-top, 0px));
+  width: 40px; height: 40px; padding: 0;
+  border: 1px solid var(--bg3); border-radius: 50%;
+  background: var(--bg2); color: var(--text2);
+  font: inherit; font-size: 22px; line-height: 1; cursor: pointer;
+  pointer-events: auto;
+  opacity: 0; transition: opacity .4s ease .5s, color var(--t-fast);
+}
+.fox-stage.on .fox-stage-close { opacity: 1; }
+.fox-stage:not(.on) .fox-stage-close { transition-delay: 0s; }   /* уходит сразу, без задержки появления */
+.fox-stage-close:hover { color: var(--text); border-color: var(--accent); }
+.fx-still .fox-stage-fly { transition: none; }
+
+/* Радуга по контуру (fox-stage.js): слой под картинкой — конический градиент
+   с маской по силуэту лисёнка, чуть крупнее его и размытый наружу; видна
+   только кайма вокруг. Горит по --viz-surge (сильные места и дропы), цвета
+   бегут по кругу. Размытие — на внешнем слое: фильтр применяется раньше
+   маски, и на том же слое маска срезала бы всё свечение снаружи. Танцует
+   вместе с картинкой — тот же transform. */
+.fox-stage-img { position: relative; }            /* над радугой */
+.fox-stage-glow {
+  position: absolute; inset: 0; pointer-events: none;
+  transform-origin: 50% 100%;
+  transform:
+    translateY(calc(var(--viz-beat, 0) * -3%))
+    rotate(calc(var(--viz-sway, 0) * 4deg))
+    scale(calc((1 + var(--viz-bass, 0) * .035) * (1.012 + var(--viz-surge, 0) * .02)),
+          calc((1 - var(--viz-bass, 0) * .03) * (1.012 + var(--viz-surge, 0) * .02)));
+  filter: blur(calc(7px + var(--viz-surge, 0) * 13px)) brightness(calc(1.1 + var(--viz-beat, 0) * .6));
+  opacity: calc(var(--viz-surge, 0) * 1.25);
+  will-change: transform, opacity, filter;
+}
+.fox-stage-rainbow {
+  position: absolute; inset: 0;
+  background: conic-gradient(from 0deg, #ff3b6b, #ff9f1c, #ffe14d, #3dff8f, #26c6ff, #8b5cf6, #ff4fd8, #ff3b6b);
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  animation: fox-rainbow 2.4s linear infinite;
+}
+@keyframes fox-rainbow { to { filter: hue-rotate(360deg); } }
+/* огоньки — на всю сцену, за лисёнком */
+.fox-stage-sparks { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.fx-still .fox-stage-glow, .fx-still .fox-stage-sparks { display: none; }
+/* живой фон сцены (fox-stage-bg.js): холст в пол-разрешения, растянут на
+   весь экран; под всем остальным на сцене — слова и огоньки вставляются
+   раньше него в разметке, поэтому порядок держит z-index */
+.fox-stage-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1;
+  pointer-events: none; opacity: 0; transition: opacity .8s ease;
+}
+.fox-stage.on .fox-stage-bg { opacity: 1; transition-delay: .3s; }
+.fx-still .fox-stage-bg { display: none; }
+
+/* плеер на сцене: островок во всю ширину низа */
+.music-skip { display: none; }
+.music.stage {
+  left: 16px; right: 16px; width: auto;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  gap: 14px; padding: 14px 16px 14px 14px; z-index: 30;
+  box-shadow: 0 12px 40px rgba(0,0,0,.6), 0 0 0 1px var(--accent-soft);
+  animation: music-stage-in .5s cubic-bezier(.3, 1.3, .5, 1);
+}
+@keyframes music-stage-in { from { transform: translateY(16px); opacity: .5; } }
+.donors.open:not(.wide) ~ .music.stage { display: flex; }
+.music.stage .music-cover { width: 72px; height: 72px; }
+.music.stage .music-title { font-size: var(--fs-title); }
+.music.stage .music-about:not(:empty) { display: block; color: var(--text2); font-size: var(--fs-hint); margin-top: 2px; }
+.music.stage .music-vol-row { max-width: 240px; }
+.music.stage .music-fold { display: none; }
+.music.stage .music-skip {
+  display: inline-flex; flex: none; width: 34px; height: 34px; padding: 0;
+  align-items: center; justify-content: center;
+  border: 0; border-radius: 50%;
+  background: var(--bg3); color: var(--text); cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.music.stage .music-skip:hover { background: var(--accent-soft); color: var(--accent2); }
+.ico-prev { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 3h2v10H3zM14 3v10L6 8z'/%3E%3C/svg%3E"); }
+.ico-next { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M11 3h2v10h-2zM2 3v10l8-5z'/%3E%3C/svg%3E"); }
+/* ручки темпа и ревёрба — только на сцене (music-widget.js); дуга —
+   conic-gradient на 270°, риска на колпачке поворачивается на --knob */
+.music-knobs { display: none; }
+.music.stage .music-knobs { display: flex; gap: 14px; flex: none; align-items: flex-start; }
+.music-knob { display: flex; flex-direction: column; align-items: center; width: 64px; }
+.music-knob-dial {
+  position: relative; width: 44px; height: 44px; border-radius: 50%;
+  cursor: ns-resize; touch-action: none; outline: none;
+  background: conic-gradient(from 225deg,
+    var(--accent2) 0 var(--knob-fill, 0%), var(--bg3) var(--knob-fill, 0%) 75%, transparent 75%);
+}
+.music-knob-dial:focus-visible { box-shadow: 0 0 0 2px var(--accent-soft); }
+.music-knob-cap {
+  position: absolute; inset: 5px; border-radius: 50%;
+  background: var(--bg2); box-shadow: inset 0 0 0 1px var(--bg3);
+  transform: rotate(var(--knob, -135deg));
+  transition: transform .08s linear;
+}
+.music-knob-cap::after {
+  content: ""; position: absolute; left: 50%; top: 4px;
+  width: 2px; height: 10px; margin-left: -1px; border-radius: 1px; background: var(--text);
+}
+.music-knob-dial:hover .music-knob-cap, .music-knob-dial.drag .music-knob-cap { background: var(--bg3); }
+.music-knob-name { color: var(--text2); font-size: var(--fs-hint); margin-top: 4px; }
+.music-knob-val {
+  color: var(--text2); font-size: var(--fs-hint); white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+/* «Ещё»: остальные ручки — панелью над плеером, у правого края */
+.music-more-btn {
+  align-self: center; flex: none; width: 34px; height: 34px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 50%; background: var(--bg3); color: var(--text); cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.music-more-btn::before {
+  content: ""; display: block; width: 14px; height: 14px; background: currentColor;
+  -webkit-mask: var(--ico) center / contain no-repeat; mask: var(--ico) center / contain no-repeat;
+}
+.music-more-btn:hover, .music-more-btn.on { background: var(--accent-soft); color: var(--accent2); }
+.ico-sliders { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 4h7M13 4h1M2 12h1M7 12h7' stroke='black' stroke-width='1.6' stroke-linecap='round'/%3E%3Ccircle cx='11' cy='4' r='2' fill='none' stroke='black' stroke-width='1.6'/%3E%3Ccircle cx='5' cy='12' r='2' fill='none' stroke='black' stroke-width='1.6'/%3E%3C/svg%3E"); }
+.music > .music-more {
+  position: absolute; right: 0; bottom: calc(100% + 10px); z-index: 2;
+  display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end;
+  max-width: min(720px, calc(100vw - 32px)); padding: 14px 16px;
+  background: var(--bg2); border: 1px solid var(--bg3); border-radius: var(--r-card);
+  box-shadow: 0 12px 40px rgba(0,0,0,.6), 0 0 0 1px var(--accent-soft);
+}
+.music > .music-more[hidden] { display: none; }
+.music-more-title {
+  color: var(--text3); font-size: var(--fs-hint); letter-spacing: .06em; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.music-more-row { display: flex; gap: 10px; }
+.music-more-reset {
+  align-self: center; margin-left: auto; padding: 7px 12px;
+  border: 1px solid var(--bg3); border-radius: var(--r-pill); background: none;
+  color: var(--text2); font: inherit; font-size: var(--fs-hint); cursor: pointer;
+}
+.music-more-reset:hover { color: var(--text); border-color: var(--accent); }
+@media (max-width: 600px) {
+  .music.stage { gap: 10px; flex-wrap: wrap; }
+  .music > .music-more { left: 0; right: 0; max-width: none; justify-content: center; }
+  .music.stage .music-cover { width: 52px; height: 52px; }
+  .music.stage .music-knobs { order: 10; width: 100%; justify-content: center; gap: 24px; }
+}
+.fx-still .music.stage { animation: none; }
+.fx-still .music-knob-cap { transition: none; }
+
+/* ── слова песни на сцене (fox-lyrics.js) ──────────────────────────────────
+   По бокам лисёнка две колонки; новое слово встаёт наверх своей колонки,
+   прежние съезжают на строку вниз (--lyric-step, считает скрипт) и гаснут.
+   Колонки прижаты к лисёнку: левая — вправо, правая — влево. Нет места по
+   бокам — колонки встают над ним, каждая на свою половину. */
+.fox-lyrics { position: absolute; inset: 0; pointer-events: none; }
+.fox-lyrics-col {
+  position: absolute; left: 16px; right: calc(50% + 8px);
+  font-size: clamp(17px, 4.4vw, 26px); font-weight: 800; line-height: 1.15;
+}
+.fox-lyrics-col.right { left: calc(50% + 8px); right: 16px; text-align: left; }
+.fox-lyrics-col.left { text-align: right; }
+.fox-lyrics.aside .fox-lyrics-col { right: auto; left: auto; font-size: clamp(22px, 2.6vw, 46px); }
+.fox-lyric {
+  position: absolute; top: 0; left: 0; right: 0;
+  overflow-wrap: anywhere;
+  transition: transform .7s cubic-bezier(.3, 1.15, .45, 1), opacity .7s ease;
+  will-change: transform, opacity;
+}
+.fox-lyric-in {
+  display: inline-block;
+  color: var(--text);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .65);
+  animation: fox-lyric-in .55s cubic-bezier(.2, 1.4, .4, 1) backwards;
+  transition: color .25s ease, text-shadow .25s ease, transform .25s ease;
+}
+.fox-lyrics-col.left .fox-lyric-in { transform-origin: 100% 50%; }
+.fox-lyrics-col.right .fox-lyric-in { transform-origin: 0 50%; }
+/* то, что поют прямо сейчас */
+.fox-lyric.now .fox-lyric-in {
+  color: var(--accent2);
+  text-shadow: 0 0 18px var(--accent), 0 2px 14px rgba(0, 0, 0, .65);
+  transform: scale(1.08);
+}
+@keyframes fox-lyric-in {
+  from { opacity: 0; filter: blur(10px); transform: translateY(-.5em) scale(1.25); }
+}
+.fx-still .fox-lyric, .fx-still .fox-lyric-in { transition: none; animation: none; }
+/* пять нажатий на лисёнка — слова по-русски; сам лисёнок ловит нажатия, а
+   на миг сверху всплывает, на каком языке теперь слова */
+.fox-stage.on .fox-stage-img { pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.fox-lyrics-hint {
+  position: absolute; left: 50%; top: calc(24px + env(safe-area-inset-top, 0px));
+  transform: translate(-50%, -6px);
+  padding: 6px 14px; border-radius: 999px;
+  background: var(--bg2); border: 1px solid var(--accent); color: var(--text);
+  font-size: 14px; white-space: nowrap;
+  opacity: 0; transition: opacity .3s ease, transform .3s ease;
+}
+.fox-lyrics-hint.on { opacity: 1; transform: translate(-50%, 0); }
+.fx-still .fox-lyrics-hint { transition: none; }

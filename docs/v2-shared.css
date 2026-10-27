@@ -1,0 +1,223 @@
+/* Макет нового каталога: общее для всех страниц. Токены — из настоящего каталога
+   (claude-rus-hub/docs/tokens.css), поэтому цвета и шрифт те же. */
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  margin: 0; min-height: 100vh; color: var(--text); font-family: var(--mono);
+  font-size: 13.5px; line-height: 1.55;
+  background:
+    radial-gradient(1200px 500px at 15% -10%, rgba(139, 92, 246, .16), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(139, 92, 246, .08), transparent 60%),
+    var(--bg);
+  overflow-x: hidden;
+}
+body.radio-on { padding-bottom: 76px; }
+a { color: var(--accent2); text-decoration: none; }
+a:hover { color: #c4b5fd; }
+img { display: block; max-width: 100%; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+
+/* ── шапка: одна на все страницы и все ширины ─────────────────────────────── */
+.nav {
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(14, 14, 16, .82); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--bg3);
+}
+.nav-row { display: flex; align-items: center; gap: 18px; height: 60px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 700; white-space: nowrap; }
+.brand img { width: 34px; height: 34px; }
+.brand b { color: var(--accent2); font-weight: 700; }
+.kinds { display: flex; gap: 4px; }
+.kinds a {
+  padding: 7px 12px; border-radius: var(--r-btn); color: var(--text2); white-space: nowrap;
+  display: flex; align-items: center; gap: 7px;
+}
+.kinds a:hover { background: var(--bg2); color: var(--text); }
+.kinds a.on { background: var(--accent-soft); color: var(--text); }
+.kinds .n { font-size: 10.5px; color: var(--text3); }
+.kinds a.on .n { color: var(--accent2); }
+.me { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.me a {
+  display: flex; align-items: center; gap: 7px; padding: 7px 11px; border-radius: var(--r-btn);
+  color: var(--text2); white-space: nowrap; border: 1px solid transparent;
+}
+.me a:hover { color: var(--text); background: var(--bg2); }
+.me a.on { color: var(--text); border-color: var(--bg3); background: var(--bg2); }
+.me svg { width: 16px; height: 16px; flex: none; }
+.me .dc { color: #fff; background: #5865f2; }
+.me .dc:hover, .me .dc.on { background: #4752c4; color: #fff; border-color: #8891f7; }
+.me .dc .live { font-size: 10.5px; opacity: .8; }
+
+@media (max-width: 900px) {
+  .nav-row { height: auto; flex-wrap: wrap; gap: 8px 12px; padding-top: 10px; padding-bottom: 10px; }
+  .brand span { display: none; }
+  .me { margin-left: auto; }
+  .me a .t { display: none; }
+  .me .dc .live { display: none; }
+  .kinds { order: 3; width: 100%; overflow-x: auto; scrollbar-width: none; }
+}
+
+/* ── общее ────────────────────────────────────────────────────────────────── */
+.page { padding-top: 28px; padding-bottom: 56px; }
+h1 { font-size: 26px; line-height: 1.25; margin: 0 0 8px; letter-spacing: -.01em; }
+h1 em { font-style: normal; color: var(--accent2); }
+h2 { font-size: 15px; margin: 0 0 14px; color: var(--accent2); }
+.lead { color: var(--text2); margin: 0; max-width: 640px; }
+.muted { color: var(--text3); }
+.card { background: var(--bg2); border: 1px solid var(--bg3); border-radius: var(--r-card); padding: 18px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 11px 18px; border-radius: var(--r-btn); font: inherit; font-weight: 700; cursor: pointer;
+  border: 1px solid var(--bg3); background: var(--bg2); color: var(--text); white-space: nowrap;
+}
+.btn:hover { background: var(--bg4); color: var(--text); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover { background: #7c4ef0; }
+.btn.big { padding: 14px 24px; font-size: 14.5px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: var(--r-pill);
+  background: var(--bg3); color: var(--text2); font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em;
+}
+.chip.ok { background: rgba(34, 197, 94, .12); color: #4ade80; }
+.chip.bad { background: rgba(239, 68, 68, .14); color: #f87171; }
+.chip.hot { background: rgba(234, 179, 8, .14); color: #facc15; }
+.chip.acc { background: var(--accent-soft); color: var(--accent2); }
+.stats-line { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--text2); margin-top: 14px; font-size: 12.5px; }
+.stats-line b { color: var(--text); }
+
+.foot { border-top: 1px solid var(--bg3); padding: 22px 0 30px; color: var(--text3); font-size: 12px; }
+.foot .wrap { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+.foot .sp { flex: 1; }
+
+/* ── плеер: настоящий music-widget.js, только не карточкой в углу, а полосой
+   внизу на всю ширину — так он ничего не перекрывает, и на телефоне тоже.
+   Свёрнутого вида у полосы нет; на сцене (.stage) всё как на сайте. */
+.music:not(.stage), .music.folded:not(.stage) {
+  left: 0; right: 0; bottom: 0; width: auto; max-width: none; gap: 12px;
+  border-radius: 0; border-width: 1px 0 0; box-shadow: none; animation: none;
+  padding: 8px max(16px, calc((100vw - 1180px) / 2 + 16px));
+  background: rgba(24, 24, 27, .94); backdrop-filter: blur(14px);
+}
+.music.folded:not(.stage) .music-info { display: block; }
+.music:not(.stage) .music-info { max-width: 420px; }
+.music:not(.stage) .music-fold { display: none; }
+.music:not(.stage) .music-play { margin-left: auto; }
+.music.folded:not(.stage) .music-cover { width: 44px; height: 44px; }
+.music.folded:not(.stage) .music-cover-btn { border-radius: 8px; }
+/* в нынешнем каталоге свёрнутый плеер — круглая «пластинка» и крутится; в полосе обложка квадратная */
+.music.folded.playing:not(.stage) .music-cover { animation: none; }
+.foot .mascot { width: 62px; }
+
+body:not(.radio-on) .music:not(.stage) { display: none; }
+.music-x {
+  flex: none; width: 30px; height: 30px; padding: 0; border: none; border-radius: 50%; cursor: pointer;
+  display: grid; place-items: center; background: transparent; color: var(--text3);
+}
+.music-x:hover { background: var(--bg3); color: var(--text); }
+.music-x svg { width: 14px; height: 14px; }
+.music.stage .music-x { display: none; }
+
+/* ── яркие карточки (донат, Discord): как .dcard в нынешнем каталоге — при
+   наведении карточка приподнимается, свечение под ней сильнее, лис наклоняется,
+   кнопка светлеет; нажатие кнопку вдавливает. */
+.lift { isolation: isolate; transition: transform .18s ease, box-shadow .18s ease; box-shadow: 0 10px 30px -12px rgba(139, 92, 246, .6); }
+.lift:hover { transform: translateY(-3px); box-shadow: 0 18px 40px -12px rgba(139, 92, 246, .85); }
+/* поворот вокруг левого нижнего края и чуть вверх: низ лиса не опускается
+   и не вылезает за край карточки (с точкой справа левый угол уходил вниз) */
+.lift .lift-fox { transition: transform .25s ease; transform-origin: 15% 100%; }
+.lift:hover .lift-fox { transform: translateY(-5px) rotate(-4deg); }
+.lift .lift-btn { transition: transform .15s ease, background .15s ease, box-shadow .15s ease; box-shadow: 0 3px 0 rgba(30, 0, 80, .45); }
+.lift:hover .lift-btn { background: #f1ebff; }
+.lift .lift-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 0 rgba(30, 0, 80, .45); }
+.lift .lift-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(30, 0, 80, .45); }
+@media (prefers-reduced-motion: reduce) {
+  .lift, .lift .lift-fox, .lift .lift-btn { transition: none; }
+  .lift:hover, .lift:hover .lift-fox { transform: none; }
+}
+
+/* пометка, что это макет */
+.mock-tag { text-decoration: none;
+  position: fixed; right: 12px; top: 70px; z-index: 40; font-size: 10.5px; padding: 4px 9px;
+  border-radius: var(--r-pill); background: var(--yellow); color: #1a1405; font-weight: 700;
+}
+@media (max-width: 900px) { .mock-tag { text-decoration: none; top: auto; bottom: 84px; } }
+
+/* ── подарок со стикерами ─────────────────────────────────────────────────────
+   Лисята спрятаны в коробке целиком. Коробка показалась на экране — крышка
+   подпрыгивает, намекая (.open). Первое наведение (на телефоне — нажатие)
+   срывает крышку: она улетает за край страницы и до перезагрузки не возвращается
+   (.lid-gone; при переходах по сайту остаётся сорванной). Пока мышь над коробкой,
+   лисята выглядывают веером, ушла — прячутся обратно. Низ у картинок обрезан,
+   поэтому наружу они выходят не целиком: низ всегда остаётся за стенкой коробки. --i — место в веере (-2…2), --a — |i|.
+   gift() в shared.js. */
+.gift { position: relative; width: 260px; max-width: 100%; margin: 0 auto; padding-top: 70px; }
+.gift-fan { position: absolute; left: 0; right: 0; top: 0; height: 90px; z-index: 1; }
+.gift-fan img {
+  --sp: 34px; --ro: 12deg; --up: 0px; --sc: calc(1 - var(--a) * .07);
+  position: absolute; left: 50%; bottom: 0; height: 78px; width: auto;
+  transform-origin: 50% 100%; filter: var(--mascot-shadow);
+  transform: translateX(calc(-50% + var(--i) * var(--sp))) translateY(calc(var(--a) * 6px + var(--up)))
+             rotate(calc(var(--i) * var(--ro))) scale(var(--sc));
+  transition: transform .6s cubic-bezier(.3, 1.7, .5, 1) calc(var(--a) * 90ms), opacity .2s calc(var(--a) * 90ms);
+}
+/* в коробке: маленькие, глубоко за её стенкой и прозрачные */
+.gift:not(:hover):not(.force) .gift-fan img { --sp: 0px; --ro: 0deg; --up: 70px; --sc: .35; opacity: 0; transition-delay: 0s; }
+/* --up: 0 — низ лисят на 20px ниже верха коробки, с запасом на отскок (кривая
+   с перелётом подбрасывает их выше конечной точки), обрез картинки не виден */
+.gift:is(:hover, .force) .gift-fan img { --sp: 37px; --ro: 13deg; --up: 0px; }
+/* без крышки низ веера уходит за верх коробки — лисята выглядывают из неё, а не висят над ней */
+.gift.lid-gone .gift-fan { height: 112px; }
+.gift-lid {
+  position: relative; z-index: 3; height: 22px; margin: 0 -8px; border-radius: 6px; transform-origin: 50% 100%;
+  background: linear-gradient(180deg, #b69cff, var(--accent));
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .35);
+  transition: transform .35s cubic-bezier(.3, 1.6, .5, 1);
+}
+.gift-lid::before, .gift-lid::after {      /* бант */
+  content: ""; position: absolute; top: -15px; left: 50%; width: 22px; height: 18px;
+  border: 5px solid #fff; border-radius: 50% 50% 4px 50%; box-sizing: border-box;
+}
+.gift-lid::before { transform: translateX(-100%) rotate(-12deg); }
+.gift-lid::after { transform: scaleX(-1) rotate(-12deg); }
+.gift-lid i { position: absolute; left: 50%; top: 0; bottom: 0; width: 18px; margin-left: -9px; background: #fff; opacity: .92; }
+.gift.open:not(.lid-gone) .gift-lid { animation: lidhop .55s ease-out; }
+@keyframes lidhop { 30% { transform: rotate(-7deg) translateY(-16px); } }
+/* сорвали — летит влево по дуге (подлетает и падает), кувыркаясь, за край страницы;
+   кадры — точки параболы, между ними linear, поэтому траектория гладкая */
+.gift.lid-gone .gift-lid { animation: lidfly 1.2s linear forwards; pointer-events: none; }
+.gift.lid-gone.lid-was .gift-lid { animation: none; visibility: hidden; }   /* сорвана в прошлый раз */
+@keyframes lidfly {
+  0% { transform: translate(calc(-95vw * 0.0), 0px) rotate(-0deg); }
+  10% { transform: translate(calc(-95vw * 0.1), -98px) rotate(-72deg); }
+  20% { transform: translate(calc(-95vw * 0.2), -163px) rotate(-144deg); }
+  30% { transform: translate(calc(-95vw * 0.3), -196px) rotate(-216deg); }
+  40% { transform: translate(calc(-95vw * 0.4), -196px) rotate(-288deg); }
+  50% { transform: translate(calc(-95vw * 0.5), -163px) rotate(-360deg); }
+  60% { transform: translate(calc(-95vw * 0.6), -98px) rotate(-432deg); }
+  70% { transform: translate(calc(-95vw * 0.7), 0px) rotate(-504deg); }
+  80% { transform: translate(calc(-95vw * 0.8), 131px) rotate(-576deg); }
+  90% { transform: translate(calc(-95vw * 0.9), 294px) rotate(-648deg); }
+  100% { transform: translate(calc(-95vw * 1.0), 490px) rotate(-720deg); visibility: hidden; }
+}
+/* открытая коробка: тёмное нутро у верхнего края */
+.gift.lid-gone .gift-box { box-shadow: inset 0 14px 14px -8px rgba(20, 6, 60, .65); border-radius: 2px 2px 10px 10px; }
+.gift-box {
+  position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 16px 14px 14px; border-radius: 0 0 10px 10px; color: #fff; text-align: center; overflow: hidden;
+  background: linear-gradient(180deg, var(--accent), #5b34c4);
+}
+.gift-box::before {                        /* лента по коробке */
+  content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 18px; margin-left: -9px;
+  background: rgba(255, 255, 255, .9);
+}
+.gift-box b, .gift-box a { position: relative; }
+.gift-box b { padding: 2px 10px; border-radius: var(--r-pill); background: #5b34c4; }
+.gift-box a {
+  align-self: stretch; padding: 8px 10px; border-radius: var(--r-btn); background: #fff; font-weight: 700;
+  color: #4a2aa0; box-shadow: 0 2px 0 #3b1f82;
+}
+.gift-box a:hover { background: #efe9ff; color: #4a2aa0; }
+@media (prefers-reduced-motion: reduce) {
+  .gift-fan img, .gift-lid { transition: none; animation: none !important; }
+  .gift.lid-gone .gift-lid { visibility: hidden; }
+}

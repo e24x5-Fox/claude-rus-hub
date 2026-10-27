@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Игра · новый каталог (бета)</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="v2-shared.css">
+<style>
+  .back { display: inline-block; margin-bottom: 16px; color: var(--text2); }
+  .top { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+  .banner { border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--bg3); aspect-ratio: 512 / 192; background: var(--bg3); }
+  .banner img { width: 100%; height: 100%; object-fit: cover; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 14px; }
+  .summary { color: var(--text2); margin: 0 0 20px; }
+  /* кнопки — как на карточке нынешнего каталога: «Скачать», мод, проверка на вирусы
+     сразу за ними (её должны увидеть до скачивания), руководство, игра, строка о файле */
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .actions .btn { padding: 9px 14px; }
+  .actions .btn.primary { padding: 10px 18px; }
+  .btn.btn-vt { gap: 8px; }
+  .btn.vt-ok { color: var(--green); background: rgba(34, 197, 94, .12); border-color: rgba(34, 197, 94, .55); }
+  .btn.vt-warn { color: var(--yellow); background: rgba(234, 179, 8, .12); border-color: rgba(234, 179, 8, .55); }
+  .btn.vt-ok:hover { border-color: var(--green); color: var(--green); }
+  .btn.vt-warn:hover { border-color: var(--yellow); color: var(--yellow); }
+  .fine { font-size: 11.5px; color: var(--text3); }
+  .vt-note { font-size: 11.5px; color: var(--text3); margin: 10px 0 0; }
+
+  .scope { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 28px 0; }
+  .scope .card { padding: 12px 14px; }
+  .scope b { display: block; color: var(--accent2); font-size: 15px; }
+  .scope span { font-size: 10.5px; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; }
+
+  .cols { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 28px; }
+  .note { color: var(--text2); font-size: 12.5px; }
+  ol.how { margin: 0; padding-left: 20px; color: var(--text2); }
+  ol.how li { margin-bottom: 6px; }
+  .help { border-color: #3b3f8f; background: linear-gradient(160deg, rgba(88, 101, 242, .16), var(--bg2) 60%); }
+  .help p { color: var(--text2); margin: 0 0 14px; font-size: 12.5px; }
+  .help .btn { margin: 0 8px 8px 0; }
+  .help .dc { background: #5865f2; border-color: #5865f2; color: #fff; }
+  .help .dc svg { width: 16px; height: 16px; }
+
+  .more { margin-top: 44px; }
+  .more .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .more a { border-radius: 10px; overflow: hidden; border: 1px solid var(--bg3); color: var(--text); background: var(--bg2); }
+  .more a:hover { border-color: var(--accent); }
+  .more img { aspect-ratio: 512 / 192; object-fit: cover; width: 100%; }
+  .more span { display: block; padding: 8px 12px; font-size: 12.5px; font-weight: 700; }
+
+  /* «спасибо» после скачивания — единственное место, где просим поддержать */
+  .thanks {
+    position: fixed; left: 50%; bottom: 24px; z-index: 50; width: min(440px, calc(100% - 32px));
+    transform: translate(-50%, 160%); transition: transform var(--t-slow);
+    display: flex; gap: 14px; align-items: center; padding: 14px 16px;
+    background: var(--bg2); border: 1px solid var(--accent); border-radius: var(--r-card);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .5);
+  }
+  .thanks.show { transform: translate(-50%, 0); }
+  body.radio-on .thanks { bottom: 88px; }
+  .thanks img { width: 64px; flex: none; }
+  .thanks p { margin: 0 0 8px; font-size: 12.5px; color: var(--text2); }
+  .thanks b { color: var(--text); }
+  .thanks .btn { padding: 7px 12px; font-size: 12px; }
+  .thanks .close { position: absolute; top: 6px; right: 8px; background: none; border: none; color: var(--text3); cursor: pointer; font-size: 16px; }
+
+  @media (max-width: 860px) {
+    .top, .cols { grid-template-columns: 1fr; }
+    .more .grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap page" id="page"></main>
+<div class="thanks" id="thanks">
+  <button class="close" id="thanks-x" title="Закрыть">×</button>
+  <img src="assets/stickers/happy.png" alt="">
+  <div>
+    <p><b>Спасибо, что скачали!</b> Перевод бесплатный. Если пригодился — можно поддержать лисёнка.</p>
+    <a class="btn primary" href="v2-support.html">Поддержать ♡</a>
+  </div>
+</div>
+
+<script src="games.js"></script>
+<script src="music.js"></script>
+<script src="downloads.js"></script>
+<script src="verified.js"></script>
+<script src="virustotal.js"></script>
+<script src="builds.js"></script>
+<script src="v2-shared.js"></script>
+<script>
+  var slug = new URLSearchParams(location.search).get('slug') || 'warriorcats';
+  var g = GAMES.filter(function (x) { return x.slug === slug; })[0] || GAMES[0];
+  document.title = g.title + ' · макет';
+  renderNav(kindOf(g));
+  renderFoot();
+
+  var links = g.links || {};
+  var vt = window.CRH_VT && CRH_VT[g.slug];
+  var vtBad = vt ? (vt.malicious || 0) + (vt.suspicious || 0) : 0;
+  var word = kindOf(g) === 'furry' ? 'фуривизатор' : kindOf(g) === 'mod' ? 'мод' : 'русификатор';
+  var SHIELD = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z"/>'
+             + '<path class="tick" d="m8.5 12 2.5 2.5 4.5-5"/></svg>';
+  function a(href, cls, text, id) {
+    return '<a class="' + cls + '"' + (id ? ' id="' + id + '"' : '') + ' href="' + esc(href) + '" target="_blank" rel="noopener">' + text + '</a>';
+  }
+  var actions = (links.download ? a(links.download, 'btn primary', 'Скачать ' + word, 'dl') : '')
+    + (links.mod ? a(links.mod, links.download ? 'btn' : 'btn primary', 'Мод на Thunderstore', 'mod') : '')
+    + (vt && vt.link ? '<a class="btn btn-vt ' + (vtBad ? 'vt-warn' : 'vt-ok') + '" id="vt" href="' + vt.link + '" target="_blank" rel="noopener" title="Отчёт VirusTotal'
+       + (vt.date ? ', ' + vt.date : '') + '">' + SHIELD + '<span>' + (vtBad ? 'Проверка на вирусы: ' + vtBad + ' из ' + vt.engines + ' — подробнее'
+       : 'Проверено: вирусов нет (0 из ' + vt.engines + ')') + '</span></a>' : '')
+    + (links.guide ? a(links.guide, 'btn', 'Руководство в Steam') : '')
+    + (links.steam ? a(links.steam, 'btn', 'Игра в Steam') : '')
+    + '<span class="fine" id="fine">' + esc(g.install_size || '') + '</span>';
+  var vtNote = vtBad ? '<p class="vt-note" id="vt-note">Сработали ' + Object.keys(vt.flagged || {}).slice(0, 3).join(', ') + ' из ' + vt.engines
+    + ' антивирусов. Установщик не подписан цифровой подписью, и отдельные антивирусы помечают такие файлы общей эвристикой, а не по найденному вирусу.</p>' : '';
+  var others = GAMES.filter(function (x) { return x.slug !== g.slug && kindOf(x) === kindOf(g); })
+    .sort(function (a, b) { return DL.week(b.slug) - DL.week(a.slug); }).slice(0, 3);
+
+  $('#page').innerHTML =
+    '<a class="back" href="v2.html#' + kindOf(g) + '">← все ' + (kindOf(g) === 'ru' ? 'переводы' : kindOf(g) === 'furry' ? 'фуривизаторы' : 'моды') + '</a>'
+    + '<section class="top">'
+    + '<div class="banner"><img src="' + cover(g) + '" alt=""></div>'
+    + '<div><h1>' + esc(g.title) + '</h1>'
+    + '<div class="chips"><span class="chip acc" id="ver">v' + esc(g.version) + '</span><span class="chip" id="build" hidden></span>'
+    + (g.tags || []).map(function (t) { return '<span class="chip">' + esc(t) + '</span>'; }).join('') + '</div>'
+    + '<p class="summary">' + esc(g.summary) + '</p>'
+    + '<div class="actions">' + actions + '</div>' + vtNote + '</div>'
+    + '</section>'
+    + '<section class="scope">' + (g.scope || []).map(function (s) {
+        return '<div class="card"><b>' + esc(s.value) + '</b><span>' + esc(s.label) + '</span></div>';
+      }).join('') + '</section>'
+    + '<section class="cols">'
+    + '<div><h2>Как поставить</h2><ol class="how">'
+    + '<li>Закройте игру.</li><li>Запустите скачанный <code>.exe</code> — он сам найдёт игру.</li>'
+    + '<li>Нажмите «Установить». Удалить — тот же файл, кнопка «Удалить».</li></ol>'
+    + (g.note ? '<p class="note">' + esc(g.note) + '</p>' : '') + '</div>'
+    + '<div class="card help"><h2>Что-то не так?</h2>'
+    + '<p>Не ставится, вылетает или нашли непереведённую строку — напишите в Discord, там отвечают быстро. Скриншот очень помогает.</p>'
+    + '<a class="btn dc" href="' + DISCORD + '" target="_blank" rel="noopener">' + ICON.discord + 'Написать в Discord</a>'
+    + '<a class="btn" href="' + REPO + '/issues/new" target="_blank" rel="noopener">Issue на GitHub</a></div>'
+    + '</section>'
+    + (others.length ? '<section class="more"><h2>Ещё ' + (kindOf(g) === 'ru' ? 'переводы' : 'из этого раздела') + '</h2><div class="grid">'
+      + others.map(function (o) { return '<a href="' + gameUrl(o) + '"><img src="' + cover(o) + '" alt=""><span>' + esc(o.title) + '</span></a>'; }).join('')
+      + '</div></section>' : '');
+
+  // те же события, что шлёт thanks-widget.js: плеер тормозит трек, пока висит «спасибо»
+  ['#dl', '#mod'].forEach(function (id) {
+    if ($(id)) $(id).addEventListener('click', function () {
+      $('#thanks').classList.add('show');
+      document.dispatchEvent(new CustomEvent('crh:download'));
+    });
+  });
+
+  /* ── что знает GitHub: свежий релиз, файл, размер, дата, скачивания ─────────
+     Та же логика, что в нынешнем v2.html: ссылка «Скачать» — прямо на exe
+     свежего релиза; значок VirusTotal прячется, если хеш файла не тот, что
+     проверяли; статус версии игры — по builds.js и verified.js. */
+  function fmtSize(b) { var mb = b / 1048576; return (mb >= 100 ? Math.round(mb) : mb.toFixed(1).replace('.0', '').replace('.', ',')) + ' МБ'; }
+  function fmtDate(iso) {
+    var m = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'], d = new Date(iso);
+    return isNaN(d) ? '' : d.getDate() + ' ' + m[d.getMonth()] + ' ' + d.getFullYear();
+  }
+  function buildStatus(rel) {
+    var b = ((window.CRH_BUILDS || {}).games || {})[g.slug];
+    if (!b || !b.build) return null;
+    var vv = (window.CRH_VERIFIED || {})[g.slug] || {};
+    if (vv.build === b.build && vv.broken) return { cls: 'bad', text: 'нужно обновление перевода' };
+    var released = rel ? Date.parse(rel.published_at || rel.created_at) : 0;
+    if (vv.build === b.build || (released && b.updated * 1000 < released)) return { cls: 'ok', text: '✓ работает с текущей версией игры' };
+    if (!rel) return null;
+    var d = new Date(b.updated * 1000);
+    return { cls: 'hot', text: 'игра обновилась ' + ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + ' — проверяем' };
+  }
+  function releases() {
+    try {
+      var c = JSON.parse(sessionStorage.getItem('mock-releases') || 'null');
+      if (c && Date.now() - c.at < 10 * 60 * 1000) return Promise.resolve(c.list);
+    } catch (e) {}
+    return fetch('https://api.github.com/repos/e24x5-Fox/claude-rus-hub/releases?per_page=100')
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (list) {
+        try { sessionStorage.setItem('mock-releases', JSON.stringify({ at: Date.now(), list: list })); } catch (e) {}
+        return list;
+      });
+  }
+  var ts = ((window.CRH_DOWNLOADS || {}).thunderstore || {})[g.slug] || {};
+  function showBuild(rel) {
+    var st = buildStatus(rel);
+    if (st) { $('#build').className = 'chip ' + st.cls; $('#build').textContent = st.text; $('#build').hidden = false; }
+  }
+  showBuild(null);
+  if (g.release) releases().then(function (list) {
+    if (!$('#fine')) return;     // уже ушли со страницы
+    var prefix = g.release.tag_prefix;
+    var mine = list.filter(function (r) { return !r.draft && r.tag_name && r.tag_name.indexOf(prefix) === 0; });
+    var stable = mine.filter(function (r) { return !r.prerelease; });
+    var rel = (stable.length ? stable : mine).sort(function (x, y) {
+      return new Date(y.published_at || y.created_at) - new Date(x.published_at || x.created_at);
+    })[0];
+    showBuild(rel || null);
+    if (!rel) return;
+    var asset = (rel.assets || []).filter(function (x) { return x.name === g.release.asset; })[0]
+      || (rel.assets || []).filter(function (x) { return /\.exe$/i.test(x.name); })[0];
+    if ($('#dl')) $('#dl').href = asset ? asset.browser_download_url : rel.html_url;
+    if ($('#vt') && asset && asset.digest && vt) {
+      var stale = asset.digest !== 'sha256:' + vt.sha256;
+      $('#vt').hidden = stale;
+      if ($('#vt-note')) $('#vt-note').hidden = stale;
+    }
+    var ver = rel.tag_name.slice(prefix.length);
+    if (ver) $('#ver').textContent = /^v/i.test(ver) ? ver : 'v' + ver;
+    var sum = ts.downloads || 0;
+    mine.forEach(function (r) { (r.assets || []).forEach(function (x) { sum += x.download_count || 0; }); });
+    var parts = [asset && asset.size ? fmtSize(asset.size) : g.install_size, fmtDate(rel.published_at || rel.created_at)];
+    if (sum) parts.push(num(sum) + ' ' + plural(sum, 'скачивание', 'скачивания', 'скачиваний'));
+    if (ts.rating) parts.push('👍 ' + ts.rating);
+    $('#fine').textContent = parts.filter(Boolean).join(' · ');
+  });
+  else if (ts.downloads) $('#fine').textContent = [g.install_size, num(ts.downloads) + ' скачиваний', ts.rating ? '👍 ' + ts.rating : ''].filter(Boolean).join(' · ');
+  $('#thanks-x').addEventListener('click', function () {
+    $('#thanks').classList.remove('show');
+    document.dispatchEvent(new CustomEvent('crh:thanks-closed'));
+  });
+</script>
+</body>
+</html>

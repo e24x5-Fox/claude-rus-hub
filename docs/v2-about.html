@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Обо мне · новый каталог (бета)</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="v2-shared.css">
+<style>
+  .me-card { position: relative; overflow: hidden; border-radius: 16px; border: 1px solid var(--bg3); min-height: 300px; display: flex; align-items: flex-end; }
+  .me-card .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 40%; }
+  .me-card::after { content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(14, 14, 16, .94) 0%, rgba(14, 14, 16, .7) 45%, rgba(14, 14, 16, .05) 80%),
+                linear-gradient(0deg, rgba(14, 14, 16, .6), transparent 50%); }
+  .me-in { position: relative; z-index: 1; display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 22px; align-items: center; padding: 28px; max-width: 680px; }
+  .me-in .ava { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover;
+                object-position: 52% 42%; transform: scale(1); box-shadow: 0 10px 30px rgba(0, 0, 0, .5); }
+  .me-in .lead { color: var(--text); font-size: 14.5px; }
+  .me-in .what { margin: 10px 0 0; color: var(--text2); font-size: 12px; }
+  .links { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 30px; }
+  .links a { display: flex; flex-direction: column; gap: 4px; padding: 16px; color: var(--text); }
+  .links a:hover { border-color: var(--accent); color: var(--text); }
+  .links b { font-size: 14px; }
+  .links span { font-size: 12px; color: var(--text3); }
+  .nums { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 36px; }
+  .nums .card b { display: block; font-size: 26px; color: var(--accent2); line-height: 1.2; }
+  .nums .card span { font-size: 12px; color: var(--text2); }
+  .goal { margin-top: 12px; }
+  .goal .bar { height: 6px; border-radius: 3px; background: var(--bg3); overflow: hidden; margin: 10px 0 6px; }
+  .goal .bar i { display: block; height: 100%; background: var(--accent); }
+  .goal p { margin: 0; color: var(--text2); font-size: 12.5px; }
+  .top5 .row { display: grid; grid-template-columns: minmax(0, 1fr) 2fr auto; gap: 12px; align-items: center; padding: 6px 0; font-size: 12.5px; }
+  .top5 .row i { display: block; height: 6px; border-radius: 3px; background: var(--accent); }
+  @media (max-width: 860px) { .links, .nums { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) {
+    .me-in { grid-template-columns: 1fr; padding: 20px; }
+    .me-card { min-height: 380px; }
+    .me-card::after { background: linear-gradient(0deg, rgba(14, 14, 16, .96) 35%, rgba(14, 14, 16, .2)); }
+    .links, .nums { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap page">
+  <!-- баннер — сам аватар во всю ширину, в кружке — крупно глаза и морда -->
+  <section class="me-card">
+    <img class="bg" src="assets/owner.jpg" alt="">
+    <div class="me-in">
+      <img class="ava" src="assets/owner.jpg" alt="Аватар икси — рыжий лис">
+      <div>
+        <h1>икся <em>:3</em></h1>
+        <p class="lead">Просто лис, который любит внимание к себе. Поэтому и делает для вас всякое — чтобы ему не было одиноко.</p>
+        <p class="what">Переводы игр вместе с нейросетью Claude · музыка в Suno · лисий Discord</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="links" id="links"></section>
+
+  <section class="nums" id="nums"></section>
+  <section class="split" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+    <div class="card goal" id="goal"></div>
+    <div class="card top5"><h2>Чаще всего качают</h2><div id="top"></div></div>
+  </section>
+</main>
+
+<script src="games.js"></script>
+<script src="music.js"></script>
+<script src="downloads.js"></script>
+<script src="v2-shared.js"></script>
+<script>
+  renderNav('about');
+  renderFoot();
+  var t = totals();
+  var links = [
+    ['v2-discord.html', 'Discord', 'Лисья мастерская: новые версии, ошибки, помощь'],
+    ['v2-music.html', 'Музыка', 'Радио с треками из Suno — каждый трек сюрприз'],
+    ['v2-support.html', 'Поддержать', 'Донат, стикеры и другие способы'],
+    [STICKERS, 'Стикеры', 'Лисёнок в Telegram'],
+    ['https://steamcommunity.com/', 'Руководства Steam', 'Инструкции к каждому переводу'],
+    [REPO, 'GitHub', 'Исходники и все релизы'],
+  ];
+  $('#links').innerHTML = links.map(function (l) {
+    var ext = /^https?:/.test(l[0]);
+    return '<a class="card" href="' + l[0] + '"' + (ext ? ' target="_blank" rel="noopener"' : '') + '><b>' + l[1] + (ext ? ' ↗' : '') + '</b><span>' + l[2] + '</span></a>';
+  }).join('');
+  $('#nums').innerHTML = [
+    [t.games, 'игр переведено'], [num(t.lines), 'реплик диалогов'],
+    ['~' + Math.round(t.words / 1000) + ' тыс.', 'слов оригинала'], ['~' + Math.round(t.words / 150 / 60) + ' ч', 'чтобы прочитать всё вслух'],
+  ].map(function (n) { return '<div class="card"><b>' + n[0] + '</b><span>' + n[1] + '</span></div>'; }).join('');
+
+  // рубежи — степени двойки, как в нынешнем каталоге
+  var goal = 2; while (goal <= DL.total) goal *= 2;
+  $('#goal').innerHTML = '<h2>Скачивания</h2><b style="font-size:26px">' + num(DL.total) + '</b>'
+    + '<div class="bar"><i style="width:' + (DL.total / goal * 100) + '%"></i></div>'
+    + '<p>До следующего рубежа — ' + num(goal - DL.total) + ' (цель ' + num(goal) + ')</p>';
+  var topG = GAMES.slice().sort(function (a, b) { return DL.of(b.slug) - DL.of(a.slug); }).slice(0, 5);
+  var max = DL.of(topG[0].slug) || 1;
+  $('#top').innerHTML = topG.map(function (g) {
+    return '<a class="row" href="' + gameUrl(g) + '" style="color:var(--text)"><span>' + esc(g.title) + '</span>'
+      + '<i style="width:' + (DL.of(g.slug) / max * 100) + '%"></i><span class="muted">' + num(DL.of(g.slug)) + '</span></a>';
+  }).join('');
+</script>
+</body>
+</html>

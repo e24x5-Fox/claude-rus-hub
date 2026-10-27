@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Discord · новый каталог (бета)</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="v2-shared.css">
+<style>
+  .server {
+    position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 20px;
+    padding: 28px; border-radius: 16px; border: 1px solid #5865f2; color: #fff;
+    background: linear-gradient(115deg, rgba(64, 40, 160, .96) 30%, rgba(88, 101, 242, .55)),
+                url("assets/discord-flowers.jpg") center / cover;
+  }
+  .server .who { display: flex; gap: 14px; align-items: center; }
+  .server .ico { width: 64px; height: 64px; border-radius: 18px; background: #fff; object-fit: cover; }
+  .server h1 { margin: 0; color: #fff; }
+  .server .live { display: flex; gap: 14px; font-size: 12.5px; color: rgba(255, 255, 255, .8); }
+  .server .live i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background: #23a55a; }
+  .server .live i.off { background: #b5bac1; }
+  .server p { color: rgba(255, 255, 255, .82); max-width: 520px; margin: 16px 0 20px; }
+  .server .btn { background: #fff; color: #4752c4; border-color: #fff; }
+  .server .btn svg { width: 18px; height: 18px; }
+  .server .fox { align-self: end; justify-self: end; width: 220px; margin: 0 -10px -30px 0; filter: drop-shadow(0 10px 24px rgba(0, 0, 0, .4)); }
+
+  .chans { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 30px; }
+  .chan { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; align-items: start; }
+  .chan .em { font-size: 22px; line-height: 40px; width: 40px; height: 40px; text-align: center; border-radius: 10px; background: var(--bg3); }
+  .chan b { display: block; }
+  .chan code { color: var(--accent2); font-size: 12px; }
+  .chan p { margin: 4px 0 0; color: var(--text2); font-size: 12.5px; }
+
+  .klod { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; align-items: center; margin-top: 30px; }
+  .klod img { width: 64px; height: 64px; border-radius: 50%; }
+  .klod p { margin: 4px 0 0; color: var(--text2); font-size: 12.5px; }
+
+  .steps3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 30px; }
+  .steps3 b { color: var(--accent2); font-size: 20px; display: block; }
+  .steps3 p { margin: 4px 0 0; color: var(--text2); font-size: 12.5px; }
+  @media (max-width: 760px) {
+    .server { grid-template-columns: 1fr; }
+    .server .fox { width: 150px; margin-top: -20px; }
+    .chans, .steps3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap page">
+  <section class="server lift">
+    <div>
+      <div class="who">
+        <img class="ico" id="ico" src="assets/favicon.png" alt="">
+        <div>
+          <h1>Лисья мастерская</h1>
+          <div class="live"><span><i></i><span id="on">…</span></span><span><i class="off"></i><span id="all">…</span></span></div>
+        </div>
+      </div>
+      <p>Сервер каталога: новые версии переводов по вашим играм, форум для ошибок и помощь с установкой. Можно и просто поболтать.</p>
+      <a class="btn big lift-btn" id="join" target="_blank" rel="noopener"></a>
+    </div>
+    <img class="fox lift-fox" src="assets/discord-fox.png" alt="">
+  </section>
+
+  <section class="steps3">
+    <div class="card"><b>1</b><p>Зайдите по кнопке выше — регистрация в Discord бесплатная.</p></div>
+    <div class="card"><b>2</b><p>В <code>#роли</code> отметьте свои игры — упоминания будут только о них.</p></div>
+    <div class="card"><b>3</b><p>Вышла новая версия — придёт уведомление. Больше ничего делать не нужно.</p></div>
+  </section>
+
+  <section class="chans">
+    <div class="card chan"><span class="em">📣</span><div><b><code>#новые-переводы</code></b><p>Объявления о выходе перевода или новой версии — с упоминанием роли игры.</p></div></div>
+    <div class="card chan"><span class="em">🐞</span><div><b><code>#нашёл-ошибку</code></b><p>Форум: непереведённая строка, опечатка, кривая надпись. Со скриншотом — исправим в следующей версии.</p></div></div>
+    <div class="card chan"><span class="em">🛠️</span><div><b><code>#тикеты</code></b><p>Не ставится или вылетает — откройте тикет, разберёмся лично.</p></div></div>
+    <div class="card chan"><span class="em">🔔</span><div><b><code>#роли</code></b><p>Отметьте свои игры — упоминания о новых версиях будут приходить только о них, остальное не побеспокоит.</p></div></div>
+  </section>
+
+  <section class="card klod">
+    <img src="assets/klod-avatar.png" alt="">
+    <div><b>В тикетах и форуме отвечает Клода</b>
+      <p>ИИ-помощник мастерской отвечает быстро, даже ночью. Владелец читает всё и при необходимости отвечает сам.</p></div>
+  </section>
+</main>
+
+<script src="games.js"></script>
+<script src="music.js"></script>
+<script src="v2-shared.js"></script>
+<script>
+  renderNav('discord');
+  renderFoot();
+  $('#join').href = DISCORD;
+  $('#join').innerHTML = ICON.discord + 'Присоединиться';
+  // тот же ответ, что у шапки (discordInfo в v2-shared.js): один запрос на загрузку страницы
+  function showServer(d) {
+    if (!$('#on')) return;
+    if (!d) { $('#on').textContent = 'наш сервер'; $('#all').textContent = ''; return; }
+    var on = d.approximate_presence_count, all = d.approximate_member_count;
+    $('#on').textContent = on + ' в сети';
+    $('#all').textContent = all + ' ' + plural(all, 'участник', 'участника', 'участников');
+    if (d.guild && d.guild.icon) $('#ico').src = 'https://cdn.discordapp.com/icons/' + d.guild.id + '/' + d.guild.icon + '.png?size=128';
+  }
+  if (discordData) showServer(discordData); else discordInfo().then(showServer);
+</script>
+</body>
+</html>
