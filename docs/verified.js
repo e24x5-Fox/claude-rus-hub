@@ -20,5 +20,11 @@ window.CRH_VERIFIED = {
   "at": "2026-10-26",
   "by": "трекер",
   "broken": false
+ },
+ "warriorcats": {
+  "build": "26184573",
+  "at": "2026-10-27",
+  "by": "проверка архива",
+  "broken": false
  }
 };
