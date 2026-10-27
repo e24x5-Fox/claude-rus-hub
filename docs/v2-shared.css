@@ -192,12 +192,43 @@ img[width="512"][height="192"].in { opacity: 1; }
 .fx-still .lift:hover, .fx-still .lift:hover .lift-fox, .fx-still .tile:hover, .fx-still .kinds a:hover { transform: none; }
 .fx-still .gift.lid-gone .gift-lid { visibility: hidden; }
 
-/* пометка, что это макет */
-.mock-tag {
-  position: fixed; right: 12px; top: 70px; z-index: 40; font-size: 10.5px; padding: 4px 9px;
-  border-radius: var(--r-pill); background: var(--yellow); color: #1a1405; font-weight: 700;
+/* «Как вам новый каталог?» — плашка беты в правом нижнем углу, над плеером,
+   и окошко реакций над ней (betaDock в shared.js) */
+.beta-dock { position: fixed; right: 16px; bottom: 16px; z-index: 45; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+body.radio-on .beta-dock { bottom: 80px; }
+.beta-pill {
+  display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; border: none; border-radius: var(--r-pill);
+  cursor: pointer; font: inherit; font-size: 12px; font-weight: 700; color: #fff; background: var(--accent);
+  box-shadow: 0 6px 20px -6px rgba(139, 92, 246, .9); transition: transform .15s ease, background .15s ease;
 }
-@media (max-width: 900px) { .mock-tag { top: auto; bottom: 84px; } }
+.beta-pill:hover, .beta-dock.open .beta-pill { background: #7c4ef0; transform: translateY(-1px); }
+.beta-pill b { padding: 2px 8px; border-radius: var(--r-pill); background: var(--yellow); color: #1a1405;
+               font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; }
+.beta-pill .short { display: none; }
+.beta-pop { display: none; order: -1; width: 300px; max-width: calc(100vw - 32px); padding: 14px; border-radius: var(--r-card);
+            border: 1px solid var(--accent); background: var(--bg2); box-shadow: 0 16px 40px rgba(0, 0, 0, .55); }
+.beta-dock.open .beta-pop { display: block; }
+.beta-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.beta-head b { font-size: 13.5px; }
+.beta-x { width: 26px; height: 26px; border: none; border-radius: 50%; background: transparent; color: var(--text3); font-size: 18px; cursor: pointer; }
+.beta-x:hover { background: var(--bg3); color: var(--text); }
+.beta-reacts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.beta-reacts button {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 6px; padding: 9px 10px;
+  border-radius: 10px; border: 1px solid var(--bg3); background: var(--bg3); color: var(--text); cursor: pointer; font: inherit; font-size: 12px;
+  transition: transform .12s ease, border-color .12s ease;
+}
+.beta-reacts button:hover:not(:disabled) { border-color: var(--accent); transform: translateY(-1px); }
+.beta-reacts button:disabled { cursor: default; opacity: .55; }
+.beta-reacts button.on { opacity: 1; border-color: var(--accent); background: var(--accent-soft); }
+.beta-reacts .e { font-size: 18px; line-height: 1; }
+.beta-reacts .l { text-align: left; }
+.beta-reacts .c { color: var(--text3); font-size: 11px; }
+.beta-reacts button.on .c { color: var(--accent2); }
+.beta-note { margin: 10px 0 8px; color: var(--text3); font-size: 11px; }
+.beta-dc { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; color: #8b95f7; }
+.beta-dc svg { width: 15px; height: 15px; }
+@media (max-width: 900px) { .beta-pill .long { display: none; } .beta-pill .short { display: inline; } }
 
 /* ── подарок со стикерами ─────────────────────────────────────────────────────
    Лисята спрятаны в коробке целиком. Коробка показалась на экране — крышка
@@ -278,18 +309,3 @@ img[width="512"][height="192"].in { opacity: 1; }
   .gift-fan img, .gift-lid { transition: none; animation: none !important; }
   .gift.lid-gone .gift-lid { visibility: hidden; }
 }
-
-.mock-tag.beta {
-  display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; text-decoration: none;
-  background: #5865f2; color: #fff; font-size: 12px; font-weight: 700;
-  box-shadow: 0 6px 20px -6px rgba(88, 101, 242, .9); transition: transform .15s ease, background .15s ease;
-}
-.mock-tag.beta:hover { background: #4752c4; color: #fff; transform: translateY(-1px); }
-.mock-tag.beta b { padding: 2px 8px; border-radius: 999px; background: var(--yellow); color: #1a1405;
-                   font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; }
-.mock-tag.beta svg { width: 16px; height: 16px; flex: none; }
-.mock-tag.beta .short { display: none; }
-@media (max-width: 900px) { .mock-tag.beta .long { display: none; } .mock-tag.beta .short { display: inline; } }
-/* в правом нижнем углу, над полосой плеера: сверху она налезала на лисёнка в шапке страниц */
-.mock-tag.beta { top: auto; bottom: 16px; right: 16px; }
-body.radio-on .mock-tag.beta { bottom: 80px; }

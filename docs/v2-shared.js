@@ -74,7 +74,7 @@ function renderNav(page) {
       + ' <span class="n">' + (counts[k.id] || 0) + '</span></a>';
   }).join('');
   // при переходе без перезагрузки шапка рисуется заново — старую убрать
-  document.querySelectorAll('.nav, .mock-tag').forEach(function (n) { n.remove(); });
+  document.querySelectorAll('.nav, .beta-dock').forEach(function (n) { n.remove(); });
   var nav = document.createElement('header');
   nav.className = 'nav';
   nav.innerHTML = '<div class="wrap nav-row">'
@@ -88,17 +88,85 @@ function renderNav(page) {
     + '</div></div>';
   document.body.insertBefore(nav, document.body.firstChild);
   fxWire(nav);
-  var tag = document.createElement('a');
-  tag.className = 'mock-tag';
-  tag.href = DISCORD;
-  tag.target = '_blank';
-  tag.rel = 'noopener';
-  tag.title = 'Это новая версия каталога. Расскажите в Discord, как она вам';
-  tag.classList.add('beta');
-  tag.innerHTML = '<b>бета</b>' + ICON.discord + '<span class="long">Как вам новый каталог? Напишите в Discord</span>'
-    + '<span class="short">Отзыв в Discord</span>';
-  document.body.appendChild(tag);
+  betaDock();
   discordLive();
+}
+
+/* ── «Как вам новый каталог?» — реакции без перехода в Discord ─────────────────
+   Плашка беты в углу открывает окошко с четырьмя реакциями. Счёт — тот же
+   сервис, что у посещений старого каталога (abacus, side.js): ключи
+   v2-react-<id>, голос только прибавляет. Один голос на браузер (localStorage
+   v2-react). С диска и с локального сервера голос не засчитывается — как и в
+   side.js, чтобы проверки не накручивали счёт. Числа спрашиваются один раз на
+   загрузку страницы и живут в памяти, как и Discord в шапке. */
+var REACT_NS = 'https://abacus.jasoncameron.dev', REACT_KEY = 'e24x5-claude-rus-hub';
+var REACTIONS = [['fire', '🔥', 'Огонь'], ['love', '😍', 'Нравится'], ['hmm', '🤔', 'Непривычно'], ['old', '👎', 'Старый лучше']];
+var reactCounts = null, reactReq = null;
+function reactLocal() {
+  return location.protocol === 'file:' || /^(localhost|127\.\d+\.\d+\.\d+|\[::1\])$/.test(location.hostname);
+}
+function reactMine() { try { return localStorage.getItem('v2-react'); } catch (e) { return 'locked'; } }
+function reactLoad() {
+  if (!reactReq) {
+    reactReq = Promise.all(REACTIONS.map(function (r) {
+      return fetch(REACT_NS + '/get/' + REACT_KEY + '/v2-react-' + r[0])
+        .then(function (x) { return x.ok ? x.json() : { value: 0 }; })
+        .then(function (j) { return typeof j.value === 'number' ? j.value : 0; }, function () { return null; });
+    })).then(function (vals) {
+      reactCounts = {};
+      REACTIONS.forEach(function (r, i) { reactCounts[r[0]] = vals[i]; });
+      return reactCounts;
+    });
+  }
+  return reactReq;
+}
+function betaDock() {
+  var dock = document.createElement('div');
+  dock.className = 'beta-dock';
+  dock.innerHTML = '<button class="beta-pill" type="button" aria-expanded="false"><b>бета</b>'
+    + '<span class="long">Как вам новый каталог?</span><span class="short">Как вам?</span></button>'
+    + '<div class="beta-pop" role="dialog" aria-label="Как вам новый каталог?">'
+    + '<div class="beta-head"><b>Как вам новый каталог?</b><button class="beta-x" type="button" title="Закрыть">×</button></div>'
+    + '<div class="beta-reacts">' + REACTIONS.map(function (r) {
+        return '<button type="button" data-r="' + r[0] + '"><span class="e">' + r[1] + '</span>'
+          + '<span class="l">' + r[2] + '</span><span class="c">·</span></button>';
+      }).join('') + '</div>'
+    + '<p class="beta-note"></p>'
+    + '<a class="beta-dc" href="' + DISCORD + '" target="_blank" rel="noopener">' + ICON.discord
+    + 'Рассказать подробнее в Discord</a></div>';
+  document.body.appendChild(dock);
+  var pill = dock.querySelector('.beta-pill');
+  function paint() {
+    var mine = reactMine();
+    dock.querySelectorAll('[data-r]').forEach(function (b) {
+      var id = b.getAttribute('data-r'), n = reactCounts && reactCounts[id];
+      b.querySelector('.c').textContent = n == null ? '·' : num(n);
+      b.classList.toggle('on', mine === id);
+      b.disabled = !!mine;
+    });
+    dock.querySelector('.beta-note').textContent = reactLocal() ? 'Это локальный макет: голос здесь не засчитывается.'
+      : mine ? 'Спасибо! Голос учтён — один на браузер.' : 'Один голос, без регистрации. Нажмите реакцию:';
+  }
+  function open(on) {
+    dock.classList.toggle('open', on);
+    pill.setAttribute('aria-expanded', on ? 'true' : 'false');
+    if (on) { paint(); reactLoad().then(paint); }
+  }
+  pill.addEventListener('click', function (e) { e.stopPropagation(); open(!dock.classList.contains('open')); });
+  dock.querySelector('.beta-x').addEventListener('click', function () { open(false); });
+  document.addEventListener('click', function (e) { if (!dock.contains(e.target)) open(false); });
+  dock.querySelector('.beta-reacts').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-r]');
+    if (!b || reactMine() || reactLocal()) return;
+    var id = b.getAttribute('data-r');
+    try { localStorage.setItem('v2-react', id); } catch (err) { return; }
+    if (reactCounts && reactCounts[id] != null) reactCounts[id] += 1;
+    paint();
+    fetch(REACT_NS + '/hit/' + REACT_KEY + '/v2-react-' + id)
+      .then(function (x) { return x.ok ? x.json() : null; })
+      .then(function (j) { if (j && typeof j.value === 'number' && reactCounts) { reactCounts[id] = j.value; paint(); } })
+      .catch(function () {});
+  });
 }
 
 /* Сервер Discord: в сети, участники, значок. Спрашиваем один раз на загрузку
