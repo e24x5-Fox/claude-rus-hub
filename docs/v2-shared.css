@@ -167,6 +167,31 @@ img[width="512"][height="192"].in { opacity: 1; }
            background: transparent; color: var(--text3); font-size: 20px; cursor: pointer; }
 .rules-x:hover { background: var(--bg3); color: var(--text); }
 
+/* «Эффекты» в шапке */
+.fx-menu { position: relative; }
+.fx-btn { width: 36px; height: 36px; display: grid; place-items: center; border-radius: var(--r-btn); cursor: pointer;
+          border: 1px solid transparent; background: transparent; color: var(--text2); }
+.fx-btn:hover, .fx-menu.open .fx-btn { color: var(--text); background: var(--bg2); border-color: var(--bg3); }
+.fx-btn svg { width: 18px; height: 18px; }
+.fx-pop { display: none; position: absolute; right: 0; top: calc(100% + 8px); z-index: 40; width: 280px; padding: 14px;
+          border-radius: var(--r-card); border: 1px solid var(--accent); background: var(--bg2);
+          box-shadow: 0 16px 40px rgba(0, 0, 0, .5); font-size: 12px; }
+.fx-menu.open .fx-pop { display: block; }
+.fx-pop b { color: var(--accent2); font-size: 13px; }
+.fx-hint { margin: 6px 0 10px; color: var(--text2); }
+.fx-row { display: flex; gap: 6px; }
+.fx-row button { flex: 1; padding: 7px 0; border-radius: var(--r-btn); cursor: pointer; font: inherit; font-weight: 700;
+                 background: var(--bg3); color: var(--text2); border: 1px solid var(--bg3); }
+.fx-row button:hover { color: var(--text); border-color: var(--accent); }
+.fx-row button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.fx-now { margin: 10px 0 0; color: var(--text3); font-size: 11px; }
+
+/* режим «без движения» (fx.js ставит .fx-still на html) — и для анимаций макета */
+.fx-still .gift-fan img, .fx-still .gift-lid, .fx-still .lift, .fx-still .lift .lift-fox, .fx-still .lift .lift-btn,
+.fx-still .tile, .fx-still .kinds a, .fx-still img[width="512"][height="192"] { transition: none !important; animation: none !important; }
+.fx-still .lift:hover, .fx-still .lift:hover .lift-fox, .fx-still .tile:hover, .fx-still .kinds a:hover { transform: none; }
+.fx-still .gift.lid-gone .gift-lid { visibility: hidden; }
+
 /* пометка, что это макет */
 .mock-tag {
   position: fixed; right: 12px; top: 70px; z-index: 40; font-size: 10.5px; padding: 4px 9px;

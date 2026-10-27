@@ -84,8 +84,10 @@ function renderNav(page) {
     + '<a href="v2-music.html"' + (page === 'music' ? ' class="on"' : '') + '>' + ICON.note + '<span class="t">Музыка</span></a>'
     + '<a href="v2-support.html"' + (page === 'support' ? ' class="on"' : '') + '>' + ICON.heart + '<span class="t">Поддержать</span></a>'
     + '<a class="dc' + (page === 'discord' ? ' on' : '') + '" href="v2-discord.html">' + ICON.discord + '<span class="t">Discord</span><span class="live" id="dc-live"></span></a>'
+    + fxMenu()
     + '</div></div>';
   document.body.insertBefore(nav, document.body.firstChild);
+  fxWire(nav);
   var tag = document.createElement('a');
   tag.className = 'mock-tag';
   tag.href = DISCORD;
@@ -112,6 +114,50 @@ function discordInfo() {
       : Promise.resolve(null);
   }
   return discordReq;
+}
+
+/* ── «Эффекты» для слабых компьютеров ─────────────────────────────────────────
+   Шестерёнка в шапке: тот же выбор, что в нынешнем каталоге (fx.js, CRH_FX):
+   «Авто» — как просит Windows и как тянет компьютер, «Все», «Без» — ничего не
+   движется и нет размытой обложки на фоне. Хранит fx.js (localStorage
+   crh-fx) — настройка общая со старым каталогом. fx.js грузится после этого
+   файла, поэтому CRH_FX спрашивается в момент нажатия. */
+var FX_MODES = [['auto', 'Авто', 'Как просит Windows и как тянет компьютер'],
+                ['full', 'Все', 'Всегда полностью'],
+                ['off', 'Без', 'Ничего не движется, размытого фона нет']];
+function fxMenu() {
+  return '<div class="fx-menu"><button class="fx-btn" type="button" title="Эффекты страницы" aria-label="Эффекты страницы" aria-expanded="false">'
+    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">'
+    + '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>'
+    + '</button><div class="fx-pop" role="group" aria-label="Эффекты страницы"><b>Эффекты</b>'
+    + '<p class="fx-hint">Если страница тормозит — «Без»: лисёнок перестанет танцевать, фон станет простым.</p>'
+    + '<div class="fx-row">' + FX_MODES.map(function (m) {
+        return '<button type="button" data-fx="' + m[0] + '" title="' + m[2] + '">' + m[1] + '</button>';
+      }).join('') + '</div><p class="fx-now"></p></div></div>';
+}
+function fxShow(root) {
+  var fx = window.CRH_FX;
+  if (!fx || !root) return;
+  root.querySelectorAll('[data-fx]').forEach(function (b) {
+    var on = b.getAttribute('data-fx') === fx.mode;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  var now = fx.still && fx.flat ? 'без движения и без размытого фона' : fx.still ? 'без движения'
+          : fx.flat ? 'без размытого фона' : 'всё включено';
+  root.querySelector('.fx-now').textContent = 'Сейчас: ' + now + (fx.mode === 'auto' && fx.why ? ' — ' + fx.why : '') + '.';
+}
+function fxWire(nav) {
+  var menu = nav.querySelector('.fx-menu'), btn = menu.querySelector('.fx-btn');
+  function open(on) { menu.classList.toggle('open', on); btn.setAttribute('aria-expanded', on ? 'true' : 'false'); if (on) fxShow(menu); }
+  btn.addEventListener('click', function (e) { e.stopPropagation(); open(!menu.classList.contains('open')); });
+  menu.querySelector('.fx-row').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-fx]');
+    if (b && window.CRH_FX) { CRH_FX.set(b.getAttribute('data-fx')); fxShow(menu); }
+  });
+  document.addEventListener('click', function (e) { if (!menu.contains(e.target)) open(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') open(false); });
+  document.addEventListener('crh:fx', function () { fxShow(menu); });
 }
 
 function discordLive() {
