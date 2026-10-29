@@ -85,12 +85,12 @@ window.CRH_VT = {
   "flagged": {}
  },
  "lucidcats": {
-  "sha256": "ff2692e1ca5c543ce32c0a9d8528264d58ed638630fcab7aa6a6f71e3e4c2d5c",
-  "link": "https://www.virustotal.com/gui/file/ff2692e1ca5c543ce32c0a9d8528264d58ed638630fcab7aa6a6f71e3e4c2d5c",
-  "date": "09.10.2026",
+  "sha256": "59ffce9344bcd157169894c4c4fa3f6f5fc85c025a55ffa47837a72e86929ac5",
+  "link": "https://www.virustotal.com/gui/file/59ffce9344bcd157169894c4c4fa3f6f5fc85c025a55ffa47837a72e86929ac5",
+  "date": "29.10.2026",
   "malicious": 0,
   "suspicious": 0,
-  "engines": 51,
+  "engines": 53,
   "flagged": {}
  },
  "meetcute": {
