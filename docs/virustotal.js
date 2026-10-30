@@ -57,6 +57,15 @@ window.CRH_VT = {
   "engines": 67,
   "flagged": {}
  },
+ "giggleland": {
+  "sha256": "8922b1d0becc0ea00367a43bc98ca3a332cdefd72e6bc6d2bab82527f0879265",
+  "link": "https://www.virustotal.com/gui/file/8922b1d0becc0ea00367a43bc98ca3a332cdefd72e6bc6d2bab82527f0879265",
+  "date": "30.10.2026",
+  "malicious": 0,
+  "suspicious": 0,
+  "engines": 52,
+  "flagged": {}
+ },
  "kemopop": {
   "sha256": "6413981e9579ce4ea1a9b512f5f04cca89cb1193580286b82fd209619ce045b2",
   "link": "https://www.virustotal.com/gui/file/6413981e9579ce4ea1a9b512f5f04cca89cb1193580286b82fd209619ce045b2",
