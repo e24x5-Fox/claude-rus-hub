@@ -16,8 +16,8 @@ window.CRH_VERIFIED = {
   "broken": false
  },
  "repo": {
-  "build": "23363152",
-  "at": "2026-10-26",
+  "build": "26294889",
+  "at": "2026-10-30",
   "by": "трекер",
   "broken": false
  },
