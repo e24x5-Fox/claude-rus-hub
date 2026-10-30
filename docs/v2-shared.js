@@ -2,7 +2,7 @@
    Данные — настоящие, из claude-rus-hub/docs (games.js, music.js, donors.js…),
    подключаются на каждой странице тегами <script> до этого файла. */
 var D = '';
-var DISCORD = 'https://discord.gg/wUsBpMdM2n';
+var DISCORD = 'https://discord.gg/KktYHPZebZ';
 var DONATE = 'https://dalink.to/e24x5';
 var STICKERS = 'https://t.me/addstickers/foxkisser_rpc';
 var REPO = 'https://github.com/e24x5-Fox/claude-rus-hub';
@@ -176,7 +176,7 @@ var discordReq = null, discordData = null;
 function discordInfo() {
   if (!discordReq) {
     discordReq = window.fetch
-      ? fetch('https://discord.com/api/v9/invites/wUsBpMdM2n?with_counts=true')
+      ? fetch('https://discord.com/api/v9/invites/KktYHPZebZ?with_counts=true')
           .then(function (r) { return r.ok ? r.json() : null; })
           .then(function (d) { discordData = d; return d; }, function () { return null; })
       : Promise.resolve(null);
