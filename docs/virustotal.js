@@ -148,12 +148,12 @@ window.CRH_VT = {
   "flagged": {}
  },
  "repo": {
-  "sha256": "acdaea4ff0346905ea87f4ea1263dfa913d3d5828157ecf1bf4e41cf8ed4f076",
-  "link": "https://www.virustotal.com/gui/file/acdaea4ff0346905ea87f4ea1263dfa913d3d5828157ecf1bf4e41cf8ed4f076",
-  "date": "20.10.2026",
+  "sha256": "9e4d43ffdd3acc8454cdad68c9cd4a579c452f258a6d186aa987824a0efe32ee",
+  "link": "https://www.virustotal.com/gui/file/9e4d43ffdd3acc8454cdad68c9cd4a579c452f258a6d186aa987824a0efe32ee",
+  "date": "30.10.2026",
   "malicious": 0,
   "suspicious": 0,
-  "engines": 63,
+  "engines": 64,
   "flagged": {}
  },
  "tailsandpines": {
