@@ -152,7 +152,7 @@ window.CATALOG = {
       "aliases": ["Бодикам", "Боди кам", "нательная камера"],
       "banner": "assets/bodycam.png",
       "status": "released",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "adult": false,
       "tags": ["Unreal Engine 5", "Windows", "Мультиплеер"],
       "summary": "Перевод интерфейса сетевого шутера: меню, настройки, снаряжение, режимы, серверы, подсказки и описания. Свой русский в игре покрывал меньше четверти строк, да и тот машинный — переведено всё заново.",
@@ -162,7 +162,7 @@ window.CATALOG = {
         { "label": "Таблицы", "value": "Game, MenuSystemPro" },
         { "label": "Из ассетов", "value": "виджеты, скины, предметы" }
       ],
-      "install_size": "1 МБ",
+      "install_size": "72 МБ",
       "release": { "tag_prefix": "bodycam-", "asset": "Bodycam-RU-Setup.exe" },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",

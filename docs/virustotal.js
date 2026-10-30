@@ -20,12 +20,12 @@ window.CRH_VT = {
   "flagged": {}
  },
  "bodycam": {
-  "sha256": "3a2199fabd69f2fdfb46f7ba7599786e7cfb42c77866eea9619f45a4ebda5c12",
-  "link": "https://www.virustotal.com/gui/file/3a2199fabd69f2fdfb46f7ba7599786e7cfb42c77866eea9619f45a4ebda5c12",
-  "date": "04.10.2026",
+  "sha256": "970dd90afe4b395309c6039f8c163f5d44d10561741711053a07e9935720c552",
+  "link": "https://www.virustotal.com/gui/file/970dd90afe4b395309c6039f8c163f5d44d10561741711053a07e9935720c552",
+  "date": "30.10.2026",
   "malicious": 0,
   "suspicious": 0,
-  "engines": 68,
+  "engines": 63,
   "flagged": {}
  },
  "dragnwash": {
