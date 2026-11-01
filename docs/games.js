@@ -74,7 +74,7 @@ window.CATALOG = {
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/spydropsgaiden-v1.0.0",
         "steam": "https://store.steampowered.com/app/4152490/",
-        "guide": ""
+        "guide": "https://steamcommunity.com/sharedfiles/filedetails/?id=3831345975"
       },
       "note": "Для Windows, Steam build 25878071. Русский заменяет английский слот. Проверены меню и начальные диалоги; полное прохождение всех миссий пока не проверено. Установщик сохраняет оригиналы и позволяет удалить перевод."
     },

@@ -156,6 +156,15 @@ window.CRH_VT = {
   "engines": 64,
   "flagged": {}
  },
+ "spydropsgaiden": {
+  "sha256": "4ba1edc32dfe9bc0b315144b26f5366a741bdb051bc28aa24a84223ed8ec4863",
+  "link": "https://www.virustotal.com/gui/file/4ba1edc32dfe9bc0b315144b26f5366a741bdb051bc28aa24a84223ed8ec4863",
+  "date": "01.11.2026",
+  "malicious": 0,
+  "suspicious": 0,
+  "engines": 66,
+  "flagged": {}
+ },
  "tailsandpines": {
   "sha256": "3b8e127afc2bf0552b0622ec9937946def3e786cfecb0b204f0111222a552bff",
   "link": "https://www.virustotal.com/gui/file/3b8e127afc2bf0552b0622ec9937946def3e786cfecb0b204f0111222a552bff",
