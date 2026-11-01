@@ -21,6 +21,7 @@
 
 | Игра | Состояние | Что переведено | Скачать |
 |---|---|---|---|
+| **Spy Drops Gaiden** <br><sub>Unity · Windows</sub> | ✅ v1.0.0 | диалоги миссий 1–8, меню, настройки, управление; 156 ключей основной таблицы | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/spydropsgaiden-v1.0.0) |
 | **Drag'n Wash** <br><sub>Unity · 18+</sub> | ✅ готово, v1.2.1 | диалоги (1839 реплик), интерфейс (89 строк), меню настроек (36 подписей), 87 текстур | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/latest) |
 | **My Furry Protogen** <br><sub>Ren'Py · 18+</sub> | ✅ готово, v1.1.1 | диалоги (2007 реплик), интерфейс (373 строки), ~36 тыс. слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/latest) |
 | **My Furry Protogen 2** <br><sub>Ren'Py · 18+</sub> | ✅ готово, v1.1.1 | диалоги (3722 реплики), интерфейс (389 строк), ~60 тыс. слов | [установщик](https://github.com/e24x5-Fox/claude-rus-hub/releases/latest) |

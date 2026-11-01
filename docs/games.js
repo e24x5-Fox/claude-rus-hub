@@ -34,6 +34,51 @@ window.CATALOG = {
   "updated": "2026-09-30",
   "games": [
     {
+      "slug": "spydropsgaiden",
+      "engine": "Unity",
+      "lines": 156,
+      "words": 2614,
+      "title": "Spy Drops Gaiden",
+      "aliases": [
+        "Спай Дропс Гайден",
+        "Spy Drops Prologue"
+      ],
+      "banner": "assets/spydropsgaiden.png",
+      "status": "released",
+      "version": "1.0.0",
+      "adult": false,
+      "tags": [
+        "Unity",
+        "Windows",
+        "Стелс"
+      ],
+      "summary": "Русский перевод диалогов миссий 1–8, меню, настроек, управления и заданий.",
+      "scope": [
+        {
+          "label": "Основная таблица",
+          "value": "156 ключей"
+        },
+        {
+          "label": "Диалоги",
+          "value": "миссии 1–8"
+        },
+        {
+          "label": "Интерфейс",
+          "value": "меню и управление"
+        }
+      ],
+      "release": {
+        "tag_prefix": "spydropsgaiden-v",
+        "asset": "SpyDropsGaiden-RU-Setup.exe"
+      },
+      "links": {
+        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/spydropsgaiden-v1.0.0",
+        "steam": "https://store.steampowered.com/app/4152490/",
+        "guide": ""
+      },
+      "note": "Для Windows, Steam build 25878071. Русский заменяет английский слот. Проверены меню и начальные диалоги; полное прохождение всех миссий пока не проверено. Установщик сохраняет оригиналы и позволяет удалить перевод."
+    },
+    {
       "slug": "dragnwash",
       "engine": "Unity",
       "lines": 1839,
