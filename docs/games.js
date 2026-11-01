@@ -43,7 +43,7 @@ window.CATALOG = {
         "Спай Дропс Гайден",
         "Spy Drops Prologue"
       ],
-      "banner": "assets/spydropsgaiden.png",
+      "banner": "assets/spydropsgaiden.png?v=official-20261101",
       "status": "released",
       "version": "1.0.0",
       "adult": false,
