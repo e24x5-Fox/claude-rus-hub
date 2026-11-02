@@ -442,18 +442,18 @@ window.CATALOG = {
     {
       "slug": "feedthecups",
       "engine": "Godot 3",
-      "lines": 2954,
+      "lines": 2975,
       "words": 22300,
       "title": "Feed the Cups",
       "aliases": ["Фид зе капс", "Фид зэ капс", "Накорми стаканы", "Корми стаканчики", "лавка напитков", "бабл-ти"],
       "banner": "assets/feedthecups.png",
       "status": "released",
-      "version": "1.0",
+      "version": "1.0.1",
       "adult": false,
       "tags": ["Godot", "Windows", "Кооператив"],
       "summary": "Перевод кооперативного рогалика про лавку напитков: меню и настройки, обучение и подсказки, карточки способностей и демонических контрактов, напитки, оборудование, достижения и реплики. Русский встраивается в родную систему языков игры.",
       "scope": [
-        { "label": "Строки", "value": "2954" },
+        { "label": "Строки", "value": "2975" },
         { "label": "Объём", "value": "~22 тыс. слов" },
         { "label": "Карточки", "value": "все" },
         { "label": "Архив игры", "value": "не меняется" }
@@ -623,7 +623,7 @@ window.CATALOG = {
       "aliases": ["Гигглленд", "Гиглленд", "Гигл ленд", "Гиггленд", "Хихиленд", "Страна смешинок"],
       "banner": "assets/giggleland.png",
       "status": "released",
-      "version": "1.0",
+      "version": "1.0.1",
       "adult": false,
       "tags": ["Unity", "Windows", "Хоррор"],
       "summary": "Перевод хоррора про заброшенный детский парк: меню и настройки, субтитры всех диалогов и телевизоров, задания, записки и дневник, подсказки и титры с песнями. Озвучка остаётся родной, субтитры идут по-русски; кириллица дорисована в фирменные шрифты игры.",
@@ -633,7 +633,7 @@ window.CATALOG = {
         { "label": "Объём", "value": "~17 тыс. слов" },
         { "label": "Шрифты", "value": "как в оригинале" }
       ],
-      "install_size": "96 МБ",
+      "install_size": "91 МБ",
       "release": { "tag_prefix": "giggleland-", "asset": "Giggleland-RU-Setup.exe" },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",

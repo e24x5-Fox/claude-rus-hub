@@ -34,9 +34,15 @@ window.CRH_VERIFIED = {
   "broken": false
  },
  "feedthecups": {
-  "build": "26179816",
-  "at": "2026-10-27",
-  "by": "проверка файлов",
+  "build": "26292948",
+  "at": "2026-11-02",
+  "by": "запуск игры с переводом 1.0.1 на FOX",
+  "broken": false
+ },
+ "giggleland": {
+  "build": "26328337",
+  "at": "2026-11-02",
+  "by": "запуск игры с переводом 1.0.1 на FOX",
   "broken": false
  }
 };

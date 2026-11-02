@@ -49,21 +49,21 @@ window.CRH_VT = {
   "flagged": {}
  },
  "feedthecups": {
-  "sha256": "7ef901bce01bb1b7192eccb28a1d6adf5f54e0d70968a00f18193e79c1807be2",
-  "link": "https://www.virustotal.com/gui/file/7ef901bce01bb1b7192eccb28a1d6adf5f54e0d70968a00f18193e79c1807be2",
-  "date": "17.10.2026",
+  "sha256": "7db274ffbff55b76b072ce9f5870b29b981d16dbc17bc51739a6896d5a0dcf48",
+  "link": "https://www.virustotal.com/gui/file/7db274ffbff55b76b072ce9f5870b29b981d16dbc17bc51739a6896d5a0dcf48",
+  "date": "02.11.2026",
   "malicious": 0,
   "suspicious": 0,
-  "engines": 67,
+  "engines": 41,
   "flagged": {}
  },
  "giggleland": {
-  "sha256": "8922b1d0becc0ea00367a43bc98ca3a332cdefd72e6bc6d2bab82527f0879265",
-  "link": "https://www.virustotal.com/gui/file/8922b1d0becc0ea00367a43bc98ca3a332cdefd72e6bc6d2bab82527f0879265",
-  "date": "30.10.2026",
+  "sha256": "f01d67d4b0d19fc268d65f8b54422f05f2a87fc6f6a1dee53a234bafeb5c499b",
+  "link": "https://www.virustotal.com/gui/file/f01d67d4b0d19fc268d65f8b54422f05f2a87fc6f6a1dee53a234bafeb5c499b",
+  "date": "02.11.2026",
   "malicious": 0,
   "suspicious": 0,
-  "engines": 52,
+  "engines": 65,
   "flagged": {}
  },
  "kemopop": {
