@@ -22,9 +22,9 @@ window.CRH_VERIFIED = {
   "broken": false
  },
  "warriorcats": {
-  "build": "26184573",
-  "at": "2026-10-27",
-  "by": "проверка архива",
+  "build": "26337109",
+  "at": "2026-11-03",
+  "by": "установка 1.0.3, запуск игры и проверка новых настроек",
   "broken": false
  },
  "oddremedy": {
