@@ -1,0 +1,62 @@
+name: Актуальность мода или перевода
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: Слаг игры (например lucidcheats)
+        required: true
+      build:
+        description: Steam buildid проверенной сборки
+        required: true
+      version:
+        description: Проверенная версия мода или перевода
+        required: true
+      note:
+        description: Что проверено (например запуск и работа мода)
+        required: true
+permissions:
+  contents: write
+concurrency:
+  group: compatibility-record
+  cancel-in-progress: false
+jobs:
+  record:
+    if: github.event_name != 'release' || (!github.event.release.prerelease && !github.event.release.draft)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Записать проверку
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TAG: ${{ github.event.release.tag_name }}
+          SLUG: ${{ inputs.slug }}
+          BUILD: ${{ inputs.build }}
+          VERSION: ${{ inputs.version }}
+          NOTE: ${{ inputs.note }}
+        shell: bash
+        run: |
+          if [ -n "$TAG" ]; then
+            gh api "repos/$REPO/releases/tags/$TAG" > release.json
+            if ! gh release download "$TAG" --pattern compatibility.json --dir /tmp/compatibility; then
+              echo "В релизе нет записи о проверенной сборке; статус оставлен прежним."
+              exit 0
+            fi
+            python3 tools/compatibility.py --release release.json --receipt /tmp/compatibility/compatibility.json
+          else
+            python3 tools/compatibility.py --slug "$SLUG" --build "$BUILD" --version "$VERSION" --note "$NOTE"
+          fi
+      - name: Опубликовать отметку
+        shell: bash
+        run: |
+          git diff --quiet docs/verified.js && exit 0
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898208+github-actions[bot]@users.noreply.github.com'
+          git add docs/verified.js
+          git commit -m 'Каталог: подтверждена совместимость с проверенной сборкой игры'
+          git pull --rebase
+          git push
