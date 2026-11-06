@@ -2,11 +2,11 @@
    пишет tools/builds_snapshot.py из GitHub Actions раз в сутки. Руками
    не править. С docs/verified.js даёт плашку версии игры. */
 window.CRH_BUILDS = {
- "checked": "2026-11-05",
+ "checked": "2026-11-06",
  "games": {
   "dragnwash": {
-   "build": "25286774",
-   "updated": 1789341780,
+   "build": "26443382",
+   "updated": 1793910975,
    "appid": "4739660"
   },
   "protogen": {
