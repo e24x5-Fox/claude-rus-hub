@@ -93,7 +93,7 @@ function renderNav(page) {
 }
 
 /* ── «Как вам новый каталог?» — реакции без перехода в Discord ─────────────────
-   Плашка беты в углу открывает окошко с четырьмя реакциями. Счёт — тот же
+   Опрос раскрыт по умолчанию; крестик запоминает закрытие в браузере. Счёт — тот же
    сервис, что у посещений старого каталога (abacus, side.js): ключи
    v2-react-<id>, голос только прибавляет. Один голос на браузер (localStorage
    v2-react). С диска и с локального сервера голос не засчитывается — как и в
@@ -126,7 +126,7 @@ function betaDock() {
   dock.innerHTML = '<button class="beta-pill" type="button" aria-expanded="false"><b>бета</b>'
     + '<span class="long">Как вам новый каталог?</span><span class="short">Как вам?</span></button>'
     + '<div class="beta-pop" role="dialog" aria-label="Как вам новый каталог?">'
-    + '<div class="beta-head"><b>Как вам новый каталог?</b><button class="beta-x" type="button" title="Закрыть">×</button></div>'
+    + '<div class="beta-head"><b>Как вам новый каталог?</b><button class="beta-x" type="button" title="Скрыть опрос" aria-label="Скрыть опрос">×</button></div>'
     + '<div class="beta-reacts">' + REACTIONS.map(function (r) {
         return '<button type="button" data-r="' + r[0] + '"><span class="e">' + r[1] + '</span>'
           + '<span class="l">' + r[2] + '</span><span class="c">·</span></button>';
@@ -152,9 +152,18 @@ function betaDock() {
     pill.setAttribute('aria-expanded', on ? 'true' : 'false');
     if (on) { paint(); reactLoad().then(paint); }
   }
-  pill.addEventListener('click', function (e) { e.stopPropagation(); open(!dock.classList.contains('open')); });
-  dock.querySelector('.beta-x').addEventListener('click', function () { open(false); });
-  document.addEventListener('click', function (e) { if (!dock.contains(e.target)) open(false); });
+  function chooseOpen(on) {
+    try {
+      if (on) localStorage.removeItem('v2-feedback-dismissed');
+      else localStorage.setItem('v2-feedback-dismissed', '1');
+    } catch (e) { /* при запрещённом хранилище выбор действует до перезагрузки */ }
+    open(on);
+  }
+  pill.addEventListener('click', function (e) { e.stopPropagation(); chooseOpen(!dock.classList.contains('open')); });
+  dock.querySelector('.beta-x').addEventListener('click', function () { chooseOpen(false); });
+  var dismissed = false;
+  try { dismissed = localStorage.getItem('v2-feedback-dismissed') === '1'; } catch (e) {}
+  open(!dismissed);
   dock.querySelector('.beta-reacts').addEventListener('click', function (e) {
     var b = e.target.closest('[data-r]');
     if (!b || reactMine() || reactLocal()) return;
