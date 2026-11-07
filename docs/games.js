@@ -486,7 +486,7 @@ window.CATALOG = {
         { "label": "Имена котов", "value": "2438" },
         { "label": "Шрифты", "value": "как в оригинале" }
       ],
-      "install_size": "65 МБ",
+      "install_size": "72 МБ",
       "release": { "tag_prefix": "warriorcats-", "asset": "WarriorCats-RU-Setup.exe" },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
