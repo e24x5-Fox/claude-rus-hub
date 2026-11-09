@@ -34,6 +34,55 @@ window.CATALOG = {
   "updated": "2026-09-30",
   "games": [
     {
+      "slug": "selkie",
+      "engine": "Godot",
+      "lines": 321,
+      "words": 2198,
+      "title": "Selkie’s Salvage&Co.",
+      "aliases": [
+        "Selkie",
+        "Селки",
+        "Сэлки",
+        "Selkies Salvage"
+      ],
+      "banner": "assets/selkie.jpg",
+      "status": "released",
+      "version": "1.0.3",
+      "adult": false,
+      "tags": [
+        "Godot",
+        "Windows",
+        "Уборка",
+        "Исследование"
+      ],
+      "summary": "Русский перевод диалогов, обучения, меню, настроек, улучшений и надписей на картинках.",
+      "scope": [
+        {
+          "label": "Текст",
+          "value": "321 строка"
+        },
+        {
+          "label": "Картинки",
+          "value": "12 текстур"
+        },
+        {
+          "label": "Шрифт",
+          "value": "кириллица"
+        }
+      ],
+      "install_size": "77 МБ",
+      "release": {
+        "tag_prefix": "selkie-v",
+        "asset": "Selkie-RU-Setup.exe"
+      },
+      "links": {
+        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/selkie-v1.0.3",
+        "steam": "https://store.steampowered.com/app/4984870/",
+        "guide": ""
+      },
+      "note": "Для Windows, Steam build 26396432. Русский включается сразу. Пользователь проверил 1.0.3 в игре и одобрил выпуск; полного прохождения разработчиком не было. Проверены установка, удаление и сохранение кода Multiplayer 0.3.2. Другие моды устанавливайте до перевода; перед их обновлением удаляйте перевод. Уведомления о новых версиях включены по умолчанию и отключаются при установке."
+    },
+    {
       "slug": "spydropsgaiden",
       "engine": "Unity",
       "lines": 156,
