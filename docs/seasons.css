@@ -1,0 +1,94 @@
+:root{--season:#eda967;--season-rgb:237,169,103;--season-bg:#151111;--season-panel:#201917;--season-line:#493629}
+/* This isolated preview already has its own beta controls. */
+.beta-dock{display:none!important}
+img.season-mirrored{scale:-1 1}
+html[data-season=spring]{--season:#f2a9c8;--season-rgb:242,169,200;--season-bg:#111715;--season-panel:#19211e;--season-line:#374b40}
+html[data-season=summer]{--season:#f4ce7a;--season-rgb:244,206,122;--season-bg:#101917;--season-panel:#182522;--season-line:#3d4d38}
+html[data-season=winter]{--season:#b2d8ed;--season-rgb:178,216,237;--season-bg:#10151f;--season-panel:#192232;--season-line:#33495d}
+html[data-season]{--bg:var(--season-bg);--bg2:var(--season-panel);--bg3:var(--season-line);--text2:#c0bcc6;--text3:#aaa4b0;background:radial-gradient(ellipse 1000px 600px at 92% 0,rgba(var(--season-rgb),.12),transparent 75%),radial-gradient(ellipse 900px 700px at 0 30%,rgba(139,92,246,.08),transparent 70%),var(--season-bg);background-attachment:fixed}
+html[data-season] .nav{background:color-mix(in srgb,var(--season-bg) 91%,transparent);border-bottom-color:color-mix(in srgb,var(--season) 20%,transparent)}
+.season-studio{position:relative;z-index:2;margin:24px auto 0;max-width:1148px;padding:24px 28px;border:1px solid var(--season-line);border-radius:20px;background:linear-gradient(110deg,var(--season-panel),color-mix(in srgb,var(--season-panel) 80%,var(--season) 8%));overflow:hidden;box-shadow:0 16px 55px #0002}
+.season-studio::before{content:"";position:absolute;left:0;top:24px;bottom:24px;width:3px;background:var(--season);border-radius:2px}
+.season-topline{display:flex;align-items:center;gap:10px;color:var(--season);font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:9px}
+.season-beta{letter-spacing:.08em;border:1px solid var(--season-line);padding:2px 6px;border-radius:4px;color:var(--text2)}
+.season-studio h2{font-size:25px;letter-spacing:-.04em;line-height:1.25;margin:0 0 7px;font-weight:600}
+.season-description{font-size:12px;color:var(--text2);margin:0;max-width:580px}
+.season-art{position:absolute;right:28px;top:15px;width:138px;height:138px;color:var(--season);opacity:.85;pointer-events:none}
+.season-controls{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:23px;padding-top:18px;border-top:1px solid var(--season-line);position:relative}
+.season-tabs{display:flex;gap:5px;flex-wrap:wrap}
+.season-tabs button{font:inherit;font-size:12px;color:var(--text2);background:transparent;border:1px solid transparent;border-radius:9px;padding:8px 11px;cursor:pointer;display:flex;gap:7px;align-items:center;transition:background .18s,border-color .18s}
+.season-tabs button svg{width:15px;height:15px}
+.season-tabs button:hover{background:#ffffff09;color:var(--text)}
+.season-tabs button[aria-pressed=true]{color:var(--season);border-color:var(--season-line);background:rgba(var(--season-rgb),.09)}
+.season-prefs{display:flex;align-items:center;gap:16px;font-size:11px;color:var(--text2);flex-wrap:wrap}
+.season-prefs label{display:flex;gap:7px;align-items:center;cursor:pointer;white-space:nowrap}
+.season-prefs input{accent-color:var(--accent);width:14px;height:14px;margin:0}
+.season-tabs button:focus-visible,.season-prefs input:focus-visible{outline:2px solid var(--accent2);outline-offset:3px}
+html[data-season] .tile{box-shadow:0 5px 20px #0002}
+html[data-season] .tile:hover{border-color:var(--season);box-shadow:0 8px 28px rgba(var(--season-rgb),.09)}
+html[data-season] .page{position:relative;z-index:1}
+html[data-season] .hero{padding-top:6px}
+html[data-season] .hero h1 em{color:var(--accent2)}
+html[data-season] .brand img{filter:drop-shadow(0 0 9px rgba(var(--season-rgb),.25))}
+html[data-season] .foot{border-top-color:var(--season-line)}
+.season-atmosphere{position:fixed;inset:60px 0 0;overflow:hidden;pointer-events:none;z-index:0;contain:strict}
+.season-particle{position:absolute;top:-30px;left:var(--x);width:var(--size);height:var(--size);background:var(--season);opacity:0;animation:season-fall var(--duration) linear infinite;animation-delay:var(--delay);border-radius:70% 10% 70% 15%;will-change:transform,opacity}
+html[data-season=spring] .season-particle{border-radius:80% 20% 75% 45%;box-shadow:inset -2px -2px 0 #f5d9e330}
+html[data-season=summer] .season-particle{border-radius:50%;box-shadow:0 0 12px 3px #f5ce7a45;animation-name:season-firefly}
+html[data-season=winter] .season-particle{border-radius:50%;background:#d8efff;box-shadow:0 0 7px #cde9ff40}
+@keyframes season-fall{0%{transform:translate3d(0,-25px,0) rotate(0);opacity:0}12%{opacity:.3}85%{opacity:.22}100%{transform:translate3d(95px,var(--season-fall-distance,105vh),0) rotate(300deg);opacity:0}}
+@keyframes season-firefly{0%{transform:translate3d(0,var(--season-fall-distance,85vh),0);opacity:0}25%{opacity:.4}50%{opacity:.08}75%{opacity:.35}100%{transform:translate3d(-65px,2vh,0);opacity:0}}
+html[data-season-motion=off] .season-atmosphere{display:none}
+@media(prefers-reduced-motion:reduce){.season-atmosphere{display:none}.season-tabs button{transition:none}}
+@media(max-width:850px){.season-studio{margin:18px 16px 0;padding:22px}.season-controls{align-items:flex-start;flex-direction:column;gap:12px}.season-art{width:100px;height:100px;right:12px;opacity:.5}.season-description{max-width:75%}}
+@media(max-width:480px){.season-studio{padding:18px 16px;border-radius:14px}.season-studio h2{font-size:21px}.season-description{max-width:calc(100% - 35px);font-size:11px}.season-art{width:65px;height:65px;top:5px;right:3px;opacity:.23}.season-tabs{gap:2px}.season-tabs button{font-size:11px;padding:8px}.season-controls{margin-top:17px;padding-top:13px}.season-prefs{font-size:10px;gap:13px}}
+/* Illustrated seasonal scenery, isolated to the beta. */
+html[data-season=spring]{--season-edge:url('assets/season-decor/spring-edge.png')}
+html[data-season=summer]{--season-edge:url('assets/season-decor/summer-edge.png')}
+html[data-season=autumn]{--season-edge:url('assets/season-decor/autumn-edge.png')}
+html[data-season=winter]{--season-edge:url('assets/season-decor/winter-edge.png')}
+html[data-season] .tile{position:relative;overflow:visible;margin-top:18px}
+html[data-season] .tile .img{border-radius:var(--r-card) var(--r-card) 0 0;overflow:hidden}
+html[data-season] .tile::after{content:'';position:absolute;z-index:4;left:-2%;top:0;width:104%;aspect-ratio:3/1;background:var(--season-edge) center/100% 100% no-repeat;transform:translateY(-61%);pointer-events:none;filter:drop-shadow(0 3px 2px #0004)}
+html[data-season] .tile:nth-child(3n)::after{transform:translateY(-61%) scaleX(-1)}
+html[data-season] .season-studio{overflow:visible;margin-top:42px;padding-top:34px}
+html[data-season] .season-studio::after{content:'';position:absolute;pointer-events:none;z-index:3;left:0;right:0;top:-39px;height:68px;background:var(--season-edge) left center/390px 130px repeat-x;filter:drop-shadow(0 3px 2px #0003)}
+.season-banks{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:2;contain:strict}
+.season-banks i{position:absolute;bottom:-80px;width:540px;aspect-ratio:3/1;background:var(--season-edge) center/contain no-repeat;filter:drop-shadow(0 -3px 10px #0003)}
+.season-banks i:first-child{left:-260px;transform:rotate(9deg)}
+.season-banks i:last-child{right:-260px;transform:rotate(-9deg) scaleX(-1)}
+.season-atmosphere{z-index:3}
+.season-particle{filter:drop-shadow(0 2px 2px #0003)}
+html[data-season=autumn] .season-particle{background:linear-gradient(135deg,#ffd16a,#db6b25 60%,#8d3524);border-radius:0;clip-path:polygon(50% 0,60% 25%,85% 12%,80% 40%,100% 52%,72% 65%,68% 90%,53% 80%,48% 100%,43% 77%,19% 84%,25% 63%,0 49%,24% 40%,17% 14%,42% 27%)}
+html[data-season=winter] .season-particle:nth-child(3n){background:#e8f7ff;border-radius:0;clip-path:polygon(44% 0,56% 0,56% 37%,87% 18%,94% 30%,63% 49%,94% 68%,87% 80%,56% 61%,56% 100%,44% 100%,44% 61%,13% 80%,6% 68%,37% 49%,6% 30%,13% 18%,44% 37%)}
+@keyframes season-fall{0%{transform:translate3d(0,-30px,0) rotate(0);opacity:0}12%{opacity:.65}85%{opacity:.48}100%{transform:translate3d(95px,var(--season-fall-distance,105vh),0) rotate(300deg);opacity:0}}
+html[data-season-motion=off] .season-banks,html[data-season-motion=off] .tile::after,html[data-season-motion=off] .season-studio::after{display:none}
+@media(max-width:650px){html[data-season] .tile{margin-top:12px}.season-banks i{width:360px;bottom:-60px}.season-banks i:first-child{left:-240px}.season-banks i:last-child{right:-240px}.season-particle:nth-child(n+25){display:none}}
+@media(prefers-reduced-motion:reduce){.season-particle{animation:none!important}}
+/* Summer foliage has a lower baseline in its transparent canvas. */
+html[data-season=summer] .season-studio::after{top:-64px}
+html[data-season=summer] .tile::after{transform:translateY(-75%)}
+html[data-season=summer] .tile:nth-child(3n)::after{transform:translateY(-75%) scaleX(-1)}
+
+html[data-season=autumn] .season-studio::after{top:-55px}
+
+/* Particle space follows document coordinates; each depth compensates scroll differently. */
+.season-atmosphere{position:absolute;inset:0 0 auto;min-height:100vh}
+html[data-season=autumn] .tile::after{transform:translateY(-68%)}
+html[data-season=autumn] .tile:nth-child(3n)::after{transform:translateY(-68%) scaleX(-1)}
+/* Seasonal palette v2: neutral charcoal surfaces, natural light accents. */
+html[data-season=spring]{--season:#9cce75;--season-rgb:156,206,117;--season-bg:#111512;--season-panel:#1a201b;--season-line:#354231;--accent:#9cce75;--accent2:#bce69b;--accent-soft:#263322;--accent-muted:#709951}
+html[data-season=summer]{--season:#f4cc62;--season-rgb:244,204,98;--season-bg:#171511;--season-panel:#232019;--season-line:#49402a;--accent:#f4cc62;--accent2:#ffe29a;--accent-soft:#3b311c;--accent-muted:#b5923e}
+html[data-season=autumn]{--season:#e99a53;--season-rgb:233,154,83;--season-bg:#181310;--season-panel:#251c17;--season-line:#4d3729;--accent:#e99a53;--accent2:#ffc18a;--accent-soft:#3c291d;--accent-muted:#b47441}
+html[data-season=winter]{--season:#9dcfe8;--season-rgb:157,207,232;--season-bg:#11151b;--season-panel:#1b222b;--season-line:#354553;--accent:#9dcfe8;--accent2:#c7e9fa;--accent-soft:#243542;--accent-muted:#6f9db6}
+html[data-season]{--text:#f1efea;--text2:#c4c1b9;--text3:#a19d94;--bg4:color-mix(in srgb,var(--season-panel),white 4%);background:radial-gradient(ellipse 1000px 650px at 90% 0,rgba(var(--season-rgb),.09),transparent 75%),var(--season-bg);background-attachment:fixed}
+html[data-season] .season-studio{background:linear-gradient(115deg,var(--season-panel),color-mix(in srgb,var(--season-panel),var(--season) 5%));box-shadow:0 16px 45px #0002}
+html[data-season] .kinds a.on,html[data-season] .btn.primary,html[data-season] .fx-row button.on{color:#211a12;text-shadow:none;box-shadow:0 0 0 3px rgba(var(--season-rgb),.11),0 5px 20px #0003}
+html[data-season] .btn.primary:hover{background:var(--accent2);color:#211a12}
+html[data-season] .kinds a.on .n{background:#0002;color:inherit}
+html[data-season] .nav{background:color-mix(in srgb,var(--season-bg) 96%,transparent)}
+html[data-season] .tile{background:var(--season-panel)}
+/* Falling sakura petals: pink accents independent of spring UI green. */
+html[data-season=spring] .season-particle{background:radial-gradient(ellipse at 32% 25%,#fff0f6 0,#f8b8d1 45%,#e983ad 100%);border-radius:75% 18% 80% 28%;box-shadow:inset -1px -1px 2px #c9618a55;clip-path:polygon(50% 0,62% 12%,80% 5%,98% 28%,100% 55%,85% 80%,55% 98%,25% 88%,4% 65%,0 38%,18% 12%,39% 15%);animation-name:season-sakura;transform-origin:45% 65%}
+html[data-season=spring] .season-particle:nth-child(3n){background:linear-gradient(135deg,#ffe9f2,#ed8fba);border-radius:25% 80% 20% 75%}
+@keyframes season-sakura{0%{transform:translate3d(0,-30px,0) rotate(-25deg) rotateY(0);opacity:0}10%{opacity:.8}25%{transform:translate3d(45px,calc(var(--season-fall-distance,105vh)*.25),0) rotate(70deg) rotateY(65deg)}50%{transform:translate3d(-30px,calc(var(--season-fall-distance,105vh)*.5),0) rotate(155deg) rotateY(10deg);opacity:.7}75%{transform:translate3d(60px,calc(var(--season-fall-distance,105vh)*.75),0) rotate(245deg) rotateY(70deg)}90%{opacity:.65}100%{transform:translate3d(15px,var(--season-fall-distance,105vh),0) rotate(330deg) rotateY(0);opacity:0}}

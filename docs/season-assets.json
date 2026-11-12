@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "images": {
+    "assets/owner.jpg": {
+      "seasons": {
+        "spring": "assets/seasons/spring/owner.png",
+        "summer": "assets/seasons/summer/owner.png",
+        "autumn": "assets/seasons/autumn/owner.png",
+        "winter": "assets/seasons/winter/owner.png"
+      }
+    },
+    "assets/stickers/happy.png": {
+      "seasons": {
+        "spring": "assets/seasons/spring/happy.png",
+        "summer": "assets/seasons/summer/happy.png",
+        "autumn": "assets/seasons/autumn/happy.png",
+        "winter": "assets/seasons/winter/happy.png"
+      }
+    },
+    "assets/mascot-wave.png": {
+      "seasons": {
+        "spring": "assets/seasons/spring/wave-v2.png",
+        "summer": "assets/seasons/summer/wave-v2.png",
+        "autumn": "assets/seasons/autumn/wave-v2.png",
+        "winter": "assets/seasons/winter/wave-v2.png"
+      }
+    },
+    "assets/mascot-calm.png": {
+      "seasons": {
+        "spring": "assets/seasons/spring/calm.png",
+        "summer": "assets/seasons/summer/calm.png",
+        "autumn": "assets/seasons/autumn/calm.png",
+        "winter": "assets/seasons/winter/calm.png"
+      }
+    },
+    "assets/stickers/delight.png": {
+      "seasons": {
+        "spring": "assets/seasons/spring/delight-v2.png",
+        "summer": "assets/seasons/summer/delight-v2.png",
+        "autumn": "assets/seasons/autumn/delight-v2.png",
+        "winter": "assets/seasons/winter/delight-v2.png"
+      }
+    },
+    "assets/stickers/cute.png": {
+      "seasons": {
+        "spring": "assets/seasons/spring/cute.png",
+        "summer": "assets/seasons/summer/cute.png",
+        "autumn": "assets/seasons/autumn/cute.png",
+        "winter": "assets/seasons/winter/cute.png"
+      }
+    },
+    "assets/stickers/wow.png": {
+      "seasons": {
+        "spring": "assets/seasons/spring/wow.png",
+        "summer": "assets/seasons/summer/wow.png",
+        "autumn": "assets/seasons/autumn/wow.png",
+        "winter": "assets/seasons/winter/wow.png"
+      }
+    },
+    "assets/stickers/joy.png": {
+      "seasons": {
+        "spring": "assets/seasons/spring/joy.png",
+        "summer": "assets/seasons/summer/joy-v2.png",
+        "autumn": "assets/seasons/autumn/joy.png",
+        "winter": "assets/seasons/winter/joy.png"
+      }
+    },
+    "assets/discord-fox.png": {
+      "mirror": true,
+      "seasons": {
+        "spring": "assets/seasons/spring/wave-v2.png",
+        "summer": "assets/seasons/summer/wave-v2.png",
+        "autumn": "assets/seasons/autumn/wave-v2.png",
+        "winter": "assets/seasons/winter/wave-v2.png"
+      }
+    }
+  }
+}
