@@ -43,10 +43,10 @@ html[data-season-motion=off] .season-atmosphere{display:none}
 @media(max-width:850px){.season-studio{margin:18px 16px 0;padding:22px}.season-controls{align-items:flex-start;flex-direction:column;gap:12px}.season-art{width:100px;height:100px;right:12px;opacity:.5}.season-description{max-width:75%}}
 @media(max-width:480px){.season-studio{padding:18px 16px;border-radius:14px}.season-studio h2{font-size:21px}.season-description{max-width:calc(100% - 35px);font-size:11px}.season-art{width:65px;height:65px;top:5px;right:3px;opacity:.23}.season-tabs{gap:2px}.season-tabs button{font-size:11px;padding:8px}.season-controls{margin-top:17px;padding-top:13px}.season-prefs{font-size:10px;gap:13px}}
 /* Illustrated seasonal scenery, isolated to the beta. */
-html[data-season=spring]{--season-edge:url('assets/season-decor/spring-edge.png')}
-html[data-season=summer]{--season-edge:url('assets/season-decor/summer-edge.png')}
-html[data-season=autumn]{--season-edge:url('assets/season-decor/autumn-edge.png')}
-html[data-season=winter]{--season-edge:url('assets/season-decor/winter-edge.png')}
+html[data-season=spring]{--season-edge:image-set(url('assets/season-decor/spring-edge-640.webp') 1x,url('assets/season-decor/spring-edge-1280.webp') 2x)}
+html[data-season=summer]{--season-edge:image-set(url('assets/season-decor/summer-edge-640.webp') 1x,url('assets/season-decor/summer-edge-1280.webp') 2x)}
+html[data-season=autumn]{--season-edge:image-set(url('assets/season-decor/autumn-edge-640.webp') 1x,url('assets/season-decor/autumn-edge-1280.webp') 2x)}
+html[data-season=winter]{--season-edge:image-set(url('assets/season-decor/winter-edge-640.webp') 1x,url('assets/season-decor/winter-edge-1280.webp') 2x)}
 html[data-season] .tile{position:relative;overflow:visible;margin-top:18px}
 html[data-season] .tile .img{border-radius:var(--r-card) var(--r-card) 0 0;overflow:hidden}
 html[data-season] .tile::after{content:'';position:absolute;z-index:4;left:-2%;top:0;width:104%;aspect-ratio:3/1;background:var(--season-edge) center/100% 100% no-repeat;transform:translateY(-61%);pointer-events:none;filter:drop-shadow(0 3px 2px #0004)}

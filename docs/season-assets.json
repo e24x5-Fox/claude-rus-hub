@@ -1,77 +1,653 @@
 {
-  "schema": 1,
+  "schema": 2,
   "images": {
     "assets/owner.jpg": {
       "seasons": {
+        "spring": "assets/seasons/spring/owner-1360.webp",
+        "summer": "assets/seasons/summer/owner-1360.webp",
+        "autumn": "assets/seasons/autumn/owner-1360.webp",
+        "winter": "assets/seasons/winter/owner-1360.webp"
+      },
+      "legacySeasons": {
         "spring": "assets/seasons/spring/owner.png",
         "summer": "assets/seasons/summer/owner.png",
         "autumn": "assets/seasons/autumn/owner.png",
         "winter": "assets/seasons/winter/owner.png"
+      },
+      "responsive": {
+        "spring": [
+          {
+            "src": "assets/seasons/spring/owner-480.webp",
+            "width": 480
+          },
+          {
+            "src": "assets/seasons/spring/owner-960.webp",
+            "width": 960
+          },
+          {
+            "src": "assets/seasons/spring/owner-1360.webp",
+            "width": 1360
+          }
+        ],
+        "summer": [
+          {
+            "src": "assets/seasons/summer/owner-480.webp",
+            "width": 480
+          },
+          {
+            "src": "assets/seasons/summer/owner-960.webp",
+            "width": 960
+          },
+          {
+            "src": "assets/seasons/summer/owner-1360.webp",
+            "width": 1360
+          }
+        ],
+        "autumn": [
+          {
+            "src": "assets/seasons/autumn/owner-480.webp",
+            "width": 480
+          },
+          {
+            "src": "assets/seasons/autumn/owner-960.webp",
+            "width": 960
+          },
+          {
+            "src": "assets/seasons/autumn/owner-1360.webp",
+            "width": 1360
+          }
+        ],
+        "winter": [
+          {
+            "src": "assets/seasons/winter/owner-480.webp",
+            "width": 480
+          },
+          {
+            "src": "assets/seasons/winter/owner-960.webp",
+            "width": 960
+          },
+          {
+            "src": "assets/seasons/winter/owner-1360.webp",
+            "width": 1360
+          }
+        ]
       }
     },
     "assets/stickers/happy.png": {
       "seasons": {
+        "spring": "assets/seasons/spring/happy-960.webp",
+        "summer": "assets/seasons/summer/happy-960.webp",
+        "autumn": "assets/seasons/autumn/happy-960.webp",
+        "winter": "assets/seasons/winter/happy-960.webp"
+      },
+      "legacySeasons": {
         "spring": "assets/seasons/spring/happy.png",
         "summer": "assets/seasons/summer/happy.png",
         "autumn": "assets/seasons/autumn/happy.png",
         "winter": "assets/seasons/winter/happy.png"
+      },
+      "responsive": {
+        "spring": [
+          {
+            "src": "assets/seasons/spring/happy-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/spring/happy-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/spring/happy-960.webp",
+            "width": 960
+          }
+        ],
+        "summer": [
+          {
+            "src": "assets/seasons/summer/happy-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/summer/happy-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/summer/happy-960.webp",
+            "width": 960
+          }
+        ],
+        "autumn": [
+          {
+            "src": "assets/seasons/autumn/happy-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/autumn/happy-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/autumn/happy-960.webp",
+            "width": 960
+          }
+        ],
+        "winter": [
+          {
+            "src": "assets/seasons/winter/happy-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/winter/happy-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/winter/happy-960.webp",
+            "width": 960
+          }
+        ]
       }
     },
     "assets/mascot-wave.png": {
       "seasons": {
+        "spring": "assets/seasons/spring/wave-v2-960.webp",
+        "summer": "assets/seasons/summer/wave-v2-960.webp",
+        "autumn": "assets/seasons/autumn/wave-v2-960.webp",
+        "winter": "assets/seasons/winter/wave-v2-960.webp"
+      },
+      "legacySeasons": {
         "spring": "assets/seasons/spring/wave-v2.png",
         "summer": "assets/seasons/summer/wave-v2.png",
         "autumn": "assets/seasons/autumn/wave-v2.png",
         "winter": "assets/seasons/winter/wave-v2.png"
+      },
+      "responsive": {
+        "spring": [
+          {
+            "src": "assets/seasons/spring/wave-v2-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/spring/wave-v2-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/spring/wave-v2-960.webp",
+            "width": 960
+          }
+        ],
+        "summer": [
+          {
+            "src": "assets/seasons/summer/wave-v2-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/summer/wave-v2-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/summer/wave-v2-960.webp",
+            "width": 960
+          }
+        ],
+        "autumn": [
+          {
+            "src": "assets/seasons/autumn/wave-v2-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/autumn/wave-v2-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/autumn/wave-v2-960.webp",
+            "width": 960
+          }
+        ],
+        "winter": [
+          {
+            "src": "assets/seasons/winter/wave-v2-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/winter/wave-v2-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/winter/wave-v2-960.webp",
+            "width": 960
+          }
+        ]
       }
     },
     "assets/mascot-calm.png": {
       "seasons": {
+        "spring": "assets/seasons/spring/calm-960.webp",
+        "summer": "assets/seasons/summer/calm-960.webp",
+        "autumn": "assets/seasons/autumn/calm-960.webp",
+        "winter": "assets/seasons/winter/calm-960.webp"
+      },
+      "legacySeasons": {
         "spring": "assets/seasons/spring/calm.png",
         "summer": "assets/seasons/summer/calm.png",
         "autumn": "assets/seasons/autumn/calm.png",
         "winter": "assets/seasons/winter/calm.png"
+      },
+      "responsive": {
+        "spring": [
+          {
+            "src": "assets/seasons/spring/calm-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/spring/calm-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/spring/calm-960.webp",
+            "width": 960
+          }
+        ],
+        "summer": [
+          {
+            "src": "assets/seasons/summer/calm-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/summer/calm-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/summer/calm-960.webp",
+            "width": 960
+          }
+        ],
+        "autumn": [
+          {
+            "src": "assets/seasons/autumn/calm-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/autumn/calm-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/autumn/calm-960.webp",
+            "width": 960
+          }
+        ],
+        "winter": [
+          {
+            "src": "assets/seasons/winter/calm-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/winter/calm-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/winter/calm-960.webp",
+            "width": 960
+          }
+        ]
       }
     },
     "assets/stickers/delight.png": {
       "seasons": {
+        "spring": "assets/seasons/spring/delight-v2-960.webp",
+        "summer": "assets/seasons/summer/delight-v2-960.webp",
+        "autumn": "assets/seasons/autumn/delight-v2-960.webp",
+        "winter": "assets/seasons/winter/delight-v2-960.webp"
+      },
+      "legacySeasons": {
         "spring": "assets/seasons/spring/delight-v2.png",
         "summer": "assets/seasons/summer/delight-v2.png",
         "autumn": "assets/seasons/autumn/delight-v2.png",
         "winter": "assets/seasons/winter/delight-v2.png"
+      },
+      "responsive": {
+        "spring": [
+          {
+            "src": "assets/seasons/spring/delight-v2-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/spring/delight-v2-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/spring/delight-v2-960.webp",
+            "width": 960
+          }
+        ],
+        "summer": [
+          {
+            "src": "assets/seasons/summer/delight-v2-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/summer/delight-v2-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/summer/delight-v2-960.webp",
+            "width": 960
+          }
+        ],
+        "autumn": [
+          {
+            "src": "assets/seasons/autumn/delight-v2-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/autumn/delight-v2-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/autumn/delight-v2-960.webp",
+            "width": 960
+          }
+        ],
+        "winter": [
+          {
+            "src": "assets/seasons/winter/delight-v2-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/winter/delight-v2-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/winter/delight-v2-960.webp",
+            "width": 960
+          }
+        ]
       }
     },
     "assets/stickers/cute.png": {
       "seasons": {
+        "spring": "assets/seasons/spring/cute-960.webp",
+        "summer": "assets/seasons/summer/cute-960.webp",
+        "autumn": "assets/seasons/autumn/cute-960.webp",
+        "winter": "assets/seasons/winter/cute-960.webp"
+      },
+      "legacySeasons": {
         "spring": "assets/seasons/spring/cute.png",
         "summer": "assets/seasons/summer/cute.png",
         "autumn": "assets/seasons/autumn/cute.png",
         "winter": "assets/seasons/winter/cute.png"
+      },
+      "responsive": {
+        "spring": [
+          {
+            "src": "assets/seasons/spring/cute-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/spring/cute-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/spring/cute-960.webp",
+            "width": 960
+          }
+        ],
+        "summer": [
+          {
+            "src": "assets/seasons/summer/cute-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/summer/cute-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/summer/cute-960.webp",
+            "width": 960
+          }
+        ],
+        "autumn": [
+          {
+            "src": "assets/seasons/autumn/cute-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/autumn/cute-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/autumn/cute-960.webp",
+            "width": 960
+          }
+        ],
+        "winter": [
+          {
+            "src": "assets/seasons/winter/cute-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/winter/cute-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/winter/cute-960.webp",
+            "width": 960
+          }
+        ]
       }
     },
     "assets/stickers/wow.png": {
       "seasons": {
+        "spring": "assets/seasons/spring/wow-960.webp",
+        "summer": "assets/seasons/summer/wow-960.webp",
+        "autumn": "assets/seasons/autumn/wow-960.webp",
+        "winter": "assets/seasons/winter/wow-960.webp"
+      },
+      "legacySeasons": {
         "spring": "assets/seasons/spring/wow.png",
         "summer": "assets/seasons/summer/wow.png",
         "autumn": "assets/seasons/autumn/wow.png",
         "winter": "assets/seasons/winter/wow.png"
+      },
+      "responsive": {
+        "spring": [
+          {
+            "src": "assets/seasons/spring/wow-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/spring/wow-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/spring/wow-960.webp",
+            "width": 960
+          }
+        ],
+        "summer": [
+          {
+            "src": "assets/seasons/summer/wow-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/summer/wow-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/summer/wow-960.webp",
+            "width": 960
+          }
+        ],
+        "autumn": [
+          {
+            "src": "assets/seasons/autumn/wow-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/autumn/wow-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/autumn/wow-960.webp",
+            "width": 960
+          }
+        ],
+        "winter": [
+          {
+            "src": "assets/seasons/winter/wow-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/winter/wow-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/winter/wow-960.webp",
+            "width": 960
+          }
+        ]
       }
     },
     "assets/stickers/joy.png": {
       "seasons": {
+        "spring": "assets/seasons/spring/joy-960.webp",
+        "summer": "assets/seasons/summer/joy-v2-960.webp",
+        "autumn": "assets/seasons/autumn/joy-960.webp",
+        "winter": "assets/seasons/winter/joy-960.webp"
+      },
+      "legacySeasons": {
         "spring": "assets/seasons/spring/joy.png",
         "summer": "assets/seasons/summer/joy-v2.png",
         "autumn": "assets/seasons/autumn/joy.png",
         "winter": "assets/seasons/winter/joy.png"
+      },
+      "responsive": {
+        "spring": [
+          {
+            "src": "assets/seasons/spring/joy-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/spring/joy-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/spring/joy-960.webp",
+            "width": 960
+          }
+        ],
+        "summer": [
+          {
+            "src": "assets/seasons/summer/joy-v2-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/summer/joy-v2-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/summer/joy-v2-960.webp",
+            "width": 960
+          }
+        ],
+        "autumn": [
+          {
+            "src": "assets/seasons/autumn/joy-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/autumn/joy-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/autumn/joy-960.webp",
+            "width": 960
+          }
+        ],
+        "winter": [
+          {
+            "src": "assets/seasons/winter/joy-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/winter/joy-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/winter/joy-960.webp",
+            "width": 960
+          }
+        ]
       }
     },
     "assets/discord-fox.png": {
       "mirror": true,
       "seasons": {
+        "spring": "assets/seasons/spring/wave-v2-960.webp",
+        "summer": "assets/seasons/summer/wave-v2-960.webp",
+        "autumn": "assets/seasons/autumn/wave-v2-960.webp",
+        "winter": "assets/seasons/winter/wave-v2-960.webp"
+      },
+      "legacySeasons": {
         "spring": "assets/seasons/spring/wave-v2.png",
         "summer": "assets/seasons/summer/wave-v2.png",
         "autumn": "assets/seasons/autumn/wave-v2.png",
         "winter": "assets/seasons/winter/wave-v2.png"
+      },
+      "responsive": {
+        "spring": [
+          {
+            "src": "assets/seasons/spring/wave-v2-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/spring/wave-v2-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/spring/wave-v2-960.webp",
+            "width": 960
+          }
+        ],
+        "summer": [
+          {
+            "src": "assets/seasons/summer/wave-v2-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/summer/wave-v2-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/summer/wave-v2-960.webp",
+            "width": 960
+          }
+        ],
+        "autumn": [
+          {
+            "src": "assets/seasons/autumn/wave-v2-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/autumn/wave-v2-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/autumn/wave-v2-960.webp",
+            "width": 960
+          }
+        ],
+        "winter": [
+          {
+            "src": "assets/seasons/winter/wave-v2-320.webp",
+            "width": 320
+          },
+          {
+            "src": "assets/seasons/winter/wave-v2-640.webp",
+            "width": 640
+          },
+          {
+            "src": "assets/seasons/winter/wave-v2-960.webp",
+            "width": 960
+          }
+        ]
       }
     }
   }

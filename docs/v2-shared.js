@@ -58,7 +58,7 @@ function totals() {
 function gameUrl(g) { return 'v2-game.html?slug=' + encodeURIComponent(g.slug); }
 /* Баннер игры — лёгкая копия WebP из assets/covers/ (в 12 раз меньше PNG: сетка из
    20 баннеров весила 2,9 МБ). Нет копии — onerror в coverImg() вернёт исходный PNG. */
-function cover(g) { return D + 'assets/covers/' + g.banner.replace(/^.*\//, '').replace(/\.png$/i, '.webp'); }
+function cover(g) { return D + 'assets/covers/' + g.banner.split(/[?#]/)[0].replace(/^.*\//, '').replace(/\.(?:png|jpe?g|webp)$/i, '.webp'); }
 function coverImg(g, eager) {
   return '<img src="' + cover(g) + '" width="512" height="192" alt="" decoding="async"'
     + (eager ? ' fetchpriority="high"' : ' loading="lazy"')
