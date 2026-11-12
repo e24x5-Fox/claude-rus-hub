@@ -90,3 +90,5 @@ html[data-season] .tile{background:var(--season-panel)}
 html[data-season=spring] .season-particle{background:radial-gradient(ellipse at 32% 25%,#fff0f6 0,#f8b8d1 45%,#e983ad 100%);border-radius:75% 18% 80% 28%;box-shadow:inset -1px -1px 2px #c9618a55;clip-path:polygon(50% 0,62% 12%,80% 5%,98% 28%,100% 55%,85% 80%,55% 98%,25% 88%,4% 65%,0 38%,18% 12%,39% 15%);animation-name:season-sakura;transform-origin:45% 65%}
 html[data-season=spring] .season-particle:nth-child(3n){background:linear-gradient(135deg,#ffe9f2,#ed8fba);border-radius:25% 80% 20% 75%}
 @keyframes season-sakura{0%{transform:translate3d(0,-30px,0) rotate(-25deg) rotateY(0);opacity:0}10%{opacity:.8}25%{transform:translate3d(45px,calc(var(--season-fall-distance,105vh)*.25),0) rotate(70deg) rotateY(65deg)}50%{transform:translate3d(-30px,calc(var(--season-fall-distance,105vh)*.5),0) rotate(155deg) rotateY(10deg);opacity:.7}75%{transform:translate3d(60px,calc(var(--season-fall-distance,105vh)*.75),0) rotate(245deg) rotateY(70deg)}90%{opacity:.65}100%{transform:translate3d(15px,var(--season-fall-distance,105vh),0) rotate(330deg) rotateY(0);opacity:0}}
+
+.season-current{font-size:12px;color:var(--season)}
