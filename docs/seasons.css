@@ -1,6 +1,4 @@
 :root{--season:#eda967;--season-rgb:237,169,103;--season-bg:#151111;--season-panel:#201917;--season-line:#493629}
-/* This isolated preview already has its own beta controls. */
-.beta-dock{display:none!important}
 img.season-mirrored{scale:-1 1}
 html[data-season=spring]{--season:#f2a9c8;--season-rgb:242,169,200;--season-bg:#111715;--season-panel:#19211e;--season-line:#374b40}
 html[data-season=summer]{--season:#f4ce7a;--season-rgb:244,206,122;--season-bg:#101917;--season-panel:#182522;--season-line:#3d4d38}
