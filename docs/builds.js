@@ -2,7 +2,7 @@
    пишет tools/builds_snapshot.py из GitHub Actions раз в сутки. Руками
    не править. С docs/verified.js даёт плашку версии игры. */
 window.CRH_BUILDS = {
- "checked": "2026-11-12",
+ "checked": "2026-11-13",
  "games": {
   "dragnwash": {
    "build": "26443382",
@@ -105,8 +105,8 @@ window.CRH_BUILDS = {
    "appid": "4778540"
   },
   "giggleland": {
-   "build": "26527345",
-   "updated": 1794176181,
+   "build": "26620246",
+   "updated": 1794500108,
    "appid": "3370490"
   },
   "spydropsgaiden": {
