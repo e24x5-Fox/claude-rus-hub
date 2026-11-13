@@ -685,6 +685,7 @@ window.CATALOG = {
       "install_size": "148 МБ",
       "release": { "tag_prefix": "giggleland-", "asset": "Giggleland-RU-Setup.exe" },
       "links": {
+        "guide": "https://steamcommunity.com/sharedfiles/filedetails/?id=3838873547",
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/3370490/"
       },
