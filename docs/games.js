@@ -78,7 +78,7 @@ window.CATALOG = {
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/selkie-v1.0.3",
         "steam": "https://store.steampowered.com/app/4984870/",
-        "guide": ""
+        "guide": "https://steamcommunity.com/sharedfiles/filedetails/?id=3838873218"
       },
       "note": "Для Windows, Steam build 26396432. Русский включается сразу. Пользователь проверил 1.0.3 в игре и одобрил выпуск; полного прохождения разработчиком не было. Проверены установка, удаление и сохранение кода Multiplayer 0.3.2. Другие моды устанавливайте до перевода; перед их обновлением удаляйте перевод. Уведомления о новых версиях включены по умолчанию и отключаются при установке."
     },
