@@ -34,6 +34,56 @@ window.CATALOG = {
   "updated": "2026-09-30",
   "games": [
     {
+      "slug": "casualtiesunknown",
+      "kind": "furry",
+      "engine": "Unity",
+      "lines": 989,
+      "words": 0,
+      "title": "Casualties: Unknown — Фуриный",
+      "aliases": [
+        "Casualties Unknown",
+        "Казуалтис",
+        "Касу",
+        "Фуриный",
+        "фуривизатор"
+      ],
+      "banner": "assets/casualtiesunknown.jpg",
+      "status": "released",
+      "version": "0.2.0",
+      "adult": false,
+      "tags": [
+        "Unity",
+        "Windows",
+        "Тестовая сборка",
+        "Выживание"
+      ],
+      "summary": "Тестовый «Фуриный» на основе русского перевода сообщества: ласковые меню, названия вещей, подсказки, часть реплик и записок. Отдельный язык с фирменным установщиком.",
+      "scope": [
+        {
+          "label": "Адаптация",
+          "value": "989 полей"
+        },
+        {
+          "label": "Выпуск",
+          "value": "0.2.0-test"
+        },
+        {
+          "label": "Игра",
+          "value": "1.0.1 / build 26590676"
+        },
+        {
+          "label": "Установка",
+          "value": "отдельный язык"
+        }
+      ],
+      "install_size": "72 МБ",
+      "links": {
+        "download": "https://github.com/e24x5-Fox/fox-workshop-tests/releases/download/casualtiesunknown-furry-v0.2.0-test1/CasualtiesUnknown-Furry-Setup-0.2.0-test.exe",
+        "steam": "https://store.steampowered.com/app/4576490/"
+      },
+      "note": "Тестовая частичная адаптация стиля; остальной текст использует исходный русский. Выбор: капсула слева → Language / Язычок → Фуриный (ru-FUR). Другие языки сохраняются. Установка и откат проверены, полного прохождения не было. Исходный русский: UCRD (Axawer), Vinterhelm, SoberFurry, Captain_Kirk, Batya_v_khati, Voprositelnii, Strag Az, Untitled9223, Bogtogus, Spectator39. Фуриная адаптация — Лисья мастерская / икси, при участии Codex."
+    },
+    {
       "slug": "selkie",
       "engine": "Godot",
       "lines": 321,
@@ -133,21 +183,45 @@ window.CATALOG = {
       "lines": 1839,
       "words": 10333,
       "title": "Drag'n Wash",
-      "aliases": ["Драг н Вош", "Драгн Ваш", "мойка дракона", "помыть дракона"],
+      "aliases": [
+        "Драг н Вош",
+        "Драгн Ваш",
+        "мойка дракона",
+        "помыть дракона"
+      ],
       "banner": "assets/dragnwash.png",
       "status": "released",
       "version": "1.2.1",
       "adult": true,
-      "tags": ["Unity", "Windows", "18+"],
+      "tags": [
+        "Unity",
+        "Windows",
+        "18+"
+      ],
       "summary": "Полный перевод: диалоги, интерфейс, меню настроек и рисованные таблички в игровом мире. Мат и взрослые шутки сохранены как в оригинале.",
       "scope": [
-        { "label": "Диалоги", "value": "1839 реплик" },
-        { "label": "Интерфейс", "value": "89 строк" },
-        { "label": "Настройки", "value": "36 подписей" },
-        { "label": "Текстуры", "value": "87 файлов" }
+        {
+          "label": "Диалоги",
+          "value": "1839 реплик"
+        },
+        {
+          "label": "Интерфейс",
+          "value": "89 строк"
+        },
+        {
+          "label": "Настройки",
+          "value": "36 подписей"
+        },
+        {
+          "label": "Текстуры",
+          "value": "87 файлов"
+        }
       ],
       "install_size": "138 МБ",
-      "release": { "tag_prefix": "dragnwash-", "asset": "DragNWash-RU-Setup.exe" },
+      "release": {
+        "tag_prefix": "dragnwash-",
+        "asset": "DragNWash-RU-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/4739660/",
@@ -161,20 +235,39 @@ window.CATALOG = {
       "lines": 2007,
       "words": 36000,
       "title": "My Furry Protogen",
-      "aliases": ["Мой пушистый протоген", "Протоген"],
+      "aliases": [
+        "Мой пушистый протоген",
+        "Протоген"
+      ],
       "banner": "assets/protogen.png",
       "status": "released",
       "version": "1.1.1",
       "adult": true,
-      "tags": ["Ren'Py", "Windows", "18+"],
+      "tags": [
+        "Ren'Py",
+        "Windows",
+        "18+"
+      ],
       "summary": "Полный перевод визуальной новеллы: 2007 реплик и весь интерфейс, ~36 тыс. слов. Мат и взрослые сцены переведены как в оригинале, без смягчения.",
       "scope": [
-        { "label": "Диалоги", "value": "2007 реплик" },
-        { "label": "Интерфейс", "value": "373 строки" },
-        { "label": "Объём", "value": "~36 тыс. слов" }
+        {
+          "label": "Диалоги",
+          "value": "2007 реплик"
+        },
+        {
+          "label": "Интерфейс",
+          "value": "373 строки"
+        },
+        {
+          "label": "Объём",
+          "value": "~36 тыс. слов"
+        }
       ],
       "install_size": "2 МБ",
-      "release": { "tag_prefix": "protogen-", "asset": "MyFurryProtogen-RU-Setup.exe" },
+      "release": {
+        "tag_prefix": "protogen-",
+        "asset": "MyFurryProtogen-RU-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/2009010/",
@@ -188,20 +281,39 @@ window.CATALOG = {
       "lines": 3722,
       "words": 60000,
       "title": "My Furry Protogen 2",
-      "aliases": ["Мой пушистый протоген 2", "Протоген 2"],
+      "aliases": [
+        "Мой пушистый протоген 2",
+        "Протоген 2"
+      ],
       "banner": "assets/protogen2.png",
       "status": "released",
       "version": "1.1.1",
       "adult": true,
-      "tags": ["Ren'Py", "Windows", "18+"],
+      "tags": [
+        "Ren'Py",
+        "Windows",
+        "18+"
+      ],
       "summary": "Продолжение, вдвое длиннее первой части: 3722 реплики и весь интерфейс, ~60 тыс. слов. Имена, термины и легенда йерианцев сведены с первой частью.",
       "scope": [
-        { "label": "Диалоги", "value": "3722 реплики" },
-        { "label": "Интерфейс", "value": "389 строк" },
-        { "label": "Объём", "value": "~60 тыс. слов" }
+        {
+          "label": "Диалоги",
+          "value": "3722 реплики"
+        },
+        {
+          "label": "Интерфейс",
+          "value": "389 строк"
+        },
+        {
+          "label": "Объём",
+          "value": "~60 тыс. слов"
+        }
       ],
       "install_size": "3 МБ",
-      "release": { "tag_prefix": "protogen2-", "asset": "MyFurryProtogen2-RU-Setup.exe" },
+      "release": {
+        "tag_prefix": "protogen2-",
+        "asset": "MyFurryProtogen2-RU-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/2591910/",
@@ -215,21 +327,44 @@ window.CATALOG = {
       "lines": 12884,
       "words": 270000,
       "title": "Amorous",
-      "aliases": ["Аморус", "Аморэс", "Эморес"],
+      "aliases": [
+        "Аморус",
+        "Аморэс",
+        "Эморес"
+      ],
       "banner": "assets/amorous.png",
       "status": "released",
       "version": "1.0.1",
       "adult": true,
-      "tags": ["FNA/MonoGame", "Windows", "18+"],
+      "tags": [
+        "FNA/MonoGame",
+        "Windows",
+        "18+"
+      ],
       "summary": "Самая большая игра каталога: 12 884 реплики, ~270 тыс. слов. Переведены диалоги, интерфейс, титры и 18 картинок с надписями. Кириллицы в шрифтах игры не было ни одного символа — шесть атласов перепечены заново.",
       "scope": [
-        { "label": "Диалоги", "value": "12 884 реплики" },
-        { "label": "Формы по роду", "value": "3754 ветки" },
-        { "label": "Интерфейс", "value": "171 строка" },
-        { "label": "Шрифты", "value": "6 атласов" }
+        {
+          "label": "Диалоги",
+          "value": "12 884 реплики"
+        },
+        {
+          "label": "Формы по роду",
+          "value": "3754 ветки"
+        },
+        {
+          "label": "Интерфейс",
+          "value": "171 строка"
+        },
+        {
+          "label": "Шрифты",
+          "value": "6 атласов"
+        }
       ],
       "install_size": "75 МБ",
-      "release": { "tag_prefix": "amorous-", "asset": "Amorous-RU-Setup.exe" },
+      "release": {
+        "tag_prefix": "amorous-",
+        "asset": "Amorous-RU-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/778700/",
@@ -243,21 +378,44 @@ window.CATALOG = {
       "lines": 0,
       "words": 15445,
       "title": "Bodycam",
-      "aliases": ["Бодикам", "Боди кам", "нательная камера"],
+      "aliases": [
+        "Бодикам",
+        "Боди кам",
+        "нательная камера"
+      ],
       "banner": "assets/bodycam.png",
       "status": "released",
       "version": "1.0.2",
       "adult": false,
-      "tags": ["Unreal Engine 5", "Windows", "Мультиплеер"],
+      "tags": [
+        "Unreal Engine 5",
+        "Windows",
+        "Мультиплеер"
+      ],
       "summary": "Перевод интерфейса сетевого шутера: меню, настройки, снаряжение, режимы, серверы, подсказки и описания. Свой русский в игре покрывал меньше четверти строк, да и тот машинный — переведено всё заново.",
       "scope": [
-        { "label": "Тексты", "value": "3674 строки" },
-        { "label": "Объём", "value": "~15 тыс. слов" },
-        { "label": "Таблицы", "value": "Game, MenuSystemPro" },
-        { "label": "Из ассетов", "value": "виджеты, скины, предметы" }
+        {
+          "label": "Тексты",
+          "value": "3674 строки"
+        },
+        {
+          "label": "Объём",
+          "value": "~15 тыс. слов"
+        },
+        {
+          "label": "Таблицы",
+          "value": "Game, MenuSystemPro"
+        },
+        {
+          "label": "Из ассетов",
+          "value": "виджеты, скины, предметы"
+        }
       ],
       "install_size": "72 МБ",
-      "release": { "tag_prefix": "bodycam-", "asset": "Bodycam-RU-Setup.exe" },
+      "release": {
+        "tag_prefix": "bodycam-",
+        "asset": "Bodycam-RU-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/2406770/",
@@ -271,21 +429,45 @@ window.CATALOG = {
       "lines": 0,
       "words": 5831,
       "title": "Odd Remedy",
-      "aliases": ["Одд Ремеди", "Од ремеди", "Странное лекарство"],
+      "aliases": [
+        "Одд Ремеди",
+        "Од ремеди",
+        "Странное лекарство"
+      ],
       "banner": "assets/oddremedy.png",
       "status": "released",
       "version": "0.2.2",
       "adult": false,
-      "tags": ["Unity", "Windows", "Мультиплеер", "Ранний доступ"],
+      "tags": [
+        "Unity",
+        "Windows",
+        "Мультиплеер",
+        "Ранний доступ"
+      ],
       "summary": "Перевод кооперативной игры в раннем доступе: меню, настройки, управление, подсказки обучения, задания, телефон и надписи в уровнях. Игра стартует сразу по-русски, английский остаётся в списке языков.",
       "scope": [
-        { "label": "Словарь игры", "value": "143 ключа" },
-        { "label": "Сцены и данные", "value": "1098 строк" },
-        { "label": "Код", "value": "514 мест" },
-        { "label": "Объём", "value": "~6 тыс. слов" }
+        {
+          "label": "Словарь игры",
+          "value": "143 ключа"
+        },
+        {
+          "label": "Сцены и данные",
+          "value": "1098 строк"
+        },
+        {
+          "label": "Код",
+          "value": "514 мест"
+        },
+        {
+          "label": "Объём",
+          "value": "~6 тыс. слов"
+        }
       ],
       "install_size": "138 МБ",
-      "release": { "tag_prefix": "oddremedy-", "asset": "OddRemedy-RU-Setup.exe" },
+      "release": {
+        "tag_prefix": "oddremedy-",
+        "asset": "OddRemedy-RU-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/1745680/",
@@ -299,21 +481,44 @@ window.CATALOG = {
       "lines": 3013,
       "words": 20000,
       "title": "ATLYSS",
-      "aliases": ["Атлисс", "Атлис", "Атласс"],
+      "aliases": [
+        "Атлисс",
+        "Атлис",
+        "Атласс"
+      ],
       "banner": "assets/atlyss.png",
       "status": "released",
       "version": "1.0.3",
       "adult": false,
-      "tags": ["Unity", "Windows", "Мультиплеер"],
+      "tags": [
+        "Unity",
+        "Windows",
+        "Мультиплеер"
+      ],
       "summary": "Полный перевод сетевой action-RPG: диалоги всех NPC, задания, предметы, навыки, интерфейс и подсказки, ~20 тыс. слов. Сохранения и игра с англоязычными игроками не ломаются — названия переводятся только на экране.",
       "scope": [
-        { "label": "Тексты и диалоги", "value": "1749 строк" },
-        { "label": "Названия", "value": "753" },
-        { "label": "Код", "value": "511 строк" },
-        { "label": "Объём", "value": "~20 тыс. слов" }
+        {
+          "label": "Тексты и диалоги",
+          "value": "1749 строк"
+        },
+        {
+          "label": "Названия",
+          "value": "753"
+        },
+        {
+          "label": "Код",
+          "value": "511 строк"
+        },
+        {
+          "label": "Объём",
+          "value": "~20 тыс. слов"
+        }
       ],
       "install_size": "138 МБ",
-      "release": { "tag_prefix": "atlyss-", "asset": "ATLYSS-RU-Setup.exe" },
+      "release": {
+        "tag_prefix": "atlyss-",
+        "asset": "ATLYSS-RU-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/2768430/",
@@ -327,51 +532,105 @@ window.CATALOG = {
       "lines": 730,
       "words": 1100,
       "title": "Lucid Cats",
-      "aliases": ["Люсид кэтс", "Лусид кетс", "Осознанные коты", "Коты"],
+      "aliases": [
+        "Люсид кэтс",
+        "Лусид кетс",
+        "Осознанные коты",
+        "Коты"
+      ],
       "banner": "assets/lucidcats.png",
       "status": "released",
       "version": "1.3.1",
       "adult": false,
-      "tags": ["Unity", "Windows", "Мультиплеер", "Хоррор"],
+      "tags": [
+        "Unity",
+        "Windows",
+        "Мультиплеер",
+        "Хоррор"
+      ],
       "summary": "Перевод кооперативного хоррора: меню, сохранения, поиск игр, настройки, статистика, подсказки, магазин улучшений, задания на ночь, комнаты, ценности, ноутбук, итоги ночи, плакаты и вывески. Задания, достижения и игра с англоязычными игроками не ломаются.",
       "scope": [
-        { "label": "Сцены и данные", "value": "646 мест" },
-        { "label": "Код", "value": "77 мест" },
-        { "label": "Текстуры", "value": "7 надписей" },
-        { "label": "Названия на экране", "value": "27" },
-        { "label": "Объём", "value": "~1100 слов" }
+        {
+          "label": "Сцены и данные",
+          "value": "646 мест"
+        },
+        {
+          "label": "Код",
+          "value": "77 мест"
+        },
+        {
+          "label": "Текстуры",
+          "value": "7 надписей"
+        },
+        {
+          "label": "Названия на экране",
+          "value": "27"
+        },
+        {
+          "label": "Объём",
+          "value": "~1100 слов"
+        }
       ],
       "install_size": "98 МБ",
-      "release": { "tag_prefix": "lucidcats-", "asset": "LucidCats-RU-Setup.exe" },
+      "release": {
+        "tag_prefix": "lucidcats-",
+        "asset": "LucidCats-RU-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/4778540/",
         "guide": ""
       },
       "note": "Собрано под версию игры 2.4 (обновление 08.10.2026: улучшения ноутбука — вспышка, приманка, интерком, трекер выхода). Названия ценностей в данных остаются английскими и переводятся только на экране — по ним игра засчитывает задания и выдаёт достижения. Меню, настройки, статистика и пауза проверены в игре; сами ночи вживую не проходились. Часть перевода вшита в код игры, поэтому после её обновления установщик эту часть не поставит, пока не выйдет новая версия русификатора."
-        },
+    },
     {
       "slug": "kemopop",
       "engine": "Godot",
       "lines": 1826,
       "words": 13500,
       "title": "Kemopop!",
-      "aliases": ["Кемопоп", "Кемопоп!", "Кемо поп"],
+      "aliases": [
+        "Кемопоп",
+        "Кемопоп!",
+        "Кемо поп"
+      ],
       "banner": "assets/kemopop.png",
       "status": "released",
       "version": "1.0",
       "adult": true,
-      "tags": ["Godot", "Windows", "18+"],
+      "tags": [
+        "Godot",
+        "Windows",
+        "18+"
+      ],
       "summary": "Полный перевод головоломки-кафе с мальчиками-официантами: интерфейс, биографии, реплики, сценки, обучение и достижения, ~13,5 тыс. слов. Русский выбирается в настройках игры, со своим флагом. Кириллица дорисована прямо в фирменный шрифт игры.",
       "scope": [
-        { "label": "Сценки", "value": "507 реплик" },
-        { "label": "Реплики в игре", "value": "281" },
-        { "label": "Биографии", "value": "77" },
-        { "label": "Шрифт", "value": "52 буквы дорисовано" },
-        { "label": "Объём", "value": "~13,5 тыс. слов" }
+        {
+          "label": "Сценки",
+          "value": "507 реплик"
+        },
+        {
+          "label": "Реплики в игре",
+          "value": "281"
+        },
+        {
+          "label": "Биографии",
+          "value": "77"
+        },
+        {
+          "label": "Шрифт",
+          "value": "52 буквы дорисовано"
+        },
+        {
+          "label": "Объём",
+          "value": "~13,5 тыс. слов"
+        }
       ],
       "install_size": "68 МБ",
-      "release": { "tag_prefix": "kemopop-", "asset": "Kemopop-RU-Setup.exe" },
+      "release": {
+        "tag_prefix": "kemopop-",
+        "asset": "Kemopop-RU-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/3093590/",
@@ -385,20 +644,40 @@ window.CATALOG = {
       "lines": 871,
       "words": 6000,
       "title": "Meet Cute: Cafe",
-      "aliases": ["Мит кьют кафе", "Мит Кьют: Кафе", "Милая встреча кафе"],
+      "aliases": [
+        "Мит кьют кафе",
+        "Мит Кьют: Кафе",
+        "Милая встреча кафе"
+      ],
       "banner": "assets/meetcute.png",
       "status": "released",
       "version": "1.0",
       "adult": true,
-      "tags": ["Ren'Py", "Windows", "18+"],
+      "tags": [
+        "Ren'Py",
+        "Windows",
+        "18+"
+      ],
       "summary": "Полный перевод короткой новеллы от авторов My Furry Protogen: герой падает в лужу по дороге на встречу, и отстирать костюм ему помогает официантка Элис. Все диалоги и интерфейс, ~6 тыс. слов.",
       "scope": [
-        { "label": "Диалоги", "value": "514 реплик" },
-        { "label": "Интерфейс", "value": "357 строк" },
-        { "label": "Объём", "value": "~6 тыс. слов" }
+        {
+          "label": "Диалоги",
+          "value": "514 реплик"
+        },
+        {
+          "label": "Интерфейс",
+          "value": "357 строк"
+        },
+        {
+          "label": "Объём",
+          "value": "~6 тыс. слов"
+        }
       ],
       "install_size": "68 МБ",
-      "release": { "tag_prefix": "meetcute-", "asset": "MeetCuteCafe-RU-Setup.exe" },
+      "release": {
+        "tag_prefix": "meetcute-",
+        "asset": "MeetCuteCafe-RU-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/1879190/",
@@ -412,20 +691,40 @@ window.CATALOG = {
       "lines": 944,
       "words": 8000,
       "title": "Meet Cute: Delivery",
-      "aliases": ["Мит кьют деливери", "Мит Кьют: Доставка", "Милая встреча доставка"],
+      "aliases": [
+        "Мит кьют деливери",
+        "Мит Кьют: Доставка",
+        "Милая встреча доставка"
+      ],
       "banner": "assets/meetcute2.png",
       "status": "released",
       "version": "1.0",
       "adult": true,
-      "tags": ["Ren'Py", "Windows", "18+"],
+      "tags": [
+        "Ren'Py",
+        "Windows",
+        "18+"
+      ],
       "summary": "Полный перевод второй новеллы серии Meet Cute: курьерша Лиллиан привозит герою телевизор и падает в обморок у его двери. Все диалоги и интерфейс, ~8 тыс. слов.",
       "scope": [
-        { "label": "Диалоги", "value": "587 реплик" },
-        { "label": "Интерфейс", "value": "357 строк" },
-        { "label": "Объём", "value": "~8 тыс. слов" }
+        {
+          "label": "Диалоги",
+          "value": "587 реплик"
+        },
+        {
+          "label": "Интерфейс",
+          "value": "357 строк"
+        },
+        {
+          "label": "Объём",
+          "value": "~8 тыс. слов"
+        }
       ],
       "install_size": "68 МБ",
-      "release": { "tag_prefix": "meetcute2-", "asset": "MeetCuteDelivery-RU-Setup.exe" },
+      "release": {
+        "tag_prefix": "meetcute2-",
+        "asset": "MeetCuteDelivery-RU-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/1897960/",
@@ -439,20 +738,40 @@ window.CATALOG = {
       "lines": 932,
       "words": 8600,
       "title": "Tails and Pines",
-      "aliases": ["Тейлз энд Пайнс", "Хвосты и сосны", "Tails & Pines"],
+      "aliases": [
+        "Тейлз энд Пайнс",
+        "Хвосты и сосны",
+        "Tails & Pines"
+      ],
       "banner": "assets/tailsandpines.png",
       "status": "released",
       "version": "1.0",
       "adult": true,
-      "tags": ["Ren'Py", "Windows", "18+"],
+      "tags": [
+        "Ren'Py",
+        "Windows",
+        "18+"
+      ],
       "summary": "Полный перевод новеллы о двух школьных подругах: официантка Эйприл бросает работу, а на пороге появляется Стейси — теперь знаменитая модель. Все диалоги и интерфейс, ~8,6 тыс. слов.",
       "scope": [
-        { "label": "Диалоги", "value": "575 реплик" },
-        { "label": "Интерфейс", "value": "357 строк" },
-        { "label": "Объём", "value": "~8,6 тыс. слов" }
+        {
+          "label": "Диалоги",
+          "value": "575 реплик"
+        },
+        {
+          "label": "Интерфейс",
+          "value": "357 строк"
+        },
+        {
+          "label": "Объём",
+          "value": "~8,6 тыс. слов"
+        }
       ],
       "install_size": "68 МБ",
-      "release": { "tag_prefix": "tailsandpines-", "asset": "TailsAndPines-RU-Setup.exe" },
+      "release": {
+        "tag_prefix": "tailsandpines-",
+        "asset": "TailsAndPines-RU-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/1772810/",
@@ -466,21 +785,45 @@ window.CATALOG = {
       "lines": 2084,
       "words": 6500,
       "title": "WEBFISHING",
-      "aliases": ["Вебфишинг", "Веб фишинг", "Webfishing", "веб-рыбалка"],
+      "aliases": [
+        "Вебфишинг",
+        "Веб фишинг",
+        "Webfishing",
+        "веб-рыбалка"
+      ],
       "banner": "assets/webfishing.png",
       "status": "released",
       "version": "1.0",
       "adult": false,
-      "tags": ["Godot", "Windows", "Мультиплеер"],
+      "tags": [
+        "Godot",
+        "Windows",
+        "Мультиплеер"
+      ],
       "summary": "Перевод уютной сетевой рыбалки со зверями: рыбы и шутки при поимке, предметы, косметика и титулы, магазины, задания, настройки, лобби и весь интерфейс. Кириллица дорисована прямо в шрифт игры.",
       "scope": [
-        { "label": "Строки", "value": "~2080" },
-        { "label": "Объём", "value": "~6,5 тыс. слов" },
-        { "label": "Косметика", "value": "~380 вещей и титулов" },
-        { "label": "Шрифт", "value": "кириллица вшита" }
+        {
+          "label": "Строки",
+          "value": "~2080"
+        },
+        {
+          "label": "Объём",
+          "value": "~6,5 тыс. слов"
+        },
+        {
+          "label": "Косметика",
+          "value": "~380 вещей и титулов"
+        },
+        {
+          "label": "Шрифт",
+          "value": "кириллица вшита"
+        }
       ],
       "install_size": "69 МБ",
-      "release": { "tag_prefix": "webfishing-", "asset": "WEBFISHING-RU-Setup.exe" },
+      "release": {
+        "tag_prefix": "webfishing-",
+        "asset": "WEBFISHING-RU-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/3146520/",
@@ -494,21 +837,47 @@ window.CATALOG = {
       "lines": 2975,
       "words": 22300,
       "title": "Feed the Cups",
-      "aliases": ["Фид зе капс", "Фид зэ капс", "Накорми стаканы", "Корми стаканчики", "лавка напитков", "бабл-ти"],
+      "aliases": [
+        "Фид зе капс",
+        "Фид зэ капс",
+        "Накорми стаканы",
+        "Корми стаканчики",
+        "лавка напитков",
+        "бабл-ти"
+      ],
       "banner": "assets/feedthecups.png",
       "status": "released",
       "version": "1.0.1",
       "adult": false,
-      "tags": ["Godot", "Windows", "Кооператив"],
+      "tags": [
+        "Godot",
+        "Windows",
+        "Кооператив"
+      ],
       "summary": "Перевод кооперативного рогалика про лавку напитков: меню и настройки, обучение и подсказки, карточки способностей и демонических контрактов, напитки, оборудование, достижения и реплики. Русский встраивается в родную систему языков игры.",
       "scope": [
-        { "label": "Строки", "value": "2975" },
-        { "label": "Объём", "value": "~22 тыс. слов" },
-        { "label": "Карточки", "value": "все" },
-        { "label": "Архив игры", "value": "не меняется" }
+        {
+          "label": "Строки",
+          "value": "2975"
+        },
+        {
+          "label": "Объём",
+          "value": "~22 тыс. слов"
+        },
+        {
+          "label": "Карточки",
+          "value": "все"
+        },
+        {
+          "label": "Архив игры",
+          "value": "не меняется"
+        }
       ],
       "install_size": "65 МБ",
-      "release": { "tag_prefix": "feedthecups-", "asset": "FeedTheCups-RU-Setup.exe" },
+      "release": {
+        "tag_prefix": "feedthecups-",
+        "asset": "FeedTheCups-RU-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/2336220/",
@@ -522,21 +891,49 @@ window.CATALOG = {
       "lines": 8907,
       "words": 87500,
       "title": "Warrior Cats: Clans of the Forest",
-      "aliases": ["Коты-воители", "Коты воители", "Коты-воители: Племена леса", "Варриор кэтс", "Воины коты", "Warriors", "Грозовое племя", "Эрин Хантер"],
+      "aliases": [
+        "Коты-воители",
+        "Коты воители",
+        "Коты-воители: Племена леса",
+        "Варриор кэтс",
+        "Воины коты",
+        "Warriors",
+        "Грозовое племя",
+        "Эрин Хантер"
+      ],
       "banner": "assets/warriorcats.png",
       "status": "released",
       "version": "1.0.3",
       "adult": false,
-      "tags": ["Unreal", "Windows", "По книгам"],
+      "tags": [
+        "Unreal",
+        "Windows",
+        "По книгам"
+      ],
       "summary": "Полный перевод игры по книгам «Коты-воители»: пророчества всех четырёх племён, диалоги и задания, интерфейс, бой и предметы. Названия и имена — как в русском издании книг (Грозовое племя, глашатай, Звездоцап), 2438 имён котов собраны по книжным правилам, кириллица дорисована в фигурные шрифты игры.",
       "scope": [
-        { "label": "Строки", "value": "8907" },
-        { "label": "Объём", "value": "~87 тыс. слов" },
-        { "label": "Имена котов", "value": "2438" },
-        { "label": "Шрифты", "value": "как в оригинале" }
+        {
+          "label": "Строки",
+          "value": "8907"
+        },
+        {
+          "label": "Объём",
+          "value": "~87 тыс. слов"
+        },
+        {
+          "label": "Имена котов",
+          "value": "2438"
+        },
+        {
+          "label": "Шрифты",
+          "value": "как в оригинале"
+        }
       ],
       "install_size": "72 МБ",
-      "release": { "tag_prefix": "warriorcats-", "asset": "WarriorCats-RU-Setup.exe" },
+      "release": {
+        "tag_prefix": "warriorcats-",
+        "asset": "WarriorCats-RU-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/3960600/",
@@ -551,21 +948,48 @@ window.CATALOG = {
       "lines": 920,
       "words": 2700,
       "title": "LOCKDOWN Protocol — Фуриный",
-      "aliases": ["Локдаун протокол", "Локдаун", "Lockdown", "фуривизатор", "фуриный", "фурри"],
+      "aliases": [
+        "Локдаун протокол",
+        "Локдаун",
+        "Lockdown",
+        "фуривизатор",
+        "фуриный",
+        "фурри"
+      ],
       "banner": "assets/lockdown.png",
       "status": "released",
       "version": "1.3",
       "adult": false,
-      "tags": ["Unreal", "Windows", "Мультиплеер", "Шуточный"],
+      "tags": [
+        "Unreal",
+        "Windows",
+        "Мультиплеер",
+        "Шуточный"
+      ],
       "summary": "Фурри-видео, девять песен с названиями и авторами, мяуки, звук смерти и новая тревога. Фуривизатор: весь текст игры переписан ласковым фуриным диалектом — уменьшительные даже в меню: «Настроечки», «Назадик», «Лобби-норка». Сотрудники — пушистики, диссиденты — бяки, руки — лапки, в списке языков — «Фуриный». Замещает официальный русский и дополняет его 335 строками, которых там не было.",
       "scope": [
-        { "label": "Записи", "value": "920" },
-        { "label": "Объём", "value": "~2,7 тыс. слов" },
-        { "label": "Язык в меню", "value": "«Фуриный»" },
-        { "label": "Тон", "value": "ласково, но понятно" }
+        {
+          "label": "Записи",
+          "value": "920"
+        },
+        {
+          "label": "Объём",
+          "value": "~2,7 тыс. слов"
+        },
+        {
+          "label": "Язык в меню",
+          "value": "«Фуриный»"
+        },
+        {
+          "label": "Тон",
+          "value": "ласково, но понятно"
+        }
       ],
       "install_size": "106 МБ",
-      "release": { "tag_prefix": "lockdown-", "asset": "LockdownProtocol-Furry-Setup.exe" },
+      "release": {
+        "tag_prefix": "lockdown-",
+        "asset": "LockdownProtocol-Furry-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/2780980/",
@@ -580,21 +1004,48 @@ window.CATALOG = {
       "lines": 803,
       "words": 8600,
       "title": "Easy Delivery Co. — Фуриный",
-      "aliases": ["Изи деливери", "Easy Delivery", "Доставка", "фуривизатор", "фуриный", "фурри"],
+      "aliases": [
+        "Изи деливери",
+        "Easy Delivery",
+        "Доставка",
+        "фуривизатор",
+        "фуриный",
+        "фурри"
+      ],
       "banner": "assets/easydelivery.png",
       "status": "released",
       "version": "1.0.0",
       "adult": false,
-      "tags": ["Unity", "Thunderstore", "BepInEx", "Шуточный"],
+      "tags": [
+        "Unity",
+        "Thunderstore",
+        "BepInEx",
+        "Шуточный"
+      ],
       "summary": "Не перевод, а фуривизатор: официальный русский уютной игры про доставку переписан ласково — посылочки, грузовичок, бензинчик, «Поиграться» и «Настроечки» в меню, в списке языков — «Фуриный». Тёплые и грустные моменты остались собой.",
       "scope": [
-        { "label": "Строки", "value": "725 из 803" },
-        { "label": "Язык в меню", "value": "«Фуриный»" },
-        { "label": "Основа", "value": "официальный русский" },
-        { "label": "Тон", "value": "ласково, но понятно" }
+        {
+          "label": "Строки",
+          "value": "725 из 803"
+        },
+        {
+          "label": "Язык в меню",
+          "value": "«Фуриный»"
+        },
+        {
+          "label": "Основа",
+          "value": "официальный русский"
+        },
+        {
+          "label": "Тон",
+          "value": "ласково, но понятно"
+        }
       ],
       "install_size": "72 МБ",
-      "release": { "tag_prefix": "easydelivery-", "asset": "EasyDelivery-Furry-Setup.exe" },
+      "release": {
+        "tag_prefix": "easydelivery-",
+        "asset": "EasyDelivery-Furry-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "mod": "https://thunderstore.io/c/easy-delivery-co/p/ClaudeRusHub/EasyDeliveryFurryRU/",
@@ -610,21 +1061,49 @@ window.CATALOG = {
       "lines": 1094,
       "words": 2600,
       "title": "R.E.P.O. — Фуриный",
-      "aliases": ["Репо", "REPO", "R.E.P.O", "фуривизатор", "фуриный", "фурри"],
+      "aliases": [
+        "Репо",
+        "REPO",
+        "R.E.P.O",
+        "фуривизатор",
+        "фуриный",
+        "фурри"
+      ],
       "banner": "assets/repo.png",
       "status": "released",
       "version": "1.0.3",
       "adult": false,
-      "tags": ["Unity", "Thunderstore", "BepInEx", "Мультиплеер", "Шуточный"],
+      "tags": [
+        "Unity",
+        "Thunderstore",
+        "BepInEx",
+        "Мультиплеер",
+        "Шуточный"
+      ],
       "summary": "Не перевод, а фуривизатор: у R.E.P.O. русского нет вовсе, и весь интерфейс сразу переведён ласковым фуриным диалектом. Роботы — пушистики, ценности — блестяшечки, сохранение — сохраняшка, «Стереть сохраняшку? Дя! / Неть...». Реплики роботов в чат тоже по-фуриному, а кириллицу в узком шрифте дорисовывает Oswald.",
       "scope": [
-        { "label": "Интерфейс", "value": "603 строки" },
-        { "label": "Наряды и надписи", "value": "491" },
-        { "label": "Чат роботов", "value": "по-фуриному" },
-        { "label": "Шрифт", "value": "Oswald под Teko" }
+        {
+          "label": "Интерфейс",
+          "value": "603 строки"
+        },
+        {
+          "label": "Наряды и надписи",
+          "value": "491"
+        },
+        {
+          "label": "Чат роботов",
+          "value": "по-фуриному"
+        },
+        {
+          "label": "Шрифт",
+          "value": "Oswald под Teko"
+        }
       ],
       "install_size": "72 МБ",
-      "release": { "tag_prefix": "repo-", "asset": "REPO-Furry-Setup.exe" },
+      "release": {
+        "tag_prefix": "repo-",
+        "asset": "REPO-Furry-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "mod": "https://thunderstore.io/c/repo/p/ClaudeRusHub/REPOFurryRU/",
@@ -640,21 +1119,50 @@ window.CATALOG = {
       "lines": 907,
       "words": 17000,
       "title": "Lethal Company — Фуриный",
-      "aliases": ["Летал компани", "Леталка", "Летальная компания", "Пушистая компания", "фуривизатор", "фуриный", "фурри"],
+      "aliases": [
+        "Летал компани",
+        "Леталка",
+        "Летальная компания",
+        "Пушистая компания",
+        "фуривизатор",
+        "фуриный",
+        "фурри"
+      ],
       "banner": "assets/lethalcompany.png",
       "status": "released",
       "version": "1.1.0",
       "adult": false,
-      "tags": ["Unity", "Thunderstore", "BepInEx", "Мультиплеер", "Шуточный"],
+      "tags": [
+        "Unity",
+        "Thunderstore",
+        "BepInEx",
+        "Мультиплеер",
+        "Шуточный"
+      ],
       "summary": "Не перевод, а фуривизатор: весь текст Lethal Company переписан ласковым фуриным диалектом, вплоть до кнопок: «Настроечки», «Назадик», «Посадим кораблик». Сотрудники — пушистики, металлолом — блестяшки, квота — квоточка пушистости. Терминал понимает русские команды, Компания говорит новым голосом, 45 надписей перерисованы — от плакатов до логотипа «Пушистая компания».",
       "scope": [
-        { "label": "Строки", "value": "907" },
-        { "label": "Надписи", "value": "45" },
-        { "label": "Терминал", "value": "русские команды" },
-        { "label": "Версия игры", "value": "v81" }
+        {
+          "label": "Строки",
+          "value": "907"
+        },
+        {
+          "label": "Надписи",
+          "value": "45"
+        },
+        {
+          "label": "Терминал",
+          "value": "русские команды"
+        },
+        {
+          "label": "Версия игры",
+          "value": "v81"
+        }
       ],
       "install_size": "96 МБ",
-      "release": { "tag_prefix": "lethalcompany-", "asset": "LethalCompany-Furry-Setup.exe" },
+      "release": {
+        "tag_prefix": "lethalcompany-",
+        "asset": "LethalCompany-Furry-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "mod": "https://thunderstore.io/c/lethal-company/p/ClaudeRusHub/LethalFurryRU/",
@@ -669,21 +1177,47 @@ window.CATALOG = {
       "lines": 1898,
       "words": 17000,
       "title": "Giggleland",
-      "aliases": ["Гигглленд", "Гиглленд", "Гигл ленд", "Гиггленд", "Хихиленд", "Страна смешинок"],
+      "aliases": [
+        "Гигглленд",
+        "Гиглленд",
+        "Гигл ленд",
+        "Гиггленд",
+        "Хихиленд",
+        "Страна смешинок"
+      ],
       "banner": "assets/giggleland.png",
       "status": "released",
       "version": "1.0.7",
       "adult": false,
-      "tags": ["Unity", "Windows", "Хоррор"],
+      "tags": [
+        "Unity",
+        "Windows",
+        "Хоррор"
+      ],
       "summary": "Перевод хоррора про заброшенный детский парк: меню и настройки, субтитры всех диалогов и телевизоров, задания, записки и дневник, подсказки и титры с песнями. Озвучка остаётся родной, субтитры идут по-русски; кириллица дорисована в фирменные шрифты игры.",
       "scope": [
-        { "label": "Строки", "value": "1898" },
-        { "label": "Субтитры", "value": "690 реплик" },
-        { "label": "Объём", "value": "~17 тыс. слов" },
-        { "label": "Шрифты", "value": "как в оригинале" }
+        {
+          "label": "Строки",
+          "value": "1898"
+        },
+        {
+          "label": "Субтитры",
+          "value": "690 реплик"
+        },
+        {
+          "label": "Объём",
+          "value": "~17 тыс. слов"
+        },
+        {
+          "label": "Шрифты",
+          "value": "как в оригинале"
+        }
       ],
       "install_size": "148 МБ",
-      "release": { "tag_prefix": "giggleland-", "asset": "Giggleland-RU-Setup.exe" },
+      "release": {
+        "tag_prefix": "giggleland-",
+        "asset": "Giggleland-RU-Setup.exe"
+      },
       "links": {
         "guide": "https://steamcommunity.com/sharedfiles/filedetails/?id=3838873547",
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
@@ -697,21 +1231,49 @@ window.CATALOG = {
       "for": "lucidcats",
       "engine": "Unity",
       "title": "Lucid Cats — Noclip и телепорт",
-      "aliases": ["Люсид кэтс читы", "Лусид кетс ноклип", "Lucid Cats cheats", "читы", "ноклип", "полёт сквозь стены", "бессмертие"],
+      "aliases": [
+        "Люсид кэтс читы",
+        "Лусид кетс ноклип",
+        "Lucid Cats cheats",
+        "читы",
+        "ноклип",
+        "полёт сквозь стены",
+        "бессмертие"
+      ],
       "banner": "assets/lucidcheats.png",
       "status": "released",
       "version": "1.0.1",
       "adult": false,
-      "tags": ["Unity", "BepInEx", "Мультиплеер", "Читы"],
+      "tags": [
+        "Unity",
+        "BepInEx",
+        "Мультиплеер",
+        "Читы"
+      ],
       "summary": "Мод для прогулок по снам без правил: полёт сквозь стены, бессмертие и телепорт — в точку под прицелом, в сохранённое место или к другу. Всё включается клавишами F1–F7, состояние видно на маленькой панели в углу экрана.",
       "scope": [
-        { "label": "Noclip", "value": "F2" },
-        { "label": "Бессмертие", "value": "F3" },
-        { "label": "Телепорт", "value": "F4–F7" },
-        { "label": "Загрузчик", "value": "BepInEx 5" }
+        {
+          "label": "Noclip",
+          "value": "F2"
+        },
+        {
+          "label": "Бессмертие",
+          "value": "F3"
+        },
+        {
+          "label": "Телепорт",
+          "value": "F4–F7"
+        },
+        {
+          "label": "Загрузчик",
+          "value": "BepInEx 5"
+        }
       ],
       "install_size": "65 МБ",
-      "release": { "tag_prefix": "lucidcheats-", "asset": "LucidCats-Cheats-Setup.exe" },
+      "release": {
+        "tag_prefix": "lucidcheats-",
+        "asset": "LucidCats-Cheats-Setup.exe"
+      },
       "links": {
         "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
         "steam": "https://store.steampowered.com/app/4778540/",
