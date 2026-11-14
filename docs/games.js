@@ -79,7 +79,8 @@ window.CATALOG = {
       "install_size": "72 МБ",
       "links": {
         "download": "https://github.com/e24x5-Fox/fox-workshop-tests/releases/download/casualtiesunknown-furry-v0.2.0-test1/CasualtiesUnknown-Furry-Setup-0.2.0-test.exe",
-        "steam": "https://store.steampowered.com/app/4576490/"
+        "steam": "https://store.steampowered.com/app/4576490/",
+        "guide": "https://steamcommunity.com/sharedfiles/filedetails/?id=3839291453"
       },
       "note": "Тестовая частичная адаптация стиля; остальной текст использует исходный русский. Выбор: капсула слева → Language / Язычок → Фуриный (ru-FUR). Другие языки сохраняются. Установка и откат проверены, полного прохождения не было. Исходный русский: UCRD (Axawer), Vinterhelm, SoberFurry, Captain_Kirk, Batya_v_khati, Voprositelnii, Strag Az, Untitled9223, Bogtogus, Spectator39. Фуриная адаптация — Лисья мастерская / икси, при участии Codex."
     },
