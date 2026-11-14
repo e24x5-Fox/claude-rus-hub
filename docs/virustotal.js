@@ -200,5 +200,14 @@ window.CRH_VT = {
   "suspicious": 0,
   "engines": 64,
   "flagged": {}
+ },
+ "casualtiesunknown": {
+  "sha256": "e85cee417e291b3ed374e8fa35ef11a70d44924d24cc054b1c684eaeb8f4e757",
+  "link": "https://www.virustotal.com/gui/file/e85cee417e291b3ed374e8fa35ef11a70d44924d24cc054b1c684eaeb8f4e757",
+  "date": "14.11.2026",
+  "malicious": 0,
+  "suspicious": 0,
+  "engines": 65,
+  "flagged": {}
  }
 };
