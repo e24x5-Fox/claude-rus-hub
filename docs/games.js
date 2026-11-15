@@ -1188,7 +1188,7 @@ window.CATALOG = {
       ],
       "banner": "assets/giggleland.png",
       "status": "released",
-      "version": "1.0.7",
+      "version": "1.0.9",
       "adult": false,
       "tags": [
         "Unity",
@@ -1214,17 +1214,17 @@ window.CATALOG = {
           "value": "как в оригинале"
         }
       ],
-      "install_size": "148 МБ",
+      "install_size": "147 МБ",
       "release": {
         "tag_prefix": "giggleland-",
         "asset": "Giggleland-RU-Setup.exe"
       },
       "links": {
         "guide": "https://steamcommunity.com/sharedfiles/filedetails/?id=3838873547",
-        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
+        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases/download/giggleland-v1.0.9/Giggleland-RU-Setup.exe",
         "steam": "https://store.steampowered.com/app/3370490/"
       },
-      "note": "Русский заменяет английский в файлах игры. Перед установкой закройте игру; при обновлении сначала удалите прежний перевод через установщик. Сохранения удалять не нужно. В версии 1.0.7 исправлены титульники, задания и финальное караоке, переведены рукописные страницы, загрузочные надписи и часть надписей на стенах. Озвучка остаётся оригинальной."
+      "note": "Для Steam build 26620246. Закройте игру и запустите установщик 1.0.9. Если проверка попросит восстановить файлы, проверьте целостность в Steam и повторите установку. Старые резервные копии поверх обновлённой игры не восстанавливайте; сохранения удалять не нужно. Исправлены установка после обновления игры, сохранение старого бэкапа и откат звукового банка; сохранены переводы титульников, заданий, записок и караоке. NaSvaiQ подтвердил успешную установку. Вылет после Eliot’s Adventure пока не проверен и не объявляется исправленным. Озвучка остаётся оригинальной."
     },
     {
       "slug": "lucidcheats",
