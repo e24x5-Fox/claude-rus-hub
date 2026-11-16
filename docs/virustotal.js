@@ -202,12 +202,12 @@ window.CRH_VT = {
   "flagged": {}
  },
  "casualtiesunknown": {
-  "sha256": "e85cee417e291b3ed374e8fa35ef11a70d44924d24cc054b1c684eaeb8f4e757",
-  "link": "https://www.virustotal.com/gui/file/e85cee417e291b3ed374e8fa35ef11a70d44924d24cc054b1c684eaeb8f4e757",
-  "date": "14.11.2026",
+  "sha256": "bdcd22310ee51026d90b5369c24a6bb03a130e8c5b134af7010a49d9afeed49f",
+  "link": "https://www.virustotal.com/gui/file/bdcd22310ee51026d90b5369c24a6bb03a130e8c5b134af7010a49d9afeed49f",
   "malicious": 0,
   "suspicious": 0,
-  "engines": 65,
-  "flagged": {}
+  "engines": 67,
+  "date": "16.11.2026",
+  "summary": "ни один из 67 антивирусов ничего не нашёл"
  }
 };
