@@ -49,7 +49,7 @@ window.CATALOG = {
       ],
       "banner": "assets/casualtiesunknown.jpg",
       "status": "released",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "adult": false,
       "tags": [
         "Unity",
@@ -65,11 +65,11 @@ window.CATALOG = {
         },
         {
           "label": "Выпуск",
-          "value": "0.2.0-test"
+          "value": "0.2.1-test"
         },
         {
           "label": "Игра",
-          "value": "1.0.1 / build 26590676"
+          "value": "1.0.2 / build 26666273"
         },
         {
           "label": "Установка",
@@ -78,7 +78,7 @@ window.CATALOG = {
       ],
       "install_size": "72 МБ",
       "links": {
-        "download": "https://github.com/e24x5-Fox/fox-workshop-tests/releases/download/casualtiesunknown-furry-v0.2.0-test1/CasualtiesUnknown-Furry-Setup-0.2.0-test.exe",
+        "download": "https://github.com/e24x5-Fox/fox-workshop-tests/releases/download/casualtiesunknown-furry-v0.2.1-test1/CasualtiesUnknown-Furry-Setup-0.2.1-test.exe",
         "steam": "https://store.steampowered.com/app/4576490/",
         "guide": "https://steamcommunity.com/sharedfiles/filedetails/?id=3839291453"
       },

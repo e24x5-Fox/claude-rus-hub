@@ -64,5 +64,12 @@ window.CRH_VERIFIED = {
   "broken": false,
   "version": "1.0.3",
   "release_tag": "selkie-v1.0.3"
+ },
+ "casualtiesunknown": {
+  "build": "26666273",
+  "at": "2026-11-16",
+  "by": "проверка на FOX: установка и фуриное меню 1.0.2",
+  "broken": false,
+  "version": "0.2.1"
  }
 };
