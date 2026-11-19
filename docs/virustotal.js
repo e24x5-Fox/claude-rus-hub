@@ -1,5 +1,7 @@
 /* Отчёты VirusTotal об установщиках - пишет tools/vt_check.py мастерской,
+
    руками не править. Страница сверяет sha256 с digest свежего релиза. */
+
 window.CRH_VT = {
  "amorous": {
   "sha256": "f2c2e6eaa7d6eb2b3091933742f727db2bf7ef30942605f11959de13a02180ab",
@@ -17,15 +19,6 @@ window.CRH_VT = {
   "malicious": 0,
   "suspicious": 0,
   "engines": 62,
-  "flagged": {}
- },
- "bodycam": {
-  "sha256": "970dd90afe4b395309c6039f8c163f5d44d10561741711053a07e9935720c552",
-  "link": "https://www.virustotal.com/gui/file/970dd90afe4b395309c6039f8c163f5d44d10561741711053a07e9935720c552",
-  "date": "30.10.2026",
-  "malicious": 0,
-  "suspicious": 0,
-  "engines": 63,
   "flagged": {}
  },
  "dragnwash": {
