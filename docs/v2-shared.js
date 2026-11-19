@@ -98,26 +98,84 @@ function renderNav(page) {
    v2-react-<id>, голос только прибавляет. Один голос на браузер (localStorage
    v2-react). С диска и с локального сервера голос не засчитывается — как и в
    side.js, чтобы проверки не накручивали счёт. Числа спрашиваются один раз на
-   загрузку страницы и живут в памяти, как и Discord в шапке. */
+   загрузку страницы. Ответы показываются независимо, последние числа хранятся
+   10 минут в браузере; зависший сервис не задерживает остальные реакции. */
 var REACT_NS = 'https://abacus.jasoncameron.dev', REACT_KEY = 'e24x5-claude-rus-hub';
 var REACTIONS = [['fire', '🔥', 'Огонь'], ['love', '😍', 'Нравится'], ['hmm', '🤔', 'Непривычно'], ['old', '👎', 'Старый лучше']];
-var reactCounts = null, reactReq = null;
+var reactCounts = {}, reactReq = null, reactLastTry = 0, reactDone = false;
+var reactCacheLoaded = false, reactVersions = {};
+var REACT_CACHE = 'v2-react-counts', REACT_CACHE_TTL = 10 * 60 * 1000;
+function reactValid(n) { return typeof n === 'number' && isFinite(n) && n >= 0; }
+function reactNotify() {
+  document.querySelectorAll('.beta-dock').forEach(function (dock) { dock.dispatchEvent(new Event('react-counts')); });
+}
+function reactRestore() {
+  if (reactCacheLoaded) return;
+  reactCacheLoaded = true;
+  try {
+    var cache = JSON.parse(localStorage.getItem(REACT_CACHE) || '{}'), now = Date.now();
+    REACTIONS.forEach(function (r) {
+      var row = cache && cache[r[0]];
+      if (row && reactValid(row.value) && typeof row.at === 'number' && row.at <= now && now - row.at < REACT_CACHE_TTL) {
+        reactCounts[r[0]] = row.value;
+      }
+    });
+  } catch (e) { /* счётчики работают и без localStorage */ }
+}
+function reactSetCount(id, value) {
+  reactCounts[id] = value;
+  try {
+    var cache = JSON.parse(localStorage.getItem(REACT_CACHE) || '{}');
+    if (!cache || typeof cache !== 'object' || Array.isArray(cache)) cache = {};
+    cache[id] = { value: value, at: Date.now() };
+    localStorage.setItem(REACT_CACHE, JSON.stringify(cache));
+  } catch (e) { /* запрещённое или заполненное хранилище не мешает показу */ }
+  reactNotify();
+}
+function reactRead(id) {
+  return new Promise(function (resolve) {
+    var controller = typeof AbortController === 'function' ? new AbortController() : null;
+    var settled = false, version = reactVersions[id] || 0;
+    function finish(ok) {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolve(ok);
+    }
+    var timer = setTimeout(function () {
+      finish(false);
+      if (controller) controller.abort();
+    }, 4000);
+    Promise.resolve().then(function () {
+      return fetch(REACT_NS + '/get/' + REACT_KEY + '/v2-react-' + id, controller ? { signal: controller.signal } : {});
+    }).then(function (response) {
+      if (response.status === 404) return { value: 0 };
+      if (!response.ok) throw new Error('Counter unavailable');
+      return response.json();
+    }).then(function (data) {
+      if (settled) return;
+      if (!data || !reactValid(data.value)) { finish(false); return; }
+      // Старый GET не должен отменять уже отправленный голос или ответ /hit.
+      if ((reactVersions[id] || 0) === version) reactSetCount(id, data.value);
+      finish(true);
+    }, function () { finish(false); });
+  });
+}
 function reactLocal() {
   return location.protocol === 'file:' || /^(localhost|127\.\d+\.\d+\.\d+|\[::1\])$/.test(location.hostname);
 }
 function reactMine() { try { return localStorage.getItem('v2-react'); } catch (e) { return 'locked'; } }
 function reactLoad() {
-  if (!reactReq) {
-    reactReq = Promise.all(REACTIONS.map(function (r) {
-      return fetch(REACT_NS + '/get/' + REACT_KEY + '/v2-react-' + r[0])
-        .then(function (x) { return x.ok ? x.json() : { value: 0 }; })
-        .then(function (j) { return typeof j.value === 'number' ? j.value : 0; }, function () { return null; });
-    })).then(function (vals) {
-      reactCounts = {};
-      REACTIONS.forEach(function (r, i) { reactCounts[r[0]] = vals[i]; });
-      return reactCounts;
-    });
-  }
+  reactRestore();
+  reactNotify();
+  if (reactReq) return reactReq;
+  if (reactDone || (reactLastTry && Date.now() - reactLastTry < 30000)) return Promise.resolve(reactCounts);
+  reactLastTry = Date.now();
+  reactReq = Promise.all(REACTIONS.map(function (r) { return reactRead(r[0]); })).then(function (ok) {
+    reactDone = ok.every(function (value) { return value; });
+    reactReq = null;
+    return reactCounts;
+  });
   return reactReq;
 }
 function betaDock() {
@@ -147,6 +205,7 @@ function betaDock() {
     dock.querySelector('.beta-note').textContent = reactLocal() ? 'Это локальный макет: голос здесь не засчитывается.'
       : mine ? 'Спасибо! Голос учтён — один на браузер.' : 'Один голос, без регистрации. Нажмите реакцию:';
   }
+  dock.addEventListener('react-counts', paint);
   function open(on) {
     dock.classList.toggle('open', on);
     pill.setAttribute('aria-expanded', on ? 'true' : 'false');
@@ -169,11 +228,12 @@ function betaDock() {
     if (!b || reactMine() || reactLocal()) return;
     var id = b.getAttribute('data-r');
     try { localStorage.setItem('v2-react', id); } catch (err) { return; }
+    reactVersions[id] = (reactVersions[id] || 0) + 1;
     if (reactCounts && reactCounts[id] != null) reactCounts[id] += 1;
     paint();
     fetch(REACT_NS + '/hit/' + REACT_KEY + '/v2-react-' + id)
       .then(function (x) { return x.ok ? x.json() : null; })
-      .then(function (j) { if (j && typeof j.value === 'number' && reactCounts) { reactCounts[id] = j.value; paint(); } })
+      .then(function (j) { if (j && reactValid(j.value)) reactSetCount(id, j.value); })
       .catch(function () {});
   });
 }
