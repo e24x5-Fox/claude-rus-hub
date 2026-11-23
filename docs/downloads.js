@@ -1028,21 +1028,46 @@ window.CRH_DOWNLOADS = {
    "lethalcompany": 668,
    "giggleland": 449,
    "lucidcheats": 11
+  },
+  "2026-11-23": {
+   "selkie": 260,
+   "spydropsgaiden": 20,
+   "dragnwash": 630,
+   "protogen": 88,
+   "protogen2": 142,
+   "amorous": 71,
+   "bodycam": 8447,
+   "oddremedy": 54,
+   "atlyss": 158,
+   "lucidcats": 141,
+   "kemopop": 16,
+   "meetcute": 1,
+   "meetcute2": 16,
+   "tailsandpines": 12,
+   "webfishing": 15,
+   "feedthecups": 9,
+   "warriorcats": 1061,
+   "lockdown": 18,
+   "easydelivery": 166,
+   "repo": 1767,
+   "lethalcompany": 672,
+   "giggleland": 474,
+   "lucidcheats": 11
   }
  },
  "thunderstore": {
   "easydelivery": {
-   "downloads": 158,
+   "downloads": 160,
    "rating": 0,
    "version": "1.0.1"
   },
   "repo": {
-   "downloads": 1628,
+   "downloads": 1655,
    "rating": 2,
    "version": "1.0.4"
   },
   "lethalcompany": {
-   "downloads": 642,
+   "downloads": 646,
    "rating": 0,
    "version": "1.1.0"
   }
