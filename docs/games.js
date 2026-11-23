@@ -989,7 +989,7 @@ window.CATALOG = {
       ],
       "banner": "assets/warriorcats.png",
       "status": "released",
-      "version": "1.0.3",
+      "version": "1.0.5",
       "adult": false,
       "tags": [
         "Unreal",
@@ -1021,11 +1021,11 @@ window.CATALOG = {
         "asset": "WarriorCats-RU-Setup.exe"
       },
       "links": {
-        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases",
+        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases/download/warriorcats-v1.0.5/WarriorCats-RU-Setup.exe",
         "steam": "https://store.steampowered.com/app/3960600/",
         "guide": "https://steamcommunity.com/sharedfiles/filedetails/?id=3826215118"
       },
-      "note": "Выбора языка в игре нет: русский встаёт на место английского, в настройках вместо «English» — «Русский». Мод-архивы игра не подключает, поэтому перевод дописывается в конец её архива; всё прежнее остаётся байт в байт, удаление и проверка файлов в Steam возвращают оригинал. Пол игрока игра не знает — о вашем коте без родовых окончаний."
+      "note": "Для Steam build 26717823. Версия 1.0.5 исправляет установку после обновления игры и определение перевода после замены архива Steam. Сохранены все 8907 строк и пять шрифтов с кириллицей. Закройте игру и запустите новый установщик; сохранения удалять не нужно. Проверены установка, побайтный откат и русский стартовый экран на FOX; полное прохождение не выполнялось. Уведомления о новых версиях включены по умолчанию, галочку можно снять."
     },
     {
       "slug": "lockdown",
