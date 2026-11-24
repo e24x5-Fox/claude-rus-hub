@@ -142,7 +142,7 @@ window.CATALOG = {
       ],
       "banner": "assets/casualtiesunknown.jpg",
       "status": "released",
-      "version": "0.2.1",
+      "version": "0.3.0",
       "adult": false,
       "tags": [
         "Unity",
@@ -150,32 +150,28 @@ window.CATALOG = {
         "Тестовая сборка",
         "Выживание"
       ],
-      "summary": "Тестовый «Фуриный» на основе русского перевода сообщества: ласковые меню, названия вещей, подсказки, часть реплик и записок. Отдельный язык с фирменным установщиком.",
+      "summary": "Отдельный язык «Фуриный»: ласковые меню, вещи, подсказки и речь трёх персонажей. В 0.3.0 усилена адаптация: 2387 строк вместо 989.",
       "scope": [
         {
-          "label": "Адаптация",
-          "value": "989 полей"
+          "label": "Адаптировано",
+          "value": "2387 строк"
         },
         {
-          "label": "Выпуск",
-          "value": "0.2.1-test"
+          "label": "Реплики",
+          "value": "1268 строк"
         },
         {
           "label": "Игра",
           "value": "1.0.2 / build 26666273"
-        },
-        {
-          "label": "Установка",
-          "value": "отдельный язык"
         }
       ],
       "install_size": "72 МБ",
       "links": {
-        "download": "https://github.com/e24x5-Fox/fox-workshop-tests/releases/download/casualtiesunknown-furry-v0.2.1-test1/CasualtiesUnknown-Furry-Setup-0.2.1-test.exe",
+        "download": "https://github.com/e24x5-Fox/claude-rus-hub/releases/tag/casualtiesunknown-v0.3.0",
         "steam": "https://store.steampowered.com/app/4576490/",
         "guide": "https://steamcommunity.com/sharedfiles/filedetails/?id=3839291453"
       },
-      "note": "Тестовая частичная адаптация стиля; остальной текст использует исходный русский. Выбор: капсула слева → Language / Язычок → Фуриный (ru-FUR). Другие языки сохраняются. Установка и откат проверены, полного прохождения не было. Исходный русский: UCRD (Axawer), Vinterhelm, SoberFurry, Captain_Kirk, Batya_v_khati, Voprositelnii, Strag Az, Untitled9223, Bogtogus, Spectator39. Фуриная адаптация — Лисья мастерская / икси, при участии Codex."
+      "note": "Расширенная фуриная адаптация русского перевода сообщества. Манера Эксперимента, Милки и Дюны сохранена. Диагнозы, дозировки и условия действий узнаваемы; научные PDA и часть тяжёлых сцен остаются серьёзными. Полного прохождения и визуальной проверки всех реплик не было. Отдельный язык ru-FUR; другие языки сохраняются. Обновление с 0.2.1 без предварительного удаления."
     },
     {
       "slug": "selkie",
