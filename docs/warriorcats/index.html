@@ -416,7 +416,8 @@
     if (!r || !r.link) { return null; }
     if (r.version && r.version !== game.version) { return null; }
     var bad = (r.malicious || 0) + (r.suspicious || 0);
-    var badge = link(r.link, 'btn btn-vt ' + (bad ? 'vt-warn' : 'vt-ok'), '');
+    var unresolved = Object.keys(r.unresolved_engines || {});
+    var badge = link(r.link, 'btn btn-vt ' + ((bad || unresolved.length) ? 'vt-warn' : 'vt-ok'), '');
     badge.innerHTML = SHIELD;
     badge.appendChild(el('span', null, 'VirusTotal: ' + bad + ' из ' + r.engines + ' срабатываний'));
     badge.title = 'Отчёт VirusTotal об этом установщике' + (r.date ? ', ' + r.date : '');
@@ -425,6 +426,9 @@
       note = el('p', 'vt-note', 'Сработал' + (bad === 1 ? '' : 'и') + ' '
         + Object.keys(r.flagged || {}).slice(0, 3).join(', ') + ' из ' + r.engines
         + ' антивирусов. Причины срабатываний требуют отдельной проверки; подробности — в отчёте по ссылке.');
+    } else if (unresolved.length) {
+      note = el('p', 'vt-note', unresolved.join(', ') + ' не завершил повторную проверку. '
+        + 'В предыдущем анализе было срабатывание; новый результат этого движка пока не получен.');
     }
     return { badge: badge, note: note, sha256: r.sha256 };
   }
