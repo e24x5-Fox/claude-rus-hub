@@ -2,7 +2,7 @@
    пишет tools/builds_snapshot.py из GitHub Actions раз в сутки. Руками
    не править. С docs/verified.js даёт плашку версии игры. */
 window.CRH_BUILDS = {
- "checked": "2026-11-24",
+ "checked": "2026-11-25",
  "games": {
   "dragnwash": {
    "build": "26443382",
@@ -40,8 +40,8 @@ window.CRH_BUILDS = {
    "appid": "2768430"
   },
   "lucidcats": {
-   "build": "26292260",
-   "updated": 1793262719,
+   "build": "26900319",
+   "updated": 1795542273,
    "appid": "4778540"
   },
   "kemopop": {
@@ -90,8 +90,8 @@ window.CRH_BUILDS = {
    "appid": "3293010"
   },
   "repo": {
-   "build": "26813769",
-   "updated": 1795425197,
+   "build": "26893562",
+   "updated": 1795602386,
    "appid": "3241660"
   },
   "lethalcompany": {
@@ -100,8 +100,8 @@ window.CRH_BUILDS = {
    "appid": "1966720"
   },
   "lucidcheats": {
-   "build": "26292260",
-   "updated": 1793262719,
+   "build": "26900319",
+   "updated": 1795542273,
    "appid": "4778540"
   },
   "giggleland": {
