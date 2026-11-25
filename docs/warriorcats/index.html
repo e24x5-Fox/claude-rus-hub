@@ -417,16 +417,13 @@
     var bad = (r.malicious || 0) + (r.suspicious || 0);
     var badge = link(r.link, 'btn btn-vt ' + (bad ? 'vt-warn' : 'vt-ok'), '');
     badge.innerHTML = SHIELD;
-    badge.appendChild(el('span', null, bad
-      ? 'Проверка на вирусы: ' + bad + ' из ' + r.engines + ' — подробнее'
-      : 'Проверено: вирусов нет (0 из ' + r.engines + ')'));
+    badge.appendChild(el('span', null, 'VirusTotal: ' + bad + ' из ' + r.engines + ' срабатываний'));
     badge.title = 'Отчёт VirusTotal об этом установщике' + (r.date ? ', ' + r.date : '');
     var note = null;
     if (bad) {
       note = el('p', 'vt-note', 'Сработал' + (bad === 1 ? '' : 'и') + ' '
         + Object.keys(r.flagged || {}).slice(0, 3).join(', ') + ' из ' + r.engines
-        + ' антивирусов. Установщик не подписан цифровой подписью, и отдельные '
-        + 'антивирусы помечают такие файлы общей эвристикой, а не по найденному вирусу.');
+        + ' антивирусов. Причины срабатываний требуют отдельной проверки; подробности — в отчёте по ссылке.');
     }
     return { badge: badge, note: note, sha256: r.sha256 };
   }
