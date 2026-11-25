@@ -16,7 +16,9 @@ window.CRH_VT = {
   "engines": 68,
   "flagged": {},
   "date": "04.10.2026",
-  "summary": "ни один из 68 антивирусов ничего не нашёл"
+  "summary": "ни один из 68 антивирусов ничего не нашёл",
+  "version": "1.0.1",
+  "release_tag": "amorous-v1.0.1"
  },
  "atlyss": {
   "sha256": "ab9a4defad4c256c82211308ac8428a467935e5aa7f9da0453824a94cdcf24fa",
@@ -29,7 +31,9 @@ window.CRH_VT = {
    "Kaspersky": "UDS:Trojan.Win32.Generic"
   },
   "date": "05.10.2026",
-  "summary": "сработали 1 из 67 антивирусов: Kaspersky (UDS:Trojan.Win32.Generic)"
+  "summary": "сработали 1 из 67 антивирусов: Kaspersky (UDS:Trojan.Win32.Generic)",
+  "version": "1.0.3",
+  "release_tag": "atlyss-v1.0.3"
  },
  "dragnwash": {
   "sha256": "cf4a9b2ec72fcbe65af4f526d276fc7f3689e7f81c95d9c3c80b04ace159247d",
@@ -42,7 +46,9 @@ window.CRH_VT = {
    "McAfeeD": "ti!CF4A9B2EC72F"
   },
   "date": "07.11.2026",
-  "summary": "сработали 1 из 65 антивирусов: McAfeeD (ti!CF4A9B2EC72F)"
+  "summary": "сработали 1 из 65 антивирусов: McAfeeD (ti!CF4A9B2EC72F)",
+  "version": "1.2.1",
+  "release_tag": "dragnwash-v1.3"
  },
  "easydelivery": {
   "sha256": "b82ba58adfd88be8e681a9b264ff09c44b112c226ac3cda6b6776a31a7482ed1",
@@ -53,7 +59,9 @@ window.CRH_VT = {
   "engines": 68,
   "flagged": {},
   "date": "20.10.2026",
-  "summary": "ни один из 68 антивирусов ничего не нашёл"
+  "summary": "ни один из 68 антивирусов ничего не нашёл",
+  "version": "1.0.0",
+  "release_tag": "easydelivery-v1.0.0"
  },
  "feedthecups": {
   "sha256": "7db274ffbff55b76b072ce9f5870b29b981d16dbc17bc51739a6896d5a0dcf48",
@@ -64,7 +72,9 @@ window.CRH_VT = {
   "engines": 66,
   "flagged": {},
   "date": "02.11.2026",
-  "summary": "ни один из 66 антивирусов ничего не нашёл"
+  "summary": "ни один из 66 антивирусов ничего не нашёл",
+  "version": "1.0.1",
+  "release_tag": "feedthecups-v1.0.1"
  },
  "giggleland": {
   "sha256": "cc5c6a5b8fa89c5827134f861731345b189ba8387840248df0ad0cd9143eecab",
@@ -75,7 +85,9 @@ window.CRH_VT = {
   "engines": 65,
   "flagged": {},
   "date": "15.11.2026",
-  "summary": "ни один из 65 антивирусов ничего не нашёл"
+  "summary": "ни один из 65 антивирусов ничего не нашёл",
+  "version": "1.0.9",
+  "release_tag": "giggleland-v1.0.9"
  },
  "kemopop": {
   "sha256": "6413981e9579ce4ea1a9b512f5f04cca89cb1193580286b82fd209619ce045b2",
@@ -86,7 +98,9 @@ window.CRH_VT = {
   "engines": 68,
   "flagged": {},
   "date": "10.10.2026",
-  "summary": "ни один из 68 антивирусов ничего не нашёл"
+  "summary": "ни один из 68 антивирусов ничего не нашёл",
+  "version": "1.0",
+  "release_tag": "kemopop-v1.0"
  },
  "lethalcompany": {
   "sha256": "ef5f399ce5c6d84d2be8f9833455f508f5d3eb57351a7e31ec85b30958ad5451",
@@ -97,7 +111,9 @@ window.CRH_VT = {
   "engines": 68,
   "flagged": {},
   "date": "21.10.2026",
-  "summary": "ни один из 68 антивирусов ничего не нашёл"
+  "summary": "ни один из 68 антивирусов ничего не нашёл",
+  "version": "1.1.0",
+  "release_tag": "lethalcompany-v1.1.0"
  },
  "lockdown": {
   "sha256": "764e7969ffee36f49cd865673e8acf1f48e00e0ee1355f7031006fc13d8d6160",
@@ -108,7 +124,9 @@ window.CRH_VT = {
   "engines": 59,
   "flagged": {},
   "date": "15.11.2026",
-  "summary": "ни один из 59 антивирусов ничего не нашёл"
+  "summary": "ни один из 59 антивирусов ничего не нашёл",
+  "version": "1.3",
+  "release_tag": "lockdown-v1.3"
  },
  "meetcute": {
   "sha256": "028e3d4d5f09d2100bbedae14f67cbd711d4c5536427ca824f5e3436b1bcd7e8",
@@ -119,7 +137,9 @@ window.CRH_VT = {
   "engines": 68,
   "flagged": {},
   "date": "11.10.2026",
-  "summary": "ни один из 68 антивирусов ничего не нашёл"
+  "summary": "ни один из 68 антивирусов ничего не нашёл",
+  "version": "1.0",
+  "release_tag": "meetcute-v1.0"
  },
  "meetcute2": {
   "sha256": "212dc9442c46620afca648e21f811a05931cbf6e6106b25eb8478b5ce35d97ea",
@@ -130,7 +150,9 @@ window.CRH_VT = {
   "engines": 68,
   "flagged": {},
   "date": "11.10.2026",
-  "summary": "ни один из 68 антивирусов ничего не нашёл"
+  "summary": "ни один из 68 антивирусов ничего не нашёл",
+  "version": "1.0",
+  "release_tag": "meetcute2-v1.0"
  },
  "oddremedy": {
   "sha256": "751891bbf8ce45c2690aa1bb6d38269472eb7c5dad1095a8f4ee22da77c7b38b",
@@ -141,7 +163,9 @@ window.CRH_VT = {
   "engines": 65,
   "flagged": {},
   "date": "27.10.2026",
-  "summary": "ни один из 65 антивирусов ничего не нашёл"
+  "summary": "ни один из 65 антивирусов ничего не нашёл",
+  "version": "0.2.2",
+  "release_tag": "oddremedy-v0.2.2"
  },
  "protogen": {
   "sha256": "40f6809bd32cf8f7fe7d1aab9a25e63ce7ddfa2857a5f1de19b2dc96e62ee685",
@@ -152,7 +176,9 @@ window.CRH_VT = {
   "engines": 68,
   "flagged": {},
   "date": "17.11.2026",
-  "summary": "ни один из 68 антивирусов ничего не нашёл"
+  "summary": "ни один из 68 антивирусов ничего не нашёл",
+  "version": "1.1.1",
+  "release_tag": "protogen-v1.1.1"
  },
  "protogen2": {
   "sha256": "a146992e01994f2f3ab33b1d6b90fe4f9ba73f761b23ef8e8d43e131c1a37679",
@@ -163,7 +189,9 @@ window.CRH_VT = {
   "engines": 65,
   "flagged": {},
   "date": "04.10.2026",
-  "summary": "ни один из 65 антивирусов ничего не нашёл"
+  "summary": "ни один из 65 антивирусов ничего не нашёл",
+  "version": "1.1.1",
+  "release_tag": "protogen2-v1.1.1"
  },
  "repo": {
   "sha256": "9e4d43ffdd3acc8454cdad68c9cd4a579c452f258a6d186aa987824a0efe32ee",
@@ -174,7 +202,9 @@ window.CRH_VT = {
   "engines": 65,
   "flagged": {},
   "date": "09.11.2026",
-  "summary": "ни один из 65 антивирусов ничего не нашёл"
+  "summary": "ни один из 65 антивирусов ничего не нашёл",
+  "version": "1.0.3",
+  "release_tag": "repo-v1.0.3"
  },
  "spydropsgaiden": {
   "sha256": "a668ee7f8d8063fd89acf3b5a4e32f951410dd6f497e2ffab2461f54a1580c10",
@@ -185,7 +215,9 @@ window.CRH_VT = {
   "engines": 65,
   "flagged": {},
   "date": "01.11.2026",
-  "summary": "ни один из 65 антивирусов ничего не нашёл"
+  "summary": "ни один из 65 антивирусов ничего не нашёл",
+  "version": "1.0.0",
+  "release_tag": "spydropsgaiden-v1.0.0"
  },
  "tailsandpines": {
   "sha256": "3b8e127afc2bf0552b0622ec9937946def3e786cfecb0b204f0111222a552bff",
@@ -196,7 +228,9 @@ window.CRH_VT = {
   "engines": 68,
   "flagged": {},
   "date": "14.10.2026",
-  "summary": "ни один из 68 антивирусов ничего не нашёл"
+  "summary": "ни один из 68 антивирусов ничего не нашёл",
+  "version": "1.0",
+  "release_tag": "tailsandpines-v1.0"
  },
  "warriorcats": {
   "sha256": "e8548d4dd608cb259b6dc9be335ad480a57924cf9f15e64c8b34f20812644734",
@@ -207,7 +241,9 @@ window.CRH_VT = {
   "engines": 64,
   "flagged": {},
   "date": "23.11.2026",
-  "summary": "ни один из 64 антивирусов ничего не нашёл"
+  "summary": "ни один из 64 антивирусов ничего не нашёл",
+  "version": "1.0.5",
+  "release_tag": "warriorcats-v1.0.5"
  },
  "webfishing": {
   "sha256": "c5a8a7e2172f4078710fcb87e35b289171e6b99f2ad1b23bc18f36581345b16c",
@@ -218,7 +254,9 @@ window.CRH_VT = {
   "engines": 67,
   "flagged": {},
   "date": "16.10.2026",
-  "summary": "ни один из 67 антивирусов ничего не нашёл"
+  "summary": "ни один из 67 антивирусов ничего не нашёл",
+  "version": "1.0",
+  "release_tag": "webfishing-v1.0"
  },
  "lucidcheats": {
   "sha256": "990fa7e59ccfb3c5677123fc6b71e1ef854771ef518ed9d5f31799cd2e7109d7",
@@ -229,7 +267,9 @@ window.CRH_VT = {
   "engines": 38,
   "flagged": {},
   "date": "13.11.2026",
-  "summary": "ни один из 38 антивирусов ничего не нашёл"
+  "summary": "ни один из 38 антивирусов ничего не нашёл",
+  "version": "1.0.1",
+  "release_tag": "lucidcheats-v1.0.1"
  },
  "casualtiesunknown": {
   "sha256": "2e9f256c54dc5d77c4632a5ab1821f804fe3d316efab6aad1ac3eabf838dc1a1",
@@ -240,7 +280,9 @@ window.CRH_VT = {
   "engines": 56,
   "flagged": {},
   "date": "25.11.2026",
-  "summary": "ни один из 56 антивирусов ничего не нашёл"
+  "summary": "ни один из 56 антивирусов ничего не нашёл",
+  "version": "0.3.0",
+  "release_tag": "casualtiesunknown-v0.3.0"
  },
  "selkie": {
   "sha256": "8422ed8be368bf8d8300b8f8c37b48bce699635c9abe80ef99722a500adf797b",
@@ -251,7 +293,9 @@ window.CRH_VT = {
   "engines": 64,
   "flagged": {},
   "date": "23.11.2026",
-  "summary": "ни один из 64 антивирусов ничего не нашёл"
+  "summary": "ни один из 64 антивирусов ничего не нашёл",
+  "version": "1.0.3",
+  "release_tag": "selkie-v1.0.3"
  },
  "bodycam": {
   "sha256": "b724e2d553dd34ad9f0a16985ef07346237ce8515bbea62fc5ea9522ca10ff91",
@@ -262,7 +306,9 @@ window.CRH_VT = {
   "engines": 66,
   "flagged": {},
   "date": "25.11.2026",
-  "summary": "ни один из 66 антивирусов ничего не нашёл"
+  "summary": "ни один из 66 антивирусов ничего не нашёл",
+  "version": "1.1.1",
+  "release_tag": "bodycam-v1.1.1"
  },
  "lucidcats": {
   "sha256": "0038eebc61a4485d5070a6131d8816cad66c16e31e234a50f335ad9272026b7e",
@@ -273,6 +319,8 @@ window.CRH_VT = {
   "engines": 63,
   "flagged": {},
   "date": "26.11.2026",
-  "summary": "ни один из 63 антивирусов ничего не нашёл"
+  "summary": "ни один из 63 антивирусов ничего не нашёл",
+  "version": "1.4.0",
+  "release_tag": "lucidcats-v1.4.0"
  }
 };
