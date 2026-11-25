@@ -23,30 +23,26 @@ window.CRH_VT = {
  "atlyss": {
   "sha256": "ab9a4defad4c256c82211308ac8428a467935e5aa7f9da0453824a94cdcf24fa",
   "link": "https://www.virustotal.com/gui/file/ab9a4defad4c256c82211308ac8428a467935e5aa7f9da0453824a94cdcf24fa",
-  "malicious": 1,
+  "malicious": 0,
   "suspicious": 0,
-  "undetected": 66,
-  "engines": 67,
-  "flagged": {
-   "Kaspersky": "UDS:Trojan.Win32.Generic"
-  },
-  "date": "05.10.2026",
-  "summary": "сработали 1 из 67 антивирусов: Kaspersky (UDS:Trojan.Win32.Generic)",
+  "undetected": 52,
+  "engines": 52,
+  "flagged": {},
+  "date": "26.11.2026",
+  "summary": "ни один из 52 антивирусов ничего не нашёл",
   "version": "1.0.3",
   "release_tag": "atlyss-v1.0.3"
  },
  "dragnwash": {
   "sha256": "cf4a9b2ec72fcbe65af4f526d276fc7f3689e7f81c95d9c3c80b04ace159247d",
   "link": "https://www.virustotal.com/gui/file/cf4a9b2ec72fcbe65af4f526d276fc7f3689e7f81c95d9c3c80b04ace159247d",
-  "malicious": 1,
+  "malicious": 0,
   "suspicious": 0,
-  "undetected": 64,
-  "engines": 65,
-  "flagged": {
-   "McAfeeD": "ti!CF4A9B2EC72F"
-  },
-  "date": "07.11.2026",
-  "summary": "сработали 1 из 65 антивирусов: McAfeeD (ti!CF4A9B2EC72F)",
+  "undetected": 53,
+  "engines": 53,
+  "flagged": {},
+  "date": "26.11.2026",
+  "summary": "ни один из 53 антивирусов ничего не нашёл",
   "version": "1.2.1",
   "release_tag": "dragnwash-v1.3"
  },
