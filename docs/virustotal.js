@@ -31,7 +31,13 @@ window.CRH_VT = {
   "date": "26.11.2026",
   "summary": "ни один из 52 антивирусов ничего не нашёл",
   "version": "1.0.3",
-  "release_tag": "atlyss-v1.0.3"
+  "release_tag": "atlyss-v1.0.3",
+  "unresolved_engines": {
+   "Kaspersky": {
+    "previous_result": "UDS:Trojan.Win32.Generic",
+    "current_category": "timeout"
+   }
+  }
  },
  "dragnwash": {
   "sha256": "cf4a9b2ec72fcbe65af4f526d276fc7f3689e7f81c95d9c3c80b04ace159247d",
