@@ -413,6 +413,7 @@
   function virustotal(game) {
     var r = (window.CRH_VT || {})[game.slug];
     if (!r || !r.link) { return null; }
+    if (r.version && r.version !== game.version) { return null; }
     var bad = (r.malicious || 0) + (r.suspicious || 0);
     var badge = link(r.link, 'btn btn-vt ' + (bad ? 'vt-warn' : 'vt-ok'), '');
     badge.innerHTML = SHIELD;
